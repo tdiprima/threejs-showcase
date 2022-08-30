@@ -1,0 +1,87 @@
+#skillShareVideoLink {
+    display: none;
+    padding: 0px;
+    margin-right: 10px;
+}
+
+#skillShareVideoLink :hover {
+    box-shadow: 5px 0px 40px rgba(0, 0, 0, .2);
+}
+
+#udemyVideoLink {
+    display: none;
+    padding: 0px;
+    margin-right: 10px;
+}
+
+#udemyVideoLink :hover {
+    box-shadow: 5px 0px 40px rgba(0, 0, 0, .2);
+}
+
+#tutorialspointVideoLink {
+    display: none;
+    padding: 0px;
+    margin-right: 10px;
+}
+
+#tutorialspointVideoLink :hover {
+    box-shadow: 5px 0px 40px rgba(0, 0, 0, .2);
+}
+
+#ytVideoLink {   
+    display: none;
+    padding: 0px;
+    margin-right: 10px;
+}
+
+#ytVideoLink :hover {
+    box-shadow: 5px 0px 40px rgba(0, 0, 0, .2);
+}
+
+#sbcodeVideoLink {
+    display: none;
+    padding: 0px;
+    margin-right: 10px;
+}
+
+#sbcodeVideoLink :hover {
+    box-shadow: 5px 0px 40px rgba(0, 0, 0, .2);
+}
+
+#sbcodeVideoDiv {
+    display: none;
+}
+
+#vwSrcLink {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    text-decoration: none;
+    font-size: 17px;
+    color: black;
+    font-family: Tahoma, sans-serif;
+    width: 25px;
+    height: 16px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 16px;
+    border-radius: 4px;
+    text-align: center;
+    background: white;
+    padding-bottom: 1px;
+    opacity: .5;
+}
+
+@keyframes highlight-timer {
+    0% {
+        background: #00ffaa
+    }
+
+    100% {
+        background: #f8f8f8;
+    }
+}
+
+.run-highlight-timer {
+    animation: highlight-pre .5s;
+}
