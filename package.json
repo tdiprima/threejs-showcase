@@ -1,0 +1,31 @@
+{
+  "name": "secure-witchfire",
+  "version": "1.0.0",
+  "description": "three.js",
+  "main": ".eslintrc.js",
+  "author": "Tammy DiPrima",
+  "scripts": {
+    "lint": "eslint --debug ./",
+    "lint:write": "eslint --debug ./ --fix",
+    "prettier": "prettier --write ./**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tdiprima/secure-witchfire.git"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.3",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^17.0.0",
+    "eslint-config-jest-enzyme": "^6.0.2",
+    "eslint-plugin-babel": "^5.1.0",
+    "eslint-plugin-import": "^2.12.0",
+    "eslint-plugin-jest": "^21.18.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-prettier": "^2.6.0",
+    "eslint-plugin-react": "^7.9.1",
+    "prettier": "^1.14.3",
+    "three": "^0.143.0",
+    "yarn": "^1.22.18"
+  }
+}
