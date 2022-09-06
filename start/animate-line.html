@@ -42,7 +42,7 @@
 
   // material
   let material = new THREE.LineBasicMaterial({ color: 0xff0000 });
-  // console.log("%c#ff0000", "color: #ff0000;");
+  console.log("%c#ff0000", "color: #ff0000;");
 
   // line
   let line = new THREE.Line(geometry, material);
@@ -69,6 +69,20 @@
 
   updatePositions();
 
+  // https://stackoverflow.com/questions/36721830/convert-hsl-to-rgb-and-hex
+  function hslToHex(h, s, l) {
+    l /= 100;
+    const a = s * Math.min(l, 1 - l) / 100;
+    const f = n => {
+      const k = (n + h / 30) % 12;
+      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+      return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
+    };
+    return `#${f(0)}${f(8)}${f(4)}`;
+  }
+
+  // hslToHex(360, 100, 50);  // "#ff0000" -> red
+
   // animate
   function animate() {
     requestAnimationFrame(animate);
@@ -83,12 +97,14 @@
 
       line.geometry.attributes.position.needsUpdate = true; // required after the first render
 
-      line.material.color.setHSL(Math.random(), 1, 0.5);
+      // line.material.color.setHSL(Math.random(), 1, 0.5);
 
-      // let hue = Math.random();
-      // line.material.color.setHSL(hue, 1, 0.5);
-      // let color = `hsl(${Math.round(hue * 255)} 100% 50%)`;
-      // console.log(`%c${color}`, `color: ${color};`);
+      let hue = Math.random();
+      line.material.color.setHSL(hue, 1, 0.5);
+      // let color = `hsl(${Math.round(hue * 360)} 100% 50%)`; // works now!
+      let color = hslToHex(Math.round(hue * 360), 100, 50);
+      console.log(`%c${color}`, `color: ${color};`);
+
     }
 
     renderer.render(scene, camera);
