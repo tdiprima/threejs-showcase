@@ -17,15 +17,8 @@
       width: 100%;
       text-align: center;
     }
-
-    body {
-      margin: 0;
-    }
-
-    canvas {
-      width: 100%;
-      height: 100%
-    }
+    body { margin: 0; }
+    canvas { width: 100%; height: 100% }
   </style>
 </head>
 <body>
@@ -56,7 +49,6 @@
 
   let controls = new OrbitControls(camera, renderer.domElement);
 
-  // let someFont = "node_modules/three/examples/fonts/droid/droid_serif_regular.typeface.json";
   let someFont = "https://unpkg.com/three@0.144.0/examples/fonts/helvetiker_regular.typeface.json";
 
   function myFriends(textGeometry) {
@@ -92,6 +84,7 @@
   // createText();
 
   function createText1() {
+    // let someFont = "https://unpkg.com/three@0.144.0/examples/fonts/droid/droid_serif_regular.typeface.json";
     camera.position.z = 100;
     // SubOptimal tutorial code - typeface.json font loader
     let fontLoader = new FontLoader();
