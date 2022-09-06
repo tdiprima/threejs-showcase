@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Loading-3D-models</title>
+  <!-- https://threejs.org/docs/#manual/en/introduction/Loading-3D-models -->
+  <style>
+    body { margin: 0; }
+    canvas { width: 100%; height: 100% }
+  </style>
+</head>
+<body>
+<script async src="/extra_html/utils/es-module-shims.js"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "/build/three.module.js"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from 'three';
+  import {OrbitControls} from '/jsm/controls/OrbitControls.js';
+  import {GLTFLoader} from '/jsm/loaders/GLTFLoader.js';
+
+  console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
+
+  let scene = new THREE.Scene();
+  let camera = window._camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  let renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  let controls = new OrbitControls(camera, renderer.domElement);
+
+  let light;
+
+  // light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+  light = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
+  scene.add(light);
+
+  light = new THREE.DirectionalLight(0xffffff, 2.0);
+  light.position.set(100, 100, 100);
+  light.castShadow = true;
+  scene.add(light);
+
+  let loader = new GLTFLoader();
+
+  loader.load('/extra_html/models/saplingTree_medium.glb', function (gltf) {
+
+    scene.add(gltf.scene);
+
+  }, undefined, function (error) {
+
+    console.error(error);
+
+  });
+
+  camera.position.z = 5;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
+</body>
+</html>
