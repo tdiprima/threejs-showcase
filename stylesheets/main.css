@@ -10,7 +10,8 @@ body {
 
 a {
   text-decoration: none;
-  color: #ff0;
+  color: rgb(154, 255, 80);
+  /*color: #ff0;*/
 }
 
 a:hover {
