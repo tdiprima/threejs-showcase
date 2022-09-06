@@ -6,7 +6,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>LOD</title>
   <!-- https://sbcode.net/threejs/lod/ -->
-  <link rel="stylesheet" href="/stylesheets/style.css"/>
+  <link href="/stylesheets/style.css" rel="stylesheet"/>
   <style>
     body {
       overflow: hidden;
@@ -30,11 +30,13 @@
 <body>
 <script type="module">
   import * as THREE from "three";
-  import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+  import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
   import Stats from "three/examples/jsm/libs/stats.module";
-  import { GUI } from "dat.gui";
-  import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-  import { TWEEN } from "three/examples/jsm/libs/tween.module.min";
+  import {GUI} from "dat.gui";
+  import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+  import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
+
+  console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
 
   let scene = new THREE.Scene();
   scene.background = new THREE.Color(0x87ceeb);
@@ -60,7 +62,7 @@
   camera.position.y = 5;
   camera.position.z = 7;
 
-  let renderer = new THREE.WebGLRenderer({ antialias: true });
+  let renderer = new THREE.WebGLRenderer({antialias: true});
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.shadowMap.enabled = true;
   document.body.appendChild(renderer.domElement);
@@ -72,7 +74,7 @@
 
   let raycaster = new THREE.Raycaster();
   let sceneMeshes = [];
-  let material = new THREE.MeshPhongMaterial({ color: 0x567d46 });
+  let material = new THREE.MeshPhongMaterial({color: 0x567d46});
 
   let planeGeometry = new THREE.PlaneGeometry(1, 1);
   planeGeometry.scale(500, 500, 1);
@@ -89,12 +91,12 @@
 
   let positions = [];
   for (let i = 0; i < treeCount; i++) {
-    positions.push({ x: Math.random() * 400 - 200, y: 0, z: Math.random() * 400 - 200 });
+    positions.push({x: Math.random() * 400 - 200, y: 0, z: Math.random() * 400 - 200});
   }
 
   let scales = [];
   for (let i = 0; i < treeCount; i++) {
-    scales.push({ x: Math.random() * 2 + 1, y: Math.random() * 5 + 1, z: Math.random() * 2 + 1 });
+    scales.push({x: Math.random() * 2 + 1, y: Math.random() * 5 + 1, z: Math.random() * 2 + 1});
   }
 
   let treesTypes = ["saplingTree", "birchTreeWithLeaves", "tree1WithLeaves"];
@@ -268,7 +270,7 @@
     light.shadow.map = null;
   }
 
-  var animate = function() {
+  var animate = function () {
     requestAnimationFrame(animate);
     controls.update();
     TWEEN.update();
@@ -285,4 +287,3 @@
 </script>
 </body>
 </html>
-
