@@ -29,7 +29,7 @@
   </style>
 </head>
 <body>
-<div id="info">Description</div>
+<div id="info">I get by with a little help from my friends</div>
 
 <script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
 <script type="importmap">
@@ -38,7 +38,6 @@
       "three": "https://unpkg.com/three@0.144.0/build/three.module.js"
     }
   }
-
 </script>
 
 <script type="module">
@@ -50,7 +49,6 @@
 
   let scene = new THREE.Scene();
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 200;
 
   let renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -58,42 +56,56 @@
 
   let controls = new OrbitControls(camera, renderer.domElement);
 
-  let someFont = "node_modules/three/examples/fonts/droid/droid_serif_regular.typeface.json";
-  someFont = "https://unpkg.com/three@0.144.0/examples/fonts/helvetiker_regular.typeface.json";
+  // let someFont = "node_modules/three/examples/fonts/droid/droid_serif_regular.typeface.json";
+  let someFont = "https://unpkg.com/three@0.144.0/examples/fonts/helvetiker_regular.typeface.json";
 
-  // const loader = new FontLoader();
-  // loader.load(someFont, function (font) {
-  //   const geometry = new TextGeometry('Hello three.js!', {
-  //     font: font,
-  //     size: 80,
-  //     height: 5,
-  //     curveSegments: 12,
-  //     bevelEnabled: true,
-  //     bevelThickness: 10,
-  //     bevelSize: 8,
-  //     bevelOffset: 0,
-  //     bevelSegments: 5
-  //   });
-  //   // scene.add(???);
-  // });
+  function myFriends(textGeometry) {
+    let textMaterial = new THREE.MeshNormalMaterial();
+    let textMesh = new THREE.Mesh(textGeometry, textMaterial);
+    textMesh.position.x = -45;
+    textMesh.position.y = 0;
+    scene.add(textMesh);
+  }
 
-  // SubOptimal tutorial code - typeface.json font loader
-  const fontLoader = new FontLoader();
-  fontLoader.load(
-    someFont,
-    (droidFont) => {
-      const textGeometry = new TextGeometry("three.js", {
+  function createText() {
+    camera.position.z = 500;
+    // https://threejs.org/docs/#examples/en/geometries/TextGeometry
+    let loader = new FontLoader();
+    loader.load(someFont, function (font) {
+      let geometry = new TextGeometry("three.js", {
+        font: font,
+        size: 80,
+        height: 5,
+        curveSegments: 12,
+        bevelEnabled: true,
+        bevelThickness: 10,
+        bevelSize: 8,
+        bevelOffset: 0,
+        bevelSegments: 5
+      });
+      // I got by with a little help from my friends...
+      myFriends(geometry);
+    });
+
+  }
+
+  // createText();
+
+  function createText1() {
+    camera.position.z = 100;
+    // SubOptimal tutorial code - typeface.json font loader
+    let fontLoader = new FontLoader();
+    fontLoader.load(someFont, function (droidFont) {
+      let textGeometry = new TextGeometry("three.js", {
         size: 20,
         height: 4,
-        font: droidFont,
+        font: droidFont
       });
-      const textMaterial = new THREE.MeshNormalMaterial();
-      const textMesh = new THREE.Mesh(textGeometry, textMaterial);
-      textMesh.position.x = -45;
-      textMesh.position.y = 0;
-      scene.add(textMesh);
-    }
-  );
+      myFriends(textGeometry);
+    });
+  }
+
+  createText1();
 
   let animate = function () {
     requestAnimationFrame(animate);
