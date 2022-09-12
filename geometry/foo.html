@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Geometry</title>
+  <!-- https://stackoverflow.com/questions/60935920/converting-three-js-rainGeo-into-buffergeometry -->
+  <script src="/js/three.87.js"></script>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+<script>
+  console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
+
+  let camera, scene, renderer, rain;
+  let rainDrop = new THREE.Vector3();
+  let rainGeo = new THREE.Geometry();
+  const rainCount = 1000;
+
+  init();
+  animate();
+
+  function init() {
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 100;
+
+    scene = new THREE.Scene();
+
+    for (let i = 0; i < rainCount; i++) {
+      rainDrop = new THREE.Vector3(
+        Math.random() * 120 - 60,
+        Math.random() * 180 - 80,
+        Math.random() * 130 - 60
+      );
+
+      rainDrop.velocity = {};
+      rainDrop.velocity = 0;
+
+      rainGeo.vertices.push(rainDrop);
+    }
+
+    let rainMaterial = new THREE.PointsMaterial({
+      color: "#ffffff",
+      size: 0.3,
+      transparent: true,
+      map: THREE.TextureLoader("snow_mask_2.png"),
+      blending: THREE.AdditiveBlending,
+    });
+    // let rainMaterial = new THREE.PointsMaterial({color: '#ffffff'});
+
+    rain = new THREE.Points(rainGeo, rainMaterial);
+    rain.rotation.x = -1.5707963267948963;
+    rain.rotation.y = -3.22;
+    scene.add(rain);
+
+    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+  }
+
+  function rainVariation() {
+    rainGeo.vertices.forEach(rainDrop => {
+      rainDrop.velocity -= 0.1 + Math.random() * 0.1;
+      rainDrop.y += rainDrop.velocity;
+
+      if (rainDrop.y < -60) {
+        rainDrop.y = 60;
+        rainDrop.velocity = 0;
+      }
+    });
+
+    rainGeo.verticesNeedUpdate = true; // needsUpdate
+    rain.rotation.y += 0.008;
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    rainVariation();
+
+    renderer.render(scene, camera);
+  }
+</script>
+</body>
+</html>
