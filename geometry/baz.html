@@ -23,37 +23,37 @@
 </div>
 <script>
   // TODO: UNCOMMENT FUNCTIONS
-  let scene, camera, renderer;
 
   // flipScript(); // except this one
 
-  scene = new THREE.Scene();
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-  renderer = new THREE.WebGLRenderer();
+  let renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
   let geometry;
+  const points = [];
+  points.push(new THREE.Vector3(-5, 0, 0));
+  points.push(new THREE.Vector3(5, 0, 0));
+
+  function getLine(c) {
+    return new THREE.Line(geometry, new THREE.LineBasicMaterial({color: c}));
+  }
 
   function createLine() {
     geometry = new THREE.Geometry();
-    geometry.vertices.push(new THREE.Vector3(-5, 0, 0));
-    geometry.vertices.push(new THREE.Vector3(5, 0, 0));
-    let line = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: 0xff00cc}));
-    scene.add(line);
+    points.forEach(p => geometry.vertices.push(p));
+    scene.add(getLine(0xff00cc));
   }
 
   // THREE.Geometry
   // createLine();
 
   function createLine1() {
-    const points = [];
-    points.push(new THREE.Vector3(-5, 0, 0));
-    points.push(new THREE.Vector3(5, 0, 0));
     geometry = new THREE.BufferGeometry().setFromPoints(points);
-    let line = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: 0xccff00}));
-    scene.add(line);
+    scene.add(getLine(0xccff00));
   }
 
   // THREE.BufferGeometry
@@ -62,6 +62,7 @@
   function explodePoints() {
     const vertices = geometry.vertices;
     for (let i = 0; i < vertices.length; i++) {
+      console.log(vertices[i]);
       vertices[i].multiplyScalar(2);
     }
     geometry.verticesNeedUpdate = true;
@@ -73,6 +74,7 @@
   function explodePoints1() {
     const positions = geometry.attributes.position.array;
     for (let i = 0; i < positions.length; i += 3) {
+      console.log(positions[i]);
       const v = new THREE.Vector3(
         positions[i],
         positions[i + 1],
@@ -119,8 +121,8 @@
   // tetrahedron();
 
   function tetrahedron1() {
-    const material = new THREE.MeshNormalMaterial()
-    geometry = new THREE.BufferGeometry()
+    const material = new THREE.MeshNormalMaterial();
+    geometry = new THREE.BufferGeometry();
 
     const points = [
       new THREE.Vector3(-1, 1, -1),//c
@@ -137,18 +139,18 @@
 
       new THREE.Vector3(-1, 1, -1),//c
       new THREE.Vector3(1, -1, -1),//d
-      new THREE.Vector3(-1, -1, 1),//b
-    ]
+      new THREE.Vector3(-1, -1, 1) //b
+    ];
 
-    geometry.setFromPoints(points)
-    geometry.computeVertexNormals()
+    geometry.setFromPoints(points);
+    geometry.computeVertexNormals();
 
-    const mesh = new THREE.Mesh(geometry, material)
-    scene.add(mesh)
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
   }
 
   // THREE.BufferGeometry
-  // tetrahedron1();
+  tetrahedron1();
 
   camera.position.z = 5;
 
