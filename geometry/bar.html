@@ -18,8 +18,8 @@
   console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
 
   let camera, scene, renderer, rain;
-  let rainDrop = new THREE.Vector3();
-  let rainGeo = new THREE.BufferGeometry();
+  let rainDrop = new THREE.Vector3(); // vertex
+  let rainGeo = new THREE.BufferGeometry(); // geometry
   const rainCount = 1000;
 
   init();
@@ -42,7 +42,7 @@
 
     rainGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
-    let rainMaterial = new THREE.PointsMaterial({color: '#ffffff'});
+    let rainMaterial = new THREE.PointsMaterial({color: "#ffffff"}); // material
 
     rain = new THREE.Points(rainGeo, rainMaterial);
     scene.add(rain);
@@ -53,7 +53,8 @@
   }
 
   function rainVariation() {
-    let positionAttribute = rain.rainGeo.getAttribute('position');
+    let positionAttribute = rain.geometry.getAttribute("position");
+    // console.log("%crain.geometry", "color: lightblue;", rain.geometry);
 
     for (let i = 0; i < positionAttribute.count; i++) {
       rainDrop.fromBufferAttribute(positionAttribute, i);
