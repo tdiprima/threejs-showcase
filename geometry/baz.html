@@ -34,7 +34,7 @@
   document.body.appendChild(renderer.domElement);
 
   let geometry;
-  const points = [];
+  let points = [];
   points.push(new THREE.Vector3(-5, 0, 0));
   points.push(new THREE.Vector3(5, 0, 0));
 
@@ -60,7 +60,7 @@
   createLine1();
 
   function explodePoints() {
-    const vertices = geometry.vertices;
+    let vertices = geometry.vertices;
     for (let i = 0; i < vertices.length; i++) {
       console.log(vertices[i]);
       vertices[i].multiplyScalar(2);
@@ -72,10 +72,10 @@
   // explodePoints();
 
   function explodePoints1() {
-    const positions = geometry.attributes.position.array;
+    let positions = geometry.attributes.position.array;
     for (let i = 0; i < positions.length; i += 3) {
       console.log(positions[i]);
-      const v = new THREE.Vector3(
+      let v = new THREE.Vector3(
         positions[i],
         positions[i + 1],
         positions[i + 2]
@@ -86,22 +86,21 @@
       positions[i + 2] = v.z;
     }
     geometry.attributes.position.needsUpdate = true;
-
   }
 
   // THREE.BufferGeometry
   explodePoints1();
 
   function tetrahedron() {
-    const material = new THREE.MeshNormalMaterial();
+    let material = new THREE.MeshNormalMaterial();
     geometry = new THREE.Geometry();
 
     // VERTICES
     geometry.vertices.push(
-      new THREE.Vector3(1, 1, 1),//a
-      new THREE.Vector3(-1, -1, 1),//b
-      new THREE.Vector3(-1, 1, -1),//c
-      new THREE.Vector3(1, -1, -1)//d
+      new THREE.Vector3(1, 1, 1), // a
+      new THREE.Vector3(-1, -1, 1), // b
+      new THREE.Vector3(-1, 1, -1), // c
+      new THREE.Vector3(1, -1, -1) // d
     );
 
     // FACES
@@ -113,7 +112,7 @@
     );
 
     geometry.computeFlatVertexNormals();
-    const mesh = new THREE.Mesh(geometry, material);
+    let mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
   }
 
@@ -121,31 +120,31 @@
   // tetrahedron();
 
   function tetrahedron1() {
-    const material = new THREE.MeshNormalMaterial();
+    let material = new THREE.MeshNormalMaterial();
     geometry = new THREE.BufferGeometry();
 
-    const points = [
-      new THREE.Vector3(-1, 1, -1),//c
-      new THREE.Vector3(-1, -1, 1),//b
-      new THREE.Vector3(1, 1, 1),//a
+    let points1 = [
+      new THREE.Vector3(-1, 1, -1), // c
+      new THREE.Vector3(-1, -1, 1), // b
+      new THREE.Vector3(1, 1, 1), // a
 
-      new THREE.Vector3(1, 1, 1),//a
-      new THREE.Vector3(1, -1, -1),//d
-      new THREE.Vector3(-1, 1, -1),//c
+      new THREE.Vector3(1, 1, 1), // a
+      new THREE.Vector3(1, -1, -1), // d
+      new THREE.Vector3(-1, 1, -1), // c
 
-      new THREE.Vector3(-1, -1, 1),//b
-      new THREE.Vector3(1, -1, -1),//d
-      new THREE.Vector3(1, 1, 1),//a
+      new THREE.Vector3(-1, -1, 1), // b
+      new THREE.Vector3(1, -1, -1), // d
+      new THREE.Vector3(1, 1, 1), // a
 
-      new THREE.Vector3(-1, 1, -1),//c
-      new THREE.Vector3(1, -1, -1),//d
-      new THREE.Vector3(-1, -1, 1) //b
+      new THREE.Vector3(-1, 1, -1), // c
+      new THREE.Vector3(1, -1, -1), // d
+      new THREE.Vector3(-1, -1, 1) // b
     ];
 
-    geometry.setFromPoints(points);
+    geometry.setFromPoints(points1);
     geometry.computeVertexNormals();
 
-    const mesh = new THREE.Mesh(geometry, material);
+    let mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
   }
 
@@ -157,29 +156,24 @@
   renderer.render(scene, camera);
 
   function flipScript() {
-    // let myScript = document.createElement("script");
-    // myScript.setAttribute("src", "/js/three.87.js");
-    // document.body.appendChild(myScript);
-
     let myScript = document.createElement('script');
     myScript.onload = myScript.onchange = function () {
-      //do stuff with the script
+      // do stuff with the script
       console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
     };
     myScript.src = "/js/three.87.js";
 
+    // document.body.appendChild(myScript);
     document.head.appendChild(myScript);
 
     function geoScript() {
       console.log("geoScript");
       myScript.src = "/js/three.87.js";
-      // myScript.setAttribute("src", "/js/three.87.js");
     }
 
     function buffScript() {
       console.log("buffScript");
       myScript.src = "/js/three.js"
-      // myScript.setAttribute("src", "/js/three.js");
     }
 
     document.getElementById("geo").addEventListener("click", geoScript);
