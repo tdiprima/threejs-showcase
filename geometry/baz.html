@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Line</title>
+  <!-- https://sbcode.net/threejs/geometry-to-buffergeometry/ -->
+  <link href="/stylesheets/main.css" rel="stylesheet">
+  <!-- TODO: SWITCH BETWEEN SCRIPTS -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.124/build/three.js"></script> -->
+  <!-- <script src="/js/three.87.js"></script> -->
+  <script src="/js/three.js"></script>
+  <style>
+    body { margin: 0; }
+    canvas { width: 100%; height: 100% }
+  </style>
+</head>
+<body>
+<div id="info">
+  <button id="geo">Geo</button>
+  <button id="buff">BuffGeo</button>
+</div>
+<script>
+  // TODO: UNCOMMENT FUNCTIONS
+  let scene, camera, renderer;
+
+  // flipScript(); // except this one
+
+  scene = new THREE.Scene();
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  let geometry;
+
+  function createLine() {
+    geometry = new THREE.Geometry();
+    geometry.vertices.push(new THREE.Vector3(-5, 0, 0));
+    geometry.vertices.push(new THREE.Vector3(5, 0, 0));
+    let line = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: 0xff00cc}));
+    scene.add(line);
+  }
+
+  // THREE.Geometry
+  // createLine();
+
+  function createLine1() {
+    const points = [];
+    points.push(new THREE.Vector3(-5, 0, 0));
+    points.push(new THREE.Vector3(5, 0, 0));
+    geometry = new THREE.BufferGeometry().setFromPoints(points);
+    let line = new THREE.Line(geometry, new THREE.LineBasicMaterial({color: 0xccff00}));
+    scene.add(line);
+  }
+
+  // THREE.BufferGeometry
+  createLine1();
+
+  function explodePoints() {
+    const vertices = geometry.vertices;
+    for (let i = 0; i < vertices.length; i++) {
+      vertices[i].multiplyScalar(2);
+    }
+    geometry.verticesNeedUpdate = true;
+  }
+
+  // THREE.Geometry
+  // explodePoints();
+
+  function explodePoints1() {
+    const positions = geometry.attributes.position.array;
+    for (let i = 0; i < positions.length; i += 3) {
+      const v = new THREE.Vector3(
+        positions[i],
+        positions[i + 1],
+        positions[i + 2]
+      ).multiplyScalar(2);
+
+      positions[i] = v.x;
+      positions[i + 1] = v.y;
+      positions[i + 2] = v.z;
+    }
+    geometry.attributes.position.needsUpdate = true;
+
+  }
+
+  // THREE.BufferGeometry
+  explodePoints1();
+
+  function tetrahedron() {
+    const material = new THREE.MeshNormalMaterial();
+    geometry = new THREE.Geometry();
+
+    // VERTICES
+    geometry.vertices.push(
+      new THREE.Vector3(1, 1, 1),//a
+      new THREE.Vector3(-1, -1, 1),//b
+      new THREE.Vector3(-1, 1, -1),//c
+      new THREE.Vector3(1, -1, -1)//d
+    );
+
+    // FACES
+    geometry.faces.push(
+      new THREE.Face3(2, 1, 0),
+      new THREE.Face3(0, 3, 2),
+      new THREE.Face3(1, 3, 0),
+      new THREE.Face3(2, 3, 1)
+    );
+
+    geometry.computeFlatVertexNormals();
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+  }
+
+  // THREE.Geometry
+  // tetrahedron();
+
+  function tetrahedron1() {
+    const material = new THREE.MeshNormalMaterial()
+    geometry = new THREE.BufferGeometry()
+
+    const points = [
+      new THREE.Vector3(-1, 1, -1),//c
+      new THREE.Vector3(-1, -1, 1),//b
+      new THREE.Vector3(1, 1, 1),//a
+
+      new THREE.Vector3(1, 1, 1),//a
+      new THREE.Vector3(1, -1, -1),//d
+      new THREE.Vector3(-1, 1, -1),//c
+
+      new THREE.Vector3(-1, -1, 1),//b
+      new THREE.Vector3(1, -1, -1),//d
+      new THREE.Vector3(1, 1, 1),//a
+
+      new THREE.Vector3(-1, 1, -1),//c
+      new THREE.Vector3(1, -1, -1),//d
+      new THREE.Vector3(-1, -1, 1),//b
+    ]
+
+    geometry.setFromPoints(points)
+    geometry.computeVertexNormals()
+
+    const mesh = new THREE.Mesh(geometry, material)
+    scene.add(mesh)
+  }
+
+  // THREE.BufferGeometry
+  // tetrahedron1();
+
+  camera.position.z = 5;
+
+  renderer.render(scene, camera);
+
+  function flipScript() {
+    // let myScript = document.createElement("script");
+    // myScript.setAttribute("src", "/js/three.87.js");
+    // document.body.appendChild(myScript);
+
+    let myScript = document.createElement('script');
+    myScript.onload = myScript.onchange = function () {
+      //do stuff with the script
+      console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
+    };
+    myScript.src = "/js/three.87.js";
+
+    document.head.appendChild(myScript);
+
+    function geoScript() {
+      console.log("geoScript");
+      myScript.src = "/js/three.87.js";
+      // myScript.setAttribute("src", "/js/three.87.js");
+    }
+
+    function buffScript() {
+      console.log("buffScript");
+      myScript.src = "/js/three.js"
+      // myScript.setAttribute("src", "/js/three.js");
+    }
+
+    document.getElementById("geo").addEventListener("click", geoScript);
+    document.getElementById("buff").addEventListener("click", buffScript);
+  }
+</script>
+</body>
+</html>
