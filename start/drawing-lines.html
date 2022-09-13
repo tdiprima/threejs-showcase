@@ -16,12 +16,19 @@
 
   let camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 500);
   camera.position.set(0, 0, 100);
+  // The LookAt function in OpenGL creates a view matrix that transforms vertices from world space to camera space.
+  // It takes three vectors as arguments that together describe the position and orientation of a camera.
   camera.lookAt(0, 0, 0);
 
   let scene = new THREE.Scene();
 
-  // Create a blue LineBasicMaterial
-  let material = new THREE.LineBasicMaterial({color: 0x00ffff});
+  // https://stackoverflow.com/questions/11638883/thickness-of-lines-using-three-linebasicmaterial
+  // https://threejs.org/docs/#api/en/materials/LineBasicMaterial
+  // TODO: Due to limitations of the OpenGL Core Profile with the WebGL renderer on most platforms linewidth will always be 1 regardless of the set value.
+  let material = new THREE.LineBasicMaterial({
+    color: 0x00ffff, 
+    linewidth: 3
+  });
 
   // After material, we will need a geometry with some vertices:
   let points = [];
