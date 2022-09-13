@@ -16,5 +16,5 @@ function hslToHex(h, s, l) {
   return `#${f(0)}${f(8)}${f(4)}`;
 }
 
-let result = hslToHex(360, 100, 50);  // "#ff0000" -> red
-console.log(result);
+// let result = hslToHex(360, 100, 50);  // "#ff0000" -> red
+// console.log(result);
