@@ -46,6 +46,11 @@
     geometry = new THREE.Geometry();
     points.forEach(p => geometry.vertices.push(p));
     scene.add(getLine(0xff00cc));
+
+    // console.log("%cgeometry", "color: #ff00cc;", geometry);
+    // Array of Vector3's
+    console.log("%cpositions", "color: #00ff00;", geometry.vertices);
+    console.log("%cvertexCount", "color: #ffff00;", geometry.vertices.length);
   }
 
   // THREE.Geometry
@@ -54,6 +59,13 @@
   function createLine1() {
     geometry = new THREE.BufferGeometry().setFromPoints(points);
     scene.add(getLine(0xccff00));
+
+    const positionAttribute = geometry.getAttribute( 'position' );
+    // console.log("%cposition attribute", "color: #ff00cc;", positionAttribute);
+    // Float32Array, like canvas data
+    console.log("%cpositions", "color: #00ff00;", positionAttribute.array);
+    // Actual vertex count (convenient)
+    console.log("%cvertexCount", "color: #ffff00;", positionAttribute.count);
   }
 
   // THREE.BufferGeometry
@@ -61,8 +73,9 @@
 
   function explodePoints() {
     let vertices = geometry.vertices;
+    // console.log("%cvertices", "color: #00ff00;", vertices);
     for (let i = 0; i < vertices.length; i++) {
-      console.log(vertices[i]);
+      // console.log(vertices[i]);
       vertices[i].multiplyScalar(2);
     }
     geometry.verticesNeedUpdate = true;
@@ -72,9 +85,10 @@
   // explodePoints();
 
   function explodePoints1() {
-    let positions = geometry.attributes.position.array;
+    let positions = geometry.attributes.position.array; // another way to say it.
+    // console.log("%cpositions", "color: #00ff00;", positions);
     for (let i = 0; i < positions.length; i += 3) {
-      console.log(positions[i]);
+      // console.log(positions[i]);
       let v = new THREE.Vector3(
         positions[i],
         positions[i + 1],
@@ -89,7 +103,7 @@
   }
 
   // THREE.BufferGeometry
-  explodePoints1();
+  // explodePoints1();
 
   function tetrahedron() {
     let material = new THREE.MeshNormalMaterial();
@@ -149,7 +163,7 @@
   }
 
   // THREE.BufferGeometry
-  tetrahedron1();
+  // tetrahedron1();
 
   camera.position.z = 5;
 
