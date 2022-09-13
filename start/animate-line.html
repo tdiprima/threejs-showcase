@@ -6,6 +6,7 @@
   <title>animated line - update things</title>
   <!-- https://threejs.org/docs/#manual/en/introduction/How-to-update-things -->
   <!-- https://jsfiddle.net/t4m85pLr/1/ -->
+  <script src="hsl-to-hex.js"></script>
   <style>
     body { margin: 0; }
   </style>
@@ -35,6 +36,7 @@
 
   // attributes
   const positions = new Float32Array(MAX_POINTS * 3); // 3 vertices per point
+  // console.log("positions", positions); // 1500 positions
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
   // draw range (draw calls)
@@ -52,6 +54,8 @@
   // Randomly add points to the line
   function updatePositions() {
     const positions = line.geometry.attributes.position.array;
+    // console.log("positions", positions);
+
     let x = 0;
     let y = 0;
     let z = 0;
@@ -70,45 +74,31 @@
 
   updatePositions();
 
-  // https://stackoverflow.com/questions/36721830/convert-hsl-to-rgb-and-hex
-  function hslToHex(h, s, l) {
-    l /= 100;
-    const a = s * Math.min(l, 1 - l) / 100;
-    const f = n => {
-      const k = (n + h / 30) % 12;
-      const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-      return Math.round(255 * color).toString(16).padStart(2, '0');   // convert to Hex and prefix "0" if needed
-    };
-    return `#${f(0)}${f(8)}${f(4)}`;
-  }
-
-  // hslToHex(360, 100, 50);  // "#ff0000" -> red
-
   // animate
   function animate() {
     requestAnimationFrame(animate);
 
+    // Increment value, and when we reach 500, start over.
     drawCount = (drawCount + 1) % MAX_POINTS;
     let newValue = drawCount;
+    // console.log("newValue", newValue);
 
     // If you want to change the number of points rendered after the first render, do this:
     line.geometry.setDrawRange(0, newValue);
 
     if (drawCount === 0) {
-      // periodically, generate new data
+      // generate new data
       updatePositions();
 
       // If you want to change the position data values after the first render, you need to set the needsUpdate flag.
       line.geometry.attributes.position.needsUpdate = true; // required after the first render
 
-      // line.material.color.setHSL(Math.random(), 1, 0.5);
-
+      // HSL (Hue-Saturation-Lightness)
       let hue = Math.random();
       line.material.color.setHSL(hue, 1, 0.5);
       // let color = `hsl(${Math.round(hue * 360)} 100% 50%)`; // works now!
       let color = hslToHex(Math.round(hue * 360), 100, 50);
       console.log(`%c${color}`, `color: ${color};`);
-
     }
 
     renderer.render(scene, camera);
