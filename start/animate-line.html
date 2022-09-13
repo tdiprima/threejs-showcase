@@ -5,6 +5,7 @@
   <meta content="width=device-width, initial-scale=1" name="viewport">
   <title>animated line - update things</title>
   <!-- https://threejs.org/docs/#manual/en/introduction/How-to-update-things -->
+  <!-- https://jsfiddle.net/t4m85pLr/1/ -->
   <style>
     body { margin: 0; }
   </style>
@@ -29,11 +30,11 @@
   let camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
   camera.position.set(0, 0, 1000);
 
-  // geometry
-  let geometry = new THREE.BufferGeometry();
+  // BufferGeometry
+  const geometry = new THREE.BufferGeometry();
 
   // attributes
-  let positions = new Float32Array(MAX_POINTS * 3); // 3 vertices per point
+  const positions = new Float32Array(MAX_POINTS * 3); // 3 vertices per point
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
 
   // draw range (draw calls)
@@ -41,16 +42,16 @@
   geometry.setDrawRange(0, drawCount);
 
   // material
-  let material = new THREE.LineBasicMaterial({ color: 0xff0000 });
+  const material = new THREE.LineBasicMaterial({ color: 0xff0000 });
   console.log("%c#ff0000", "color: #ff0000;");
 
   // line
-  let line = new THREE.Line(geometry, material);
+  const line = new THREE.Line(geometry, material);
   scene.add(line);
 
-  // update positions
+  // Randomly add points to the line
   function updatePositions() {
-    let positions = line.geometry.attributes.position.array;
+    const positions = line.geometry.attributes.position.array;
     let x = 0;
     let y = 0;
     let z = 0;
@@ -88,13 +89,16 @@
     requestAnimationFrame(animate);
 
     drawCount = (drawCount + 1) % MAX_POINTS;
+    let newValue = drawCount;
 
-    line.geometry.setDrawRange(0, drawCount);
+    // If you want to change the number of points rendered after the first render, do this:
+    line.geometry.setDrawRange(0, newValue);
 
     if (drawCount === 0) {
       // periodically, generate new data
       updatePositions();
 
+      // If you want to change the position data values after the first render, you need to set the needsUpdate flag.
       line.geometry.attributes.position.needsUpdate = true; // required after the first render
 
       // line.material.color.setHSL(Math.random(), 1, 0.5);
