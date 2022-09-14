@@ -1,9 +1,4 @@
-// The code from the resource is highly inefficient since you continously allocate geometry all the time without disposal management which will lead to a memory leak. Try the following approach:
-
-let camera, 
-scene, 
-renderer, 
-line;
+let camera, scene, renderer, line;
 
 const frustumSize = 4;
 
@@ -44,13 +39,13 @@ function init() {
   addPoint(0, 0, 0); // start point
   addPoint(1, 0, 0); // current pointer coordinate
 
-  //
-
   renderer = new THREE.WebGLRenderer({
     antialias: true
   });
+
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
+
   document.body.appendChild(renderer.domElement);
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
@@ -117,13 +112,3 @@ function onWindowResize() {
 function render() {
   renderer.render(scene, camera);
 }
-
-// body {
-//     margin: 0;
-// }
-
-// <script src="https://cdn.jsdelivr.net/npm/three@0.144/build/three.min.js"></script>
-
-// The idea is to allocate a single large buffer to store all current and future points of a line. You then use setDrawRange() to define, what parts of the buffer should be rendered.
-
-// https://stackoverflow.com/questions/73705786/how-to-free-draw-a-line-in-three-js-r144-on-mouse-move-and-using-buffergeometry/73713583#73713583
