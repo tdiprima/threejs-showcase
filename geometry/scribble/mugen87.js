@@ -94,16 +94,22 @@ function onPointerMove(event) {
   render();
 }
 
+// See: discoverthreejs-site/static/examples/worlds/inline-scenes/first-steps/animation-loop.js
 function onWindowResize() {
+  // set the aspect ratio to match the new browser window aspect ratio
+  // camera.aspect = container.clientWidth / container.clientHeight;
   const aspect = window.innerWidth / window.innerHeight;
 
   camera.left = (-frustumSize * aspect) / 2;
   camera.right = (frustumSize * aspect) / 2;
   camera.top = frustumSize / 2;
   camera.bottom = -frustumSize / 2;
+  console.log("camera LRTB", camera.left, camera.right, camera.top, camera.bottom);
 
+  // update the camera's frustum
   camera.updateProjectionMatrix();
 
+  // update the size of the renderer AND the canvas
   renderer.setSize(window.innerWidth, window.innerHeight);
 
   render();

@@ -1,17 +1,9 @@
 /**
  * Global variables
  */
-let scene,
-width,
-height,
-camera,
-renderer;
+let scene, width, height, camera, renderer;
 
-let mouseIsPressed,
-mouseX,
-mouseY,
-pmouseX,
-pmouseY;
+let mouseIsPressed, mouseX, mouseY, pmouseX, pmouseY;
 
 /**
  * Initialization of global objects and set up callbacks for mouse and resize
@@ -26,7 +18,7 @@ function init() {
 
   // Orthogonal camera for 2D drawing
   camera = new THREE.OrthographicCamera(0, width, 0, height, -height, height);
-  camera.lookAt(new THREE.Vector3(0, 0, 0)); // TODO: learn ortho, lookAt.
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   // Renderer will use a canvas taking the whole window
   renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -145,8 +137,15 @@ function mousePressed() {
   const point = new THREE.Vector3(mouseX, mouseY, 0);
   let points = [];
   points.push(point);
+
+  // just testing to see if the darn thing works at all
+  points.push(new THREE.Vector3(0, 10, 0));
+  points.push(new THREE.Vector3(10, 0, 0));
+
   let geometry = new THREE.BufferGeometry().setFromPoints( points );
   let line = new THREE.Line(geometry, material);
+  // console.log("line", line);
+
   scene.add(line);
   selected = line;
 }
@@ -174,16 +173,41 @@ function mouseDragged() {
 
   newgeometry.attributes.position.needsUpdate = true;
 
-  // const newgeometry = new THREE.Geometry();
-  // newgeometry.vertices = oldgeometry.vertices;
-  // newgeometry.vertices.push(point);
-
   line.geometry = newgeometry;
 }
 
 /**
- * mouseReleased
+ * IDK :/
  */
-function mouseReleased() {}
+function mouseDragged2() {
+  const line = selected;
+
+  const point = new THREE.Vector3(mouseX, mouseY, 0);
+  let points = [];
+  points.push(point);
+
+  const oldgeometry = line.geometry;
+
+  let positions = oldgeometry.attributes.position.array; // 3 vertices per point
+  let newgeometry = new THREE.BufferGeometry();
+
+  for (let i = 0; i < positions.length; i += 3) {
+    const v = new THREE.Vector3(positions[i], positions[i + 1], positions[i + 2]);
+    positions[i] = v.x;
+    positions[i + 1] = v.y;
+    positions[i + 2] = v.z;
+  }
+  positions.push(point);
+  newgeometry.attributes.position.needsUpdate = true;
+
+  line.geometry = newgeometry;
+
+  // scene.add(line);
+  // selected = line;
+}
+
+function mouseReleased() {
+  // console.log("%cmouseReleased", "color: #ccff00;");
+}
 
 init();
