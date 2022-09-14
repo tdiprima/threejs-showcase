@@ -11,6 +11,7 @@ render();
 function init() {
   const aspect = window.innerWidth / window.innerHeight;
 
+  // new OrthographicCamera(left: 0, right: width, top: 0, bottom: height, near: 0, far: 20);
   camera = new THREE.OrthographicCamera(
     (frustumSize * aspect) / -2,
     (frustumSize * aspect) / 2,
@@ -35,7 +36,6 @@ function init() {
   scene.add(line);
 
   // initial points
-
   addPoint(0, 0, 0); // start point
   addPoint(1, 0, 0); // current pointer coordinate
 
@@ -104,7 +104,8 @@ function onWindowResize() {
   camera.right = (frustumSize * aspect) / 2;
   camera.top = frustumSize / 2;
   camera.bottom = -frustumSize / 2;
-  console.log("camera LRTB", camera.left, camera.right, camera.top, camera.bottom);
+
+  console.log("%ccamera LRTB", "color: deeppink;", camera.left, camera.right, camera.top, camera.bottom);
 
   // update the camera's frustum
   camera.updateProjectionMatrix();
