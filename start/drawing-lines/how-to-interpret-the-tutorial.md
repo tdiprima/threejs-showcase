@@ -1,6 +1,6 @@
 # How to Interpret the Drawing Lines tutorial from three.js documentation
 
-[Article](https://stackoverflow.com/questions/73210565/how-to-interpret-the-drawing-lines-tutorial-from-three-js-documentation)
+**[See my answer](https://stackoverflow.com/questions/73210565/how-to-interpret-the-drawing-lines-tutorial-from-three-js-documentation#73719651)** :)
 
 Let's go over the commands used in the creation of lines as suggested by the three.js documentation.
 
@@ -45,7 +45,11 @@ It says <mark>create a Camera</mark>, given is the:
 camera.position.set( 0, 0, 100 );
 ```
 
-It says <mark>position the camera on the z-axis</mark> as shown in Picture 4. I assume that the orientation of camera is always parallel to x-axis.
+It says <mark>**position** the camera on the z-axis</mark> as shown in Picture 4.
+
+*the orientation of the camera*
+
+Puts the camera at 100 units along the z-axis, parallel to the z-axis because it hasn't been rotated.
 
 ![](https://i.stack.imgur.com/jCkIh.png)
 
@@ -89,7 +93,9 @@ It says the window where the user will see, will be adjusted by renderer. This w
 document.body.appendChild( renderer.domElement );
 ```
 
-It says <mark>the renderer now exists in 3D space.</mark>
+<mark>Adds the `<canvas>` element to your HTML document.</mark>
+
+It's one of the few commands that have nothing to do with 3D space.
 
 <br>
 
@@ -179,9 +185,25 @@ renderer.render( scene, camera );
 
 It says the renderer has been ordered to <mark>render the scene and the camera.</mark>
 
+Actually, it renders everything that's been added to the scene.
+
+*You already added the lines with `scene.add(line)`, so there's no reason to specifically target `line` again.*
+
 <br>
 
 # Resources
+
+Some of your screenshots use different axes systems. To get acquainted with the Three.js/WebGL coordinate system, I recommend you visit [the Three.js editor](https://threejs.org/editor/) and add a camera with `Add > PerspectiveCamera` (near the bottom). You can then modify its position attributes to see what the axes do. Also keep an eye on the axes widget on the corner:
+
+![](https://i.stack.imgur.com/MWo6F.jpg)
+
+```text
+x-axis: +right / -left
+y-axis: +up / -down
+z-axis: +toward user / - away
+```
+
+<br>
 
 <!--https://www.ilovefreesoftware.com/06/featured/online-3d-graphing-free-websites.html-->
 

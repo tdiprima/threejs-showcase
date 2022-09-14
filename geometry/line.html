@@ -35,6 +35,10 @@
   points.push(new THREE.Vector3(-5, 0, 0));
   points.push(new THREE.Vector3(5, 0, 0));
 
+  // points.push(new THREE.Vector3(-10, 0, 0));
+  // points.push(new THREE.Vector3(0, 10, 0));
+  // points.push(new THREE.Vector3(10, 0, 0));
+
   function getLine(c) {
     return new THREE.Line(geometry, new THREE.LineBasicMaterial({color: c}));
   }
@@ -46,7 +50,7 @@
 
     // console.log("%cgeometry", "color: #ff00cc;", geometry);
     // Array of Vector3's
-    console.log("%cpositions", "color: #00ff00;", geometry.vertices);
+    console.log("%cpositions", "color: #00ff00;", geometry.vertices); // JSON.stringify(geometry.vertices)
     console.log("%cvertexCount", "color: #ffff00;", geometry.vertices.length);
   }
 
