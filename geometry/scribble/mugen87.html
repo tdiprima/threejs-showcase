@@ -9,12 +9,22 @@
   <!-- https://github.com/Mugen87 -->
   <link href="/stylesheets/main.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/three@0.144/build/three.min.js"></script>
+  <style>
+    body {
+      font-family: 'Montserrat-SemiBold', 'Montserrat', 'Open Sans', 'Helvetica', 'Arial', 'sans-serif';
+      font-size: x-large;
+    }
+  </style>
 </head>
 <body>
 <div id="info">The code from the resource is highly inefficient; since you continuously allocate geometry all the time,
   without disposal management, which will lead to a memory leak. Try the following approach:<br>
   The idea is to allocate a single large buffer to store all current and future points of a line. You then use
-  <code>setDrawRange()</code> to define, what parts of the buffer should be rendered.
+  <code>setDrawRange()</code> to define, what parts of the buffer should be rendered.<br>
+  You can set <code>frustumSize</code> to whatever value you need. It just defines the size of the orthographic
+  projection.
+  The <code>frustumSize * aspect / -2</code> stuff just computes the side planes of the view frustum.
+  You have to honor the desired size as well as the aspect ratio.
 </div>
 <script src="mugen87.js"></script>
 <!-- <script src="144.js"></script> -->
