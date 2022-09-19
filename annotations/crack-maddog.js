@@ -42,11 +42,11 @@ controls.target.set(8, 3, 4);
 
 let raycaster = new THREE.Raycaster();
 let sceneMeshes = [];
-let circleTexture = new THREE.TextureLoader().load("img/circle.png");
+let circleTexture = new THREE.TextureLoader().load("/extra_html/img/circle.png");
 
 let mtlLoader = new MTLLoader();
 mtlLoader.load(
-  "models/house_water.mtl",
+  "/extra_html/models/house_water.mtl",
   materials => {
     materials.preload();
     let progressBar = document.getElementById("progressBar");
@@ -54,7 +54,7 @@ mtlLoader.load(
     let objLoader = new OBJLoader();
     objLoader.setMaterials(materials);
     objLoader.load(
-      "models/house_water.obj",
+      "/extra_html/models/house_water.obj",
       object => {
         object.scale.set(0.01, 0.01, 0.01);
         scene.add(object);
