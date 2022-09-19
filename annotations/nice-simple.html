@@ -54,23 +54,29 @@
   </style>
 </head>
 <body>
+
 <!-- <div class="annotation"> -->
 <div class="annotation" style="top: 104px; left: 546px; opacity: 1;">
   <p><strong>Cube</strong></p>
   <p>In geometry, a cube is a three-dimensional solid object bounded by six square faces, facets or sides, with three
     meeting at each vertex.</p>
 </div>
+
 <canvas height="64" id="number" width="64"></canvas>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/85/three.min.js"></script>
+
+<!-- TODO: node_modules -->
+<script src="/node_modules/three/build/three.js"></script>
+<script src="/node_modules/three/examples/js/controls/OrbitControls.js"></script>
+
 <script>
   // Number
-  const canvas = document.getElementById("number");
-  const ctx = canvas.getContext("2d");
-  const x = 32;
-  const y = 32;
-  const radius = 30;
-  const startAngle = 0;
-  const endAngle = Math.PI * 2;
+  let canvas = document.getElementById("number");
+  let ctx = canvas.getContext("2d");
+  let x = 32;
+  let y = 32;
+  let radius = 30;
+  let startAngle = 0;
+  let endAngle = Math.PI * 2;
 
   ctx.fillStyle = "rgb(0, 0, 0)";
   ctx.beginPath();
@@ -97,13 +103,12 @@
   let sprite;
   let mesh;
   let spriteBehindObject;
-  const annotation = document.querySelector(".annotation");
+  let annotation = document.querySelector(".annotation");
 
   init();
   animate();
 
   function init() {
-
     // Camera
     camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 2, 2000);
     camera.position.x = 750;
@@ -114,7 +119,7 @@
     scene = new THREE.Scene();
 
     // Lights
-    const lights = [];
+    let lights = [];
     lights[0] = new THREE.PointLight(0xffffff, 1, 0);
     lights[1] = new THREE.PointLight(0xffffff, 1, 0);
     lights[2] = new THREE.PointLight(0xffffff, 1, 0);
@@ -128,7 +133,7 @@
     scene.add(lights[2]);
 
     // Mesh
-    const cubeGeometry = new THREE.BoxGeometry(500, 500, 500);
+    let cubeGeometry = new THREE.BoxGeometry(500, 500, 500);
 
     mesh = new THREE.Mesh(
       cubeGeometry,
@@ -139,7 +144,7 @@
         shading: THREE.FlatShading
       }));
 
-    const line = new THREE.LineSegments(
+    let line = new THREE.LineSegments(
       new THREE.WireframeGeometry(cubeGeometry),
       new THREE.LineBasicMaterial({
         color: 0xffffff,
@@ -152,11 +157,9 @@
     scene.add(line);
 
     // Sprite
-    const numberTexture = new THREE.CanvasTexture(
-      document.querySelector("#number"));
+    let numberTexture = new THREE.CanvasTexture(document.querySelector("#number"));
 
-
-    const spriteMaterial = new THREE.SpriteMaterial({
+    let spriteMaterial = new THREE.SpriteMaterial({
       map: numberTexture,
       alphaTest: 0.5,
       transparent: true,
@@ -204,8 +207,8 @@
   }
 
   function updateAnnotationOpacity() {
-    const meshDistance = camera.position.distanceTo(mesh.position);
-    const spriteDistance = camera.position.distanceTo(sprite.position);
+    let meshDistance = camera.position.distanceTo(mesh.position);
+    let spriteDistance = camera.position.distanceTo(sprite.position);
     spriteBehindObject = spriteDistance > meshDistance;
     sprite.material.opacity = spriteBehindObject ? 0.25 : 1;
 
@@ -215,8 +218,8 @@
   }
 
   function updateScreenPosition() {
-    const vector = new THREE.Vector3(250, 250, 250);
-    const canvas = renderer.domElement;
+    let vector = new THREE.Vector3(250, 250, 250);
+    let canvas = renderer.domElement;
 
     vector.project(camera);
 
