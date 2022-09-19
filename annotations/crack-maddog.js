@@ -169,12 +169,18 @@ function onClick(event) {
     camera
   );
 
+  // annotationMarkers = The object to check for intersection with the ray.
+  // intersectObjects(): returns an array of intersected objects
   let intersects = raycaster.intersectObjects(annotationMarkers, true);
-  if (intersects.length > 0 && intersects[0].object.userData && intersects[0].object.userData.id) {
-    gotoAnnotation(annotations[intersects[0].object.userData.id]);
+  if (intersects.length > 0) {
+    console.log("%cGot One", "color: #ff00cc;", intersects[0].object.type);
+    if (intersects[0].object.userData && intersects[0].object.userData.id) {
+      gotoAnnotation(annotations[intersects[0].object.userData.id]);
+    }
   }
 }
 
+// Brings whatever you clicked on, to the center of the screen.
 renderer.domElement.addEventListener("dblclick", onDoubleClick, false);
 function onDoubleClick(event) {
   raycaster.setFromCamera(
@@ -238,7 +244,9 @@ function gotoAnnotation(a) {
   });
 
   if (a.descriptionDomElement) {
-    console.log(a.descriptionDomElement.style.display);
+    // console.log(a.descriptionDomElement.style.display);
+    // console.log("description", a.descriptionDomElement);
+    console.log("annotation obj", a);
     a.descriptionDomElement.style.display = "block";
   }
 }
