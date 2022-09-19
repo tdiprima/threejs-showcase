@@ -9,16 +9,19 @@ import { CSS2DRenderer, CSS2DObject } from "three/examples/jsm/renderers/CSS2DRe
 let annotations = [];
 let annotationMarkers = [];
 
+// LEFT LIGHTING
 let light = new THREE.DirectionalLight();
 light.position.set(-30, 30, 30);
 
 let scene = new THREE.Scene();
 scene.add(light);
 
+// LIGHTING
 let light2 = new THREE.DirectionalLight();
 light2.position.set(30, 30, -30);
 scene.add(light2);
 
+// Position camera so we can see the house nicely
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.x = 10;
 camera.position.y = 5;
@@ -28,6 +31,7 @@ let renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+// LABELS - the numbers inside the circles
 let labelRenderer = new CSS2DRenderer();
 labelRenderer.setSize(window.innerWidth, window.innerHeight);
 labelRenderer.domElement.style.position = "absolute";
@@ -35,18 +39,27 @@ labelRenderer.domElement.style.top = "0px";
 labelRenderer.domElement.style.pointerEvents = "none";
 document.body.appendChild(labelRenderer.domElement);
 
+// ORBIT CONTROLS - allow the camera to orbit around a target.
 let controls = new OrbitControls(camera, renderer.domElement);
 controls.dampingFactor = 0.2;
 controls.enableDamping = true;
 controls.target.set(8, 3, 4);
 
+// RAYCASTING - allows you to create a vector from a 3D point in the scene & detect which objects the vector intersects.
 let raycaster = new THREE.Raycaster();
 let sceneMeshes = [];
-let circleTexture = new THREE.TextureLoader().load("/extra_html/img/circle.png");
 
-let mtlLoader = new MTLLoader();
-mtlLoader.load(
-  "/extra_html/models/house_water.mtl",
+const obj_url = "/extra_html/models/house_water.obj";
+const mtl_url = "/extra_html/models/house_water.mtl";
+const anno_url = "/data/annotations.json";
+const circle_url = "/extra_html/img/circle.png";
+
+// CIRCLE
+let circleTexture = new THREE.TextureLoader().load(circle_url);
+
+// MTL = Material Template Library format.
+new MTLLoader().load(
+  mtl_url,
   materials => {
     materials.preload();
     let progressBar = document.getElementById("progressBar");
@@ -54,14 +67,14 @@ mtlLoader.load(
     let objLoader = new OBJLoader();
     objLoader.setMaterials(materials);
     objLoader.load(
-      "/extra_html/models/house_water.obj",
+      obj_url,
       object => {
         object.scale.set(0.01, 0.01, 0.01);
         scene.add(object);
         sceneMeshes.push(object);
 
         let annotationsDownload = new XMLHttpRequest();
-        annotationsDownload.open("GET", "/data/annotations.json");
+        annotationsDownload.open("GET", anno_url);
 
         annotationsDownload.onreadystatechange = function() {
           if (annotationsDownload.readyState === 4) {
@@ -119,20 +132,21 @@ mtlLoader.load(
       xhr => {
         if (xhr.lengthComputable) {
           let percentComplete = (xhr.loaded / xhr.total) * 100;
+          // console.log(`%c${percentComplete}`, "color: lime");
           progressBar.value = percentComplete;
           progressBar.style.display = "block";
         }
       },
       error => {
-        console.log("An error happened");
+        console.log(`%c${error.message}`, "color: #ff6a5a;");
       }
     );
   },
   xhr => {
-    console.log(`${(xhr.loaded / xhr.total) * 100}% loaded`);
+    console.log(`%c${(xhr.loaded / xhr.total) * 100}% loaded`, "color: lime");
   },
   error => {
-    console.log("An error happened");
+    console.log(`%c${error.message}`, "color: #ff6a5a;");
   }
 );
 
@@ -156,7 +170,7 @@ function onClick(event) {
   );
 
   let intersects = raycaster.intersectObjects(annotationMarkers, true);
-  if (intersects[0].object.userData && intersects[0].object.userData.id) {
+  if (intersects.length > 0 && intersects[0].object.userData && intersects[0].object.userData.id) {
     gotoAnnotation(annotations[intersects[0].object.userData.id]);
   }
 }
@@ -186,8 +200,8 @@ function onDoubleClick(event) {
       .easing(TWEEN.Easing.Cubic.Out)
       .start()
       .onComplete(() => {
-        console.log(camera.position);
-        console.log(controls.target);
+        console.log("camera.position", camera.position);
+        console.log("controls.target", controls.target);
       });
   }
 }
