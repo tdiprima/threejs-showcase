@@ -200,8 +200,8 @@ function onDoubleClick(event) {
       .easing(TWEEN.Easing.Cubic.Out)
       .start()
       .onComplete(() => {
-        console.log("camera.position", camera.position);
-        console.log("controls.target", controls.target);
+        console.log("camera position", camera.position);
+        console.log("controls target", controls.target);
       });
   }
 }
