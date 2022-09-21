@@ -14,4 +14,6 @@ Removed the [sphere and cube](https://r105.threejsfundamentals.org/threejs/three
 
 From that the first thing we need to do is include the [OBJLoader2](https://threejs.org/docs/#examples/loaders/OBJLoader2) loader in our scene. The OBJLoader2 also needs the [LoaderSupport.js](https://threejs.org/docs/#examples/loaders/LoaderSupport.js) file so let's add both.
 
+We need the material on the blades to be double sided, something we went over in [the article on materials](https://r105.threejsfundamentals.org/threejs/lessons/threejs-materials.html).
+
 ## [Example of loading a Three JS object with OBJLoader as well as MTLLoader to attach the MTL file](https://observablehq.com/@hellonearthis/this-is-an-example-of-loading-a-three-js-object-with-objloade)
