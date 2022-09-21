@@ -81,6 +81,13 @@
   addPoint(0, 0, 0); // start point
   addPoint(1, 0, 0); // current pointer coordinate
 
+  renderer.domElement.addEventListener('pointerdown', onPointerDown);
+  renderer.domElement.addEventListener('pointermove', onPointerMove);
+
+  window.addEventListener("resize", onWindowResize, false);
+
+  animate();
+
   function addPoint(x, y, z) {
     const positionAttribute = line.geometry.getAttribute('position');
     positionAttribute.setXYZ(index, x, y, z);
@@ -91,6 +98,36 @@
     line.geometry.setDrawRange(0, index);
   }
 
+  function updatePoint(x, y, z) {
+    const positionAttribute = line.geometry.getAttribute('position');
+    positionAttribute.setXYZ(index - 1, coords.x, coords.y, 0);
+    positionAttribute.needsUpdate = true;
+  }
+
+  function onPointerDown(event) {
+    coords.x = (event.clientX / window.innerWidth) * 2 - 1;
+    coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    // coords.z = (camera.near + camera.far) / (camera.near - camera.far);
+
+    // coords.unproject(camera);
+
+    addPoint(coords.x, coords.y, 0);
+
+    renderer.render(scene, camera);
+  }
+
+  function onPointerMove(event) {
+    coords.x = (event.clientX / window.innerWidth) * 2 - 1;
+    coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    // coords.z = (camera.near + camera.far) / (camera.near - camera.far);
+
+    // coords.unproject(camera);
+
+    updatePoint(coords.x, coords.y, 0);
+
+    renderer.render(scene, camera);
+  }
+
   function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -98,14 +135,10 @@
     renderer.render(scene, camera);
   }
 
-  window.addEventListener("resize", onWindowResize, false);
-
   function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
   }
-
-  animate();
 </script>
 </body>
 </html>
