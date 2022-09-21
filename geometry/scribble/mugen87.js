@@ -8,6 +8,7 @@ render();
 
 function init() {
   // https://stackoverflow.com/questions/17558085/three-js-orthographic-camera
+  // See also: webgl_camera.html
   let aspect = window.innerWidth / window.innerHeight;
 
   let height = frustumSize;
