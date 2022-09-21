@@ -13,31 +13,38 @@
   </style>
 </head>
 <body>
-<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/three.min.js"></script>
+<!-- <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/three.min.js"></script>
 <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/controls/OrbitControls.js"></script>
 <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/LoaderSupport.js"></script>
 <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/OBJLoader2.js"></script>
-<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/MTLLoader.js"></script>
+<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/MTLLoader.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.144/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/loaders/MTLLoader.js"></script>
 <script>
   console.log(`%cREVISION ${THREE.REVISION}`, "color: #ccff00;");
 
   let scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x333333);
+  scene.background = new THREE.Color(0xcfe2f3);
 
-  let lights = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+  let lights = new THREE.HemisphereLight();
   scene.add(lights);
+
+  // let helper = new THREE.HemisphereLightHelper(light, 5);
+  // scene.add(helper);
 
   let radius = 0.01;
 
   // Camera parameters
-  const fov = 45; // could be 75
-  const aspect = window.innerWidth / window.innerHeight;
-  const near = radius / 2;
-  const far = 1000 * radius;
+  let fov = 45;
+  let aspect = window.innerWidth / window.innerHeight;
+  let near = radius / 2;
+  let far = 1000 * radius;
 
   console.log('radius ', radius, ' near ', near, ' far ', far);
 
-  const camera = (window._camera = new THREE.PerspectiveCamera(fov, aspect, near, far));
+  let camera = (window._camera = new THREE.PerspectiveCamera(fov, aspect, near, far));
   // camera.position.set(-4, 0.580335703124709, 5);
   camera.position.set(-0.007560464555714057, 0.5278398102814124, 0.3606677485446075);
 
@@ -47,14 +54,33 @@
 
   let controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-  let objLoader = new THREE.OBJLoader2();
-  objLoader.loadMtl("RangiririPaAucklandSketchfab.mtl", null, materials => {
-    objLoader.setMaterials(materials);
-    objLoader.load("RangiririPaAucklandSketchfab.obj", event => {
-      let root = event.detail.loaderRootNode;
-      scene.add(root);
+  // let objLoader = new THREE.OBJLoader2();
+  // objLoader.loadMtl("RangiririPaAucklandSketchfab.mtl", null, materials => {
+  //   objLoader.setMaterials(materials);
+  //   objLoader.load("RangiririPaAucklandSketchfab.obj", event => {
+  //     let root = event.detail.loaderRootNode;
+  //     scene.add(root);
+  //   });
+  // });
+
+  new THREE.MTLLoader()
+    .load("RangiririPaAucklandSketchfab.mtl", function (materials) {
+      materials.preload();
+      new THREE.OBJLoader()
+        .setMaterials(materials)
+        .load("RangiririPaAucklandSketchfab.obj", function (object) {
+          scene.add(object);
+        });
     });
-  });
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener("resize", onWindowResize, false);
 
   function animate() {
     requestAnimationFrame(animate);
