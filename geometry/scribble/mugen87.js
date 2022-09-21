@@ -1,7 +1,5 @@
 let camera, scene, renderer, line;
 
-const frustumSize = 4;
-
 let index = 0;
 const coords = new THREE.Vector3();
 
@@ -11,14 +9,21 @@ render();
 function init() {
   const aspect = window.innerWidth / window.innerHeight;
 
-  // new OrthographicCamera(left: 0, right: width, top: 0, bottom: height, near: 0, far: 20);
+  const frustumSize = 4;
+  const height = frustumSize;
+  const width = frustumSize * aspect; // width of the camera's cuboid-shaped frustum measured in world-space units.
+  const near = 0.1;
+  const far = 20;
+
+  // Pattern for instantiating an orthographic camera:
+  // new OrthographicCamera(left, right, top, bottom, near, far);
   camera = new THREE.OrthographicCamera(
-    (frustumSize * aspect) / -2,
-    (frustumSize * aspect) / 2,
-    frustumSize / 2,
-    frustumSize / -2,
-    0.1,
-    20
+    width / -2,
+    width / 2,
+    height / 2,
+    height / -2,
+    near,
+    far
   );
   camera.position.z = 5;
 
