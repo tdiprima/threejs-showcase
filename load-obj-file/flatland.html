@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Document</title>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/three.min.js"></script>
+<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/controls/OrbitControls.js"></script>
+<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/LoaderSupport.js"></script>
+<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/OBJLoader2.js"></script>
+<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/MTLLoader.js"></script>
+<script>
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  let renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  let skyColor = 0xb1e1ff; // light blue
+  let groundColor = 0xb97a20; // brownish orange
+  let intensity = 1;
+  let light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+  scene.add(light);
+
+  let color = 0xffffff;
+  intensity = 1;
+  light = new THREE.DirectionalLight(color, intensity);
+  light.position.set(5, 10, 2);
+  scene.add(light);
+  scene.add(light.target);
+
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  let objLoader = new THREE.OBJLoader2();
+  objLoader.loadMtl(
+    "RangiririPaAucklandSketchfab.mtl",
+    null,
+    materials => {
+      objLoader.setMaterials(materials);
+      objLoader.load("RangiririPaAucklandSketchfab.obj", event => {
+        let root = event.detail.loaderRootNode;
+        scene.add(root);
+      });
+    }
+  );
+
+  camera.position.z = 5;
+
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
+</body>
+</html>
