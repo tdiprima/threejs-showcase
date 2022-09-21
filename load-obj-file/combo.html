@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>updated</title>
+  <title>Combo</title>
   <style>
     body {
       margin: 0;
@@ -46,20 +46,20 @@
   let controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   // let objLoader = new THREE.OBJLoader();
-  // objLoader.loadMtl("RangiririPaAucklandSketchfab.mtl", null, materials => {
+  // objLoader.loadMtl("assets/flatland.mtl", null, materials => {
   //   objLoader.setMaterials(materials);
-  //   objLoader.load("RangiririPaAucklandSketchfab.obj", event => {
+  //   objLoader.load("assets/flatland.obj", event => {
   //     let root = event.detail.loaderRootNode;
   //     scene.add(root);
   //   });
   // });
 
   new THREE.MTLLoader()
-    .load("RangiririPaAucklandSketchfab.mtl", function (materials) {
+    .load("assets/flatland.mtl", function (materials) {
       materials.preload();
       new THREE.OBJLoader()
         .setMaterials(materials)
-        .load("RangiririPaAucklandSketchfab.obj", function (object) {
+        .load("assets/flatland.obj", function (object) {
           scene.add(object);
         });
     });
