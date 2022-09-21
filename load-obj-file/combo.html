@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>updated</title>
+  <style>
+    body {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/three@0.144/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/loaders/OBJLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/loaders/MTLLoader.js"></script>
+<script>
+  let scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xCFE2F3);
+
+  let lights = new THREE.HemisphereLight();
+  scene.add(lights);
+
+  // let helper = new THREE.HemisphereLightHelper(light, 5);
+  // scene.add(helper);
+
+  let radius = 0.01;
+
+  // Camera parameters
+  let fov = 45;
+  let aspect = window.innerWidth / window.innerHeight;
+  let near = radius / 2;
+  let far = 1000 * radius;
+
+  let camera = (window._camera = new THREE.PerspectiveCamera(fov, aspect, near, far));
+  camera.position.set(-0.007560464555714057, 0.5278398102814124, 0.3606677485446075);
+
+  let renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+  // let objLoader = new THREE.OBJLoader();
+  // objLoader.loadMtl("RangiririPaAucklandSketchfab.mtl", null, materials => {
+  //   objLoader.setMaterials(materials);
+  //   objLoader.load("RangiririPaAucklandSketchfab.obj", event => {
+  //     let root = event.detail.loaderRootNode;
+  //     scene.add(root);
+  //   });
+  // });
+
+  new THREE.MTLLoader()
+    .load("RangiririPaAucklandSketchfab.mtl", function (materials) {
+      materials.preload();
+      new THREE.OBJLoader()
+        .setMaterials(materials)
+        .load("RangiririPaAucklandSketchfab.obj", function (object) {
+          scene.add(object);
+        });
+    });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
+</body>
+</html>
