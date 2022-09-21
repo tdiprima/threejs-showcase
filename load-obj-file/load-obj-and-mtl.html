@@ -1,27 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
   <title>Three.js - Load .OBJ and .MTL file - Fixed</title>
   <!-- https://jsfiddle.net/api/mdn/ -->
   <!-- https://r105.threejsfundamentals.org/threejs/lessons/threejs-load-obj.html -->
-  <meta content="width=device-width, initial-scale=1" name="viewport">
-
-  <style id="compiled-css" type="text/css">
+  <style>
     html, body {
-      margin: 0;
       height: 100%;
+      margin: 0;
     }
 
     #c {
+      display: block;
       width: 100%;
       height: 100%;
-      display: block;
     }
   </style>
-
-  <script id="insert"></script>
-
 </head>
 <body>
 <canvas id="c"></canvas>
@@ -30,113 +26,111 @@
 <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/LoaderSupport.js"></script>
 <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/OBJLoader2.js"></script>
 <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/MTLLoader.js"></script>
+<script>
+  // Three.js - Load .OBJ and .MTL file - Fixed
+  // from https://r105.threejsfundamentals.org/threejs/threejs-load-obj-materials-fixed.html
 
-<script type="text/javascript">//<![CDATA[
+  /* global THREE */
 
-// Three.js - Load .OBJ and .MTL file - Fixed
-// from https://r105.threejsfundamentals.org/threejs/threejs-load-obj-materials-fixed.html
+  function main() {
+    let canvas = document.querySelector("#c");
+    let renderer = new THREE.WebGLRenderer({ canvas });
 
-'use strict';
+    let fov = 45;
+    let aspect = 2; // the canvas default
+    let near = 0.1;
+    let far = 100;
+    let camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    camera.position.set(0, 10, 20);
 
-/* global THREE */
+    let controls = new THREE.OrbitControls(camera, canvas);
+    controls.target.set(0, 5, 0);
+    controls.update();
 
-function main() {
-  const canvas = document.querySelector('#c');
-  const renderer = new THREE.WebGLRenderer({canvas});
+    let scene = new THREE.Scene();
+    scene.background = new THREE.Color("black");
 
-  const fov = 45;
-  const aspect = 2;  // the canvas default
-  const near = 0.1;
-  const far = 100;
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-  camera.position.set(0, 10, 20);
+    {
+      let planeSize = 40;
 
-  const controls = new THREE.OrbitControls(camera, canvas);
-  controls.target.set(0, 5, 0);
-  controls.update();
+      let loader = new THREE.TextureLoader();
+      let texture = loader.load("https://r105.threejsfundamentals.org/threejs/resources/images/checker.png");
+      texture.wrapS = THREE.RepeatWrapping;
+      texture.wrapT = THREE.RepeatWrapping;
+      texture.magFilter = THREE.NearestFilter;
+      let repeats = planeSize / 2;
+      texture.repeat.set(repeats, repeats);
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color('black');
-
-  {
-    const planeSize = 40;
-
-    const loader = new THREE.TextureLoader();
-    const texture = loader.load('https://r105.threejsfundamentals.org/threejs/resources/images/checker.png');
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-    texture.magFilter = THREE.NearestFilter;
-    const repeats = planeSize / 2;
-    texture.repeat.set(repeats, repeats);
-
-    const planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
-    const planeMat = new THREE.MeshPhongMaterial({
-      map: texture,
-      side: THREE.DoubleSide,
-    });
-    const mesh = new THREE.Mesh(planeGeo, planeMat);
-    mesh.rotation.x = Math.PI * -.5;
-    scene.add(mesh);
-  }
-
-  {
-    const skyColor = 0xB1E1FF;  // light blue
-    const groundColor = 0xB97A20;  // brownish orange
-    const intensity = 1;
-    const light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
-    scene.add(light);
-  }
-
-  {
-    const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(5, 10, 2);
-    scene.add(light);
-    scene.add(light.target);
-  }
-
-  {
-    const objLoader = new THREE.OBJLoader2();
-    objLoader.loadMtl('https://r105.threejsfundamentals.org/threejs/resources/models/windmill/windmill-fixed.mtl', null, (materials) => {
-      materials.Material.side = THREE.DoubleSide;
-      objLoader.setMaterials(materials);
-      objLoader.load('https://r105.threejsfundamentals.org/threejs/resources/models/windmill/windmill.obj', (event) => {
-        const root = event.detail.loaderRootNode;
-        scene.add(root);
+      let planeGeo = new THREE.PlaneBufferGeometry(planeSize, planeSize);
+      let planeMat = new THREE.MeshPhongMaterial({
+        map: texture,
+        side: THREE.DoubleSide
       });
-    });
-  }
-
-  function resizeRendererToDisplaySize(renderer) {
-    const canvas = renderer.domElement;
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    const needResize = canvas.width !== width || canvas.height !== height;
-    if (needResize) {
-      renderer.setSize(width, height, false);
-    }
-    return needResize;
-  }
-
-  function render() {
-
-    if (resizeRendererToDisplaySize(renderer)) {
-      const canvas = renderer.domElement;
-      camera.aspect = canvas.clientWidth / canvas.clientHeight;
-      camera.updateProjectionMatrix();
+      let mesh = new THREE.Mesh(planeGeo, planeMat);
+      mesh.rotation.x = Math.PI * -0.5;
+      scene.add(mesh);
     }
 
-    renderer.render(scene, camera);
+    {
+      let skyColor = 0xb1e1ff; // light blue
+      let groundColor = 0xb97a20; // brownish orange
+      let intensity = 1;
+      let light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
+      scene.add(light);
+    }
+
+    {
+      let color = 0xffffff;
+      let intensity = 1;
+      let light = new THREE.DirectionalLight(color, intensity);
+      light.position.set(5, 10, 2);
+      scene.add(light);
+      scene.add(light.target);
+    }
+
+    {
+      let objLoader = new THREE.OBJLoader2();
+      objLoader.loadMtl(
+        "https://r105.threejsfundamentals.org/threejs/resources/models/windmill/windmill-fixed.mtl",
+        null,
+        materials => {
+          materials.Material.side = THREE.DoubleSide;
+          objLoader.setMaterials(materials);
+          objLoader.load("https://r105.threejsfundamentals.org/threejs/resources/models/windmill/windmill.obj", event => {
+            let root = event.detail.loaderRootNode;
+            scene.add(root);
+          });
+        }
+      );
+    }
+
+    function resizeRendererToDisplaySize(renderer) {
+      let canvas = renderer.domElement;
+      let width = canvas.clientWidth;
+      let height = canvas.clientHeight;
+      let needResize = canvas.width !== width || canvas.height !== height;
+      if (needResize) {
+        renderer.setSize(width, height, false);
+      }
+      return needResize;
+    }
+
+    function render() {
+      if (resizeRendererToDisplaySize(renderer)) {
+        let canvas = renderer.domElement;
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
+      }
+
+      renderer.render(scene, camera);
+
+      requestAnimationFrame(render);
+    }
 
     requestAnimationFrame(render);
   }
 
-  requestAnimationFrame(render);
-}
-
-main();
-
-//]]></script>
+  main();
+</script>
 </body>
 </html>
