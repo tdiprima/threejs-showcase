@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Document</title>
+  <title>Flatland</title>
   <style>
     body {
       margin: 0;
@@ -19,41 +19,39 @@
 <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/MTLLoader.js"></script>
 <script>
   let scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  scene.background = new THREE.Color(0x333333);
 
-  let renderer = new THREE.WebGLRenderer({antialias: true});
+  let lights = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
+  scene.add(lights);
+
+  let radius = 0.01;
+
+  // Camera parameters
+  const fov = 45; // could be 75
+  const aspect = window.innerWidth / window.innerHeight;
+  const near = radius / 2;
+  const far = 1000 * radius;
+
+  console.log('radius ', radius, ' near ', near, ' far ', far);
+
+  const camera = (window._camera = new THREE.PerspectiveCamera(fov, aspect, near, far));
+  // camera.position.set(-4, 0.580335703124709, 5);
+  camera.position.set(-0.007560464555714057, 0.5278398102814124, 0.3606677485446075);
+
+  let renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
-
-  let skyColor = 0xb1e1ff; // light blue
-  let groundColor = 0xb97a20; // brownish orange
-  let intensity = 1;
-  let light = new THREE.HemisphereLight(skyColor, groundColor, intensity);
-  scene.add(light);
-
-  let color = 0xffffff;
-  intensity = 1;
-  light = new THREE.DirectionalLight(color, intensity);
-  light.position.set(5, 10, 2);
-  scene.add(light);
-  scene.add(light.target);
 
   let controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   let objLoader = new THREE.OBJLoader2();
-  objLoader.loadMtl(
-    "RangiririPaAucklandSketchfab.mtl",
-    null,
-    materials => {
-      objLoader.setMaterials(materials);
-      objLoader.load("RangiririPaAucklandSketchfab.obj", event => {
-        let root = event.detail.loaderRootNode;
-        scene.add(root);
-      });
-    }
-  );
-
-  camera.position.z = 5;
+  objLoader.loadMtl("RangiririPaAucklandSketchfab.mtl", null, materials => {
+    objLoader.setMaterials(materials);
+    objLoader.load("RangiririPaAucklandSketchfab.obj", event => {
+      let root = event.detail.loaderRootNode;
+      scene.add(root);
+    });
+  });
 
   function animate() {
     requestAnimationFrame(animate);
