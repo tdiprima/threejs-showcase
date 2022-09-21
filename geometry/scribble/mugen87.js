@@ -27,6 +27,10 @@ function init() {
     near,
     far
   );
+
+  // Camera that uses perspective projection.
+  // camera = new THREE.PerspectiveCamera( 45, aspect, 1, 1000 );
+
   camera.position.z = 5;
 
   scene = new THREE.Scene();
