@@ -1,19 +1,20 @@
 let camera, scene, renderer, line;
-
+let frustumSize = 4;
+let coords = new THREE.Vector3();
 let index = 0;
-const coords = new THREE.Vector3();
 
 init();
 render();
 
 function init() {
-  const aspect = window.innerWidth / window.innerHeight;
+  // https://stackoverflow.com/questions/17558085/three-js-orthographic-camera
+  let aspect = window.innerWidth / window.innerHeight;
 
-  const frustumSize = 4;
-  const height = frustumSize;
-  const width = frustumSize * aspect; // width of the camera's cuboid-shaped frustum measured in world-space units.
-  const near = 0.1;
-  const far = 20;
+  let height = frustumSize;
+  // the camera aspect ratio should match the aspect ratio of the renderer's viewport
+  let width = frustumSize * aspect; // width of the camera's cuboid-shaped frustum measured in world-space units.
+  let near = 0.1; // near and far are the world-space distances to the near and far planes of the frustum.
+  let far = 20;
 
   // Pattern for instantiating an orthographic camera:
   // new OrthographicCamera(left, right, top, bottom, near, far);
@@ -29,13 +30,13 @@ function init() {
 
   scene = new THREE.Scene();
 
-  const geometry = new THREE.BufferGeometry();
+  let geometry = new THREE.BufferGeometry();
 
-  const positionAttribute = new THREE.BufferAttribute(new Float32Array(1000 * 3), 3); // allocate large enough buffer
+  let positionAttribute = new THREE.BufferAttribute(new Float32Array(1000 * 3), 3); // allocate large enough buffer
   positionAttribute.setUsage(THREE.DynamicDrawUsage);
-  geometry.setAttribute('position', positionAttribute);
+  geometry.setAttribute("position", positionAttribute);
 
-  const material = new THREE.LineBasicMaterial();
+  let material = new THREE.LineBasicMaterial();
 
   line = new THREE.Line(geometry, material);
   scene.add(line);
@@ -53,14 +54,14 @@ function init() {
 
   document.body.appendChild(renderer.domElement);
 
-  renderer.domElement.addEventListener('pointerdown', onPointerDown);
-  renderer.domElement.addEventListener('pointermove', onPointerMove);
+  renderer.domElement.addEventListener("pointerdown", onPointerDown);
+  renderer.domElement.addEventListener("pointermove", onPointerMove);
 
-  window.addEventListener('resize', onWindowResize);
+  window.addEventListener("resize", onWindowResize);
 }
 
 function addPoint(x, y, z) {
-  const positionAttribute = line.geometry.getAttribute('position');
+  let positionAttribute = line.geometry.getAttribute("position");
   positionAttribute.setXYZ(index, x, y, z);
   positionAttribute.needsUpdate = true;
 
@@ -70,7 +71,7 @@ function addPoint(x, y, z) {
 }
 
 function updatePoint(x, y, z) {
-  const positionAttribute = line.geometry.getAttribute('position');
+  let positionAttribute = line.geometry.getAttribute("position");
   positionAttribute.setXYZ(index - 1, coords.x, coords.y, 0);
   positionAttribute.needsUpdate = true;
 }
@@ -103,7 +104,7 @@ function onPointerMove(event) {
 function onWindowResize() {
   // set the aspect ratio to match the new browser window aspect ratio
   // camera.aspect = container.clientWidth / container.clientHeight;
-  const aspect = window.innerWidth / window.innerHeight;
+  let aspect = window.innerWidth / window.innerHeight;
 
   camera.left = (-frustumSize * aspect) / 2;
   camera.right = (frustumSize * aspect) / 2;
