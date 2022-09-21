@@ -17,8 +17,10 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/loaders/OBJLoader.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/loaders/MTLLoader.js"></script>
 <script>
+  console.log(`%cREVISION ${THREE.REVISION}`, "color: #ccff00;");
+
   let scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xCFE2F3);
+  scene.background = new THREE.Color(0xcfe2f3);
 
   let lights = new THREE.HemisphereLight();
   scene.add(lights);
@@ -34,7 +36,7 @@
   let near = radius / 2;
   let far = 1000 * radius;
 
-  let camera = (window._camera = new THREE.PerspectiveCamera(fov, aspect, near, far));
+  let camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
   camera.position.set(-0.007560464555714057, 0.5278398102814124, 0.3606677485446075);
 
   let renderer = new THREE.WebGLRenderer({antialias: true});
@@ -61,6 +63,15 @@
           scene.add(object);
         });
     });
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener("resize", onWindowResize, false);
 
   function animate() {
     requestAnimationFrame(animate);
