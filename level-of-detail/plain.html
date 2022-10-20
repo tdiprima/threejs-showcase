@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>LOD</title>
+  <title>Ha! :)</title>
+  <!-- https://discourse.threejs.org/t/does-loading-a-glb-file-load-a-scene/36009 -->
   <link href="/stylesheets/style.css" rel="stylesheet"/>
   <style>
     body {
@@ -60,7 +61,6 @@
 
   let controls = new OrbitControls(camera, renderer.domElement);
 
-  let sceneMeshes = [];
   let material = new THREE.MeshPhongMaterial({color: fernGreen});
 
   let planeGeometry = new THREE.PlaneGeometry(1, 1);
@@ -70,95 +70,42 @@
   planeMesh.rotateX(-Math.PI / 2);
   planeMesh.receiveShadow = true;
   scene.add(planeMesh);
-  sceneMeshes.push(planeMesh);
 
   let childObjectCount = 2; // how many child meshes are in the tree model. The trunk and leaves are different meshes
-  let treeCount = 1200; // this many trees are drawn
-  let treeCounter = 0;
-
-  let positions = [];
-  for (let i = 0; i < treeCount; i++) {
-    positions.push({x: Math.random() * 400 - 200, y: 0, z: Math.random() * 400 - 200});
-  }
-
-  let scales = [];
-  for (let i = 0; i < treeCount; i++) {
-    scales.push({x: Math.random() * 2 + 1, y: Math.random() * 5 + 1, z: Math.random() * 2 + 1});
-  }
 
   let treesTypes = ["saplingTree", "birchTreeWithLeaves", "tree1WithLeaves"];
+
+  // I got 3 trees on top of each other, and I kinda like it that way:
   treesTypes.forEach(treeType => {
     let treeHighDetail = new THREE.Object3D();
-    let treeMediumDetail = new THREE.Object3D();
-    let treeLowDetail = new THREE.Object3D();
 
     let gLTFLoader = new GLTFLoader();
     gLTFLoader.load(`/extra_html/models/${treeType}_high.glb`, gltf => {
-      // const mesh = gltf.scene.children[0];
-      // scene.add(mesh); // <- Here's a stupid tree, laying on its side.
+      // You could just do that:
+      // let geometry = gltf.scene.children[0].children[1].geometry;
+      // treeHighDetail.add(new THREE.Mesh(geometry, gltf.scene.children[0].children[1].material));
+      // scene.add(treeHighDetail);
 
-      // TODO:
-      // Somehow, this gets the trees to stand up, and you can swivel
-      // them around on the plane.
       for (let j = 0; j < childObjectCount; j++) {
+        // NOTE: Do not just grab the first child of the group unless you're very sure about
+        // the exact content of your model. If you discard parent objects, you may also be
+        // discarding the position/rotation/scale that would be necessary for the objects
+        // to appear in the right locations.
+        // In our case, that's exactly the point.
         let geometry = gltf.scene.children[0].children[j].geometry;
         treeHighDetail.add(new THREE.Mesh(geometry, gltf.scene.children[0].children[j].material));
       }
 
+      // Traverse the gltf.scene and look for specific content.
+      // Get all the mesh inside your file:
       treeHighDetail.traverse(child => {
         if (child.isMesh) {
+          // retrieve geometry/map/skeleton or whatsoever here...
           child.castShadow = true;
         }
       });
 
-      gLTFLoader.load(`/extra_html/models/${treeType}_medium.glb`, gltf => {
-
-        for (let j = 0; j < childObjectCount; j++) {
-          let geometry = gltf.scene.children[0].children[j].geometry;
-          treeMediumDetail.add(new THREE.Mesh(geometry, gltf.scene.children[0].children[j].material));
-        }
-
-        treeMediumDetail.traverse(child => {
-          if (child.isMesh) {
-            child.castShadow = true;
-          }
-        });
-
-        gLTFLoader.load(`/extra_html/models/${treeType}_low.glb`, gltf => {
-          for (let j = 0; j < childObjectCount; j++) {
-            let geometry = gltf.scene.children[0].children[j].geometry;
-            treeLowDetail.add(new THREE.Mesh(geometry, gltf.scene.children[0].children[j].material));
-          }
-
-          treeLowDetail.traverse(child => {
-            if (child.isMesh) {
-              child.castShadow = true;
-            }
-          });
-
-          for (let i = 0; i < treeCount / treesTypes.length; i++) {
-            let lod = new THREE.LOD();
-
-            let mesh = treeHighDetail.clone();
-            mesh.scale.copy(scales[treeCounter]);
-
-            lod.addLevel(mesh, 5);
-
-            mesh = treeMediumDetail.clone();
-            mesh.scale.copy(scales[treeCounter]);
-
-            lod.addLevel(mesh, 10);
-            mesh = treeLowDetail.clone();
-            mesh.scale.copy(scales[treeCounter]);
-
-            lod.addLevel(mesh, 30);
-            lod.position.copy(positions[treeCounter]);
-
-            scene.add(lod);
-            treeCounter++;
-          }
-        });
-      });
+      scene.add(treeHighDetail); // Now add it to the scene.
     });
   });
 
