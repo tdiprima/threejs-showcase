@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>LOD</title>
+  <link href="/stylesheets/style.css" rel="stylesheet"/>
+  <style>
+    body {
+      overflow: hidden;
+      margin: 0;
+    }
+  </style>
+  <script async src="/extra_html/utils/es-module-shims.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+          "three": "/build/three.module.js",
+          "three/examples/jsm/controls/OrbitControls": "/jsm/controls/OrbitControls.js",
+          "three/examples/jsm/loaders/GLTFLoader": "/jsm/loaders/GLTFLoader.js"
+      }
+    }
+  </script>
+</head>
+<body>
+<script type="module">
+  import * as THREE from "three";
+  import {OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+  import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
+
+  const skyblue = "#87ceeb";
+  const fernGreen = "#567d46";
+
+  let scene = new THREE.Scene();
+  scene.background = new THREE.Color(skyblue);
+
+  let light = new THREE.DirectionalLight(0xffffff, 2.0);
+  light.position.set(100, 100, 100);
+  light.castShadow = true;
+  light.shadow.mapSize.width = 4096;
+  light.shadow.mapSize.height = 4096;
+  light.shadow.camera.near = 0.5;
+  light.shadow.camera.far = 500;
+  light.shadow.camera.left = -500;
+  light.shadow.camera.right = 500;
+  light.shadow.camera.top = 500;
+  light.shadow.camera.bottom = -500;
+  scene.add(light);
+
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.x = 4;
+  camera.position.y = 5;
+  camera.position.z = 7;
+
+  let renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  document.body.appendChild(renderer.domElement);
+
+  let controls = new OrbitControls(camera, renderer.domElement);
+
+  let sceneMeshes = [];
+  let material = new THREE.MeshPhongMaterial({color: fernGreen});
+
+  let planeGeometry = new THREE.PlaneGeometry(1, 1);
+  planeGeometry.scale(500, 500, 1);
+
+  let planeMesh = new THREE.Mesh(planeGeometry, material);
+  planeMesh.rotateX(-Math.PI / 2);
+  planeMesh.receiveShadow = true;
+  scene.add(planeMesh);
+  sceneMeshes.push(planeMesh);
+
+  let childObjectCount = 2; // how many child meshes are in the tree model. The trunk and leaves are different meshes
+  let treeCount = 1200; // this many trees are drawn
+  let treeCounter = 0;
+
+  let positions = [];
+  for (let i = 0; i < treeCount; i++) {
+    positions.push({x: Math.random() * 400 - 200, y: 0, z: Math.random() * 400 - 200});
+  }
+
+  let scales = [];
+  for (let i = 0; i < treeCount; i++) {
+    scales.push({x: Math.random() * 2 + 1, y: Math.random() * 5 + 1, z: Math.random() * 2 + 1});
+  }
+
+  let treesTypes = ["saplingTree", "birchTreeWithLeaves", "tree1WithLeaves"];
+  treesTypes.forEach(treeType => {
+    let treeHighDetail = new THREE.Object3D();
+    let treeMediumDetail = new THREE.Object3D();
+    let treeLowDetail = new THREE.Object3D();
+
+    let gLTFLoader = new GLTFLoader();
+    gLTFLoader.load(`/extra_html/models/${treeType}_high.glb`, gltf => {
+      // const mesh = gltf.scene.children[0];
+      // scene.add(mesh); // <- Here's a stupid tree, laying on its side.
+
+      // TODO:
+      // Somehow, this gets the trees to stand up, and you can swivel
+      // them around on the plane.
+      for (let j = 0; j < childObjectCount; j++) {
+        let geometry = gltf.scene.children[0].children[j].geometry;
+        treeHighDetail.add(new THREE.Mesh(geometry, gltf.scene.children[0].children[j].material));
+      }
+
+      treeHighDetail.traverse(child => {
+        if (child.isMesh) {
+          child.castShadow = true;
+        }
+      });
+
+      gLTFLoader.load(`/extra_html/models/${treeType}_medium.glb`, gltf => {
+
+        for (let j = 0; j < childObjectCount; j++) {
+          let geometry = gltf.scene.children[0].children[j].geometry;
+          treeMediumDetail.add(new THREE.Mesh(geometry, gltf.scene.children[0].children[j].material));
+        }
+
+        treeMediumDetail.traverse(child => {
+          if (child.isMesh) {
+            child.castShadow = true;
+          }
+        });
+
+        gLTFLoader.load(`/extra_html/models/${treeType}_low.glb`, gltf => {
+          for (let j = 0; j < childObjectCount; j++) {
+            let geometry = gltf.scene.children[0].children[j].geometry;
+            treeLowDetail.add(new THREE.Mesh(geometry, gltf.scene.children[0].children[j].material));
+          }
+
+          treeLowDetail.traverse(child => {
+            if (child.isMesh) {
+              child.castShadow = true;
+            }
+          });
+
+          for (let i = 0; i < treeCount / treesTypes.length; i++) {
+            let lod = new THREE.LOD();
+
+            let mesh = treeHighDetail.clone();
+            mesh.scale.copy(scales[treeCounter]);
+
+            lod.addLevel(mesh, 5);
+
+            mesh = treeMediumDetail.clone();
+            mesh.scale.copy(scales[treeCounter]);
+
+            lod.addLevel(mesh, 10);
+            mesh = treeLowDetail.clone();
+            mesh.scale.copy(scales[treeCounter]);
+
+            lod.addLevel(mesh, 30);
+            lod.position.copy(positions[treeCounter]);
+
+            scene.add(lod);
+            treeCounter++;
+          }
+        });
+      });
+    });
+  });
+
+  window.addEventListener("resize", onWindowResize, false);
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    render();
+  }
+
+  var animate = function () {
+    requestAnimationFrame(animate);
+    controls.update();
+    render();
+  };
+
+  function render() {
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
+</body>
+</html>

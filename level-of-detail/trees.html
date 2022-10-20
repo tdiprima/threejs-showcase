@@ -70,6 +70,7 @@
     mesh.position.y = -0.5;
     mesh.position.x = -1;
     scene.add(mesh);
+    console.log("gltf.scene", gltf.scene);
     console.log(`%c${dumpObject(gltf.scene).join('\n')}`, "color: #00ff00;");
   }, undefined, function (error) {
     console.error(error);
