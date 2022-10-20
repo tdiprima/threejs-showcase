@@ -36,10 +36,11 @@
   import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
   import {TWEEN} from "three/examples/jsm/libs/tween.module.min";
 
-  console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
+  const skyblue = "#87ceeb";
+  const fernGreen = "#567d46";
 
   let scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x87ceeb);
+  scene.background = new THREE.Color(skyblue);
 
   let light = new THREE.DirectionalLight(0xffffff, 2.0);
   light.position.set(100, 100, 100);
@@ -74,7 +75,7 @@
 
   let raycaster = new THREE.Raycaster();
   let sceneMeshes = [];
-  let material = new THREE.MeshPhongMaterial({color: 0x567d46});
+  let material = new THREE.MeshPhongMaterial({color: fernGreen});
 
   let planeGeometry = new THREE.PlaneGeometry(1, 1);
   planeGeometry.scale(500, 500, 1);
