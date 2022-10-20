@@ -64,11 +64,17 @@
 
 <canvas height="64" id="number" width="64"></canvas>
 
-<!-- TODO: node_modules -->
-<script src="/node_modules/three/build/three.js"></script>
-<script src="/node_modules/three/examples/js/controls/OrbitControls.js"></script>
-
-<script>
+<script async src="/extra_html/utils/es-module-shims.js"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "/build/three.module.js"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "/jsm/controls/OrbitControls.js";
   // Number
   let canvas = document.getElementById("number");
   let ctx = canvas.getContext("2d");
@@ -181,7 +187,7 @@
     document.body.appendChild(renderer.domElement);
 
     // Controls
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls = new OrbitControls(camera, renderer.domElement);
     controls.enableZoom = false;
 
     window.addEventListener("resize", onWindowResize, false);
