@@ -13,16 +13,20 @@
   </style>
 </head>
 <body>
-<!-- <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/three.min.js"></script>
-<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/controls/OrbitControls.js"></script>
-<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/LoaderSupport.js"></script>
-<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/OBJLoader2.js"></script>
-<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/loaders/MTLLoader.js"></script> -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.144/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/loaders/OBJLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.144.0/examples/js/loaders/MTLLoader.js"></script>
-<script>
+<script async src="/extra_html/utils/es-module-shims.js"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "/build/three.module.js"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "/jsm/controls/OrbitControls.js";
+  import { OBJLoader } from "/jsm/loaders/OBJLoader.js";
+  import { MTLLoader } from "/jsm/loaders/MTLLoader.js";
+
   console.log(`%cREVISION ${THREE.REVISION}`, "color: #ccff00;");
 
   let scene = new THREE.Scene();
@@ -52,21 +56,12 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  let controls = new THREE.OrbitControls(camera, renderer.domElement);
+  let controls = new OrbitControls(camera, renderer.domElement);
 
-  // let objLoader = new THREE.OBJLoader2();
-  // objLoader.loadMtl("assets/flatland.mtl", null, materials => {
-  //   objLoader.setMaterials(materials);
-  //   objLoader.load("assets/flatland.obj", event => {
-  //     let root = event.detail.loaderRootNode;
-  //     scene.add(root);
-  //   });
-  // });
-
-  new THREE.MTLLoader()
+  new MTLLoader()
     .load("assets/flatland.mtl", function (materials) {
       materials.preload();
-      new THREE.OBJLoader()
+      new OBJLoader()
         .setMaterials(materials)
         .load("assets/flatland.obj", function (object) {
           scene.add(object);

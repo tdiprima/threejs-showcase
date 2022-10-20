@@ -20,11 +20,18 @@
 </head>
 <canvas id="c"></canvas>
 <body>
-  <!-- <script src="/js/three.js"></script> -->
-  <script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/three.min.js"></script>
-<script src="https://r105.threejsfundamentals.org/threejs/resources/threejs/r105/js/controls/OrbitControls.js"></script>
+<script async src="/extra_html/utils/es-module-shims.js"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "/build/three.module.js"
+    }
+  }
+</script>
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "/jsm/controls/OrbitControls.js";
 
-  <script>
     console.log(`%cREVISION ${THREE.REVISION}`, "color: #ccff00;");
     let scene = new THREE.Scene();
 
@@ -37,7 +44,7 @@
     let canvas = document.querySelector("#c");
     let renderer = new THREE.WebGLRenderer({ canvas });
 
-    let controls = new THREE.OrbitControls(camera, canvas);
+    let controls = new OrbitControls(camera, canvas);
     controls.target.set(0, 5, 0);
     controls.update();
 
