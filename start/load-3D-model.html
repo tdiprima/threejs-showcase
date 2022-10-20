@@ -6,6 +6,7 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Loading-3D-models</title>
   <!-- https://threejs.org/docs/#manual/en/introduction/Loading-3D-models -->
+  <!-- one tree -->
   <style>
     body { margin: 0; }
     canvas { width: 100%; height: 100% }
@@ -25,20 +26,32 @@
   import {OrbitControls} from '/jsm/controls/OrbitControls.js';
   import {GLTFLoader} from '/jsm/loaders/GLTFLoader.js';
 
-  console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
+  function dumpObject(obj, lines = [], isLast = true, prefix = '') {
+    const localPrefix = isLast ? '└─' : '├─';
+    lines.push(`${prefix}${prefix ? localPrefix : ''}${obj.name || '*no-name*'} [${obj.type}]`);
+    const newPrefix = prefix + (isLast ? '  ' : '│ ');
+    const lastNdx = obj.children.length - 1;
+    obj.children.forEach((child, ndx) => {
+      const isLast = ndx === lastNdx;
+      dumpObject(child, lines, isLast, newPrefix);
+    });
+    return lines;
+  }
 
   let scene = new THREE.Scene();
+  scene.background = new THREE.Color("#454B1B");
+
   let camera = window._camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
   let renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
   document.body.appendChild(renderer.domElement);
 
   let controls = new OrbitControls(camera, renderer.domElement);
 
   let light;
 
-  // light = new THREE.HemisphereLight(0xffffbb, 0x080820, 1);
   light = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
   scene.add(light);
 
@@ -47,16 +60,34 @@
   light.castShadow = true;
   scene.add(light);
 
-  let loader = new GLTFLoader();
+  let sapling = "/extra_html/models/saplingTree_high.glb";
+  let birch = "/extra_html/models/birchTreeWithLeaves_high.glb";
+  let tree = "/extra_html/models/tree1WithLeaves_high.glb";
 
-  loader.load('/extra_html/models/saplingTree_medium.glb', function (gltf) {
-
-    scene.add(gltf.scene);
-
+  new GLTFLoader().load(tree, function (gltf) {
+    const mesh = gltf.scene;
+    mesh.position.y = -0.5;
+    mesh.position.x = -1;
+    scene.add(mesh);
   }, undefined, function (error) {
-
     console.error(error);
+  });
 
+  new GLTFLoader().load(birch, gltf => {
+    // onLoad
+    const mesh = gltf.scene;
+    mesh.position.y = -0.5;
+    mesh.position.x = 1;
+    mesh.castShadow = true;
+    mesh.receiveShadow = true;
+    scene.add(mesh);
+    console.log(`%c${dumpObject(gltf.scene).join('\n')}`, "color: #00ff00;");
+  }, function (xhr) {
+    // onProgress
+    console.log(`${(xhr.loaded / xhr.total) * 100}% loaded`);
+  }, function (error) {
+    // onError
+    console.log(`%c${error.message}`, "color: #ff6a5a;");
   });
 
   camera.position.z = 5;
