@@ -1,7 +1,5 @@
 import * as THREE from "https://cdn.rawgit.com/mrdoob/three.js/r124/build/three.module.js";
 import Stats from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/libs/stats.module.js";
-// import { Reflector } from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/objects/Reflector.js";
-// import { GPUComputationRenderer } from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/misc/GPUComputationRenderer.js";
 import { GUI } from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/libs/dat.gui.module.js";
 
 console.log(`%cREV: ${THREE.REVISION}`, "color: #ff00cc;");
@@ -218,13 +216,8 @@ function animate() {
 let camSpeed = 1;
 function myKeyPress(event) {
   let key = event.which || event.keyCode;
-  // 224 = Apple command key on Firefox; in Chrome it's 91.
-  // The left command key is 91 and the right command key 93.
-  // So in your code please check for both.
   console.log(key);
 
-  // if (key === 16) spawnLight(1); // SHIFT
-  // if (key === 17) spawnBlocks(); // CTRL
   if (key === 35) camera.rotation.x -= 0.1; // END
   if (key === 36) camera.rotation.x += 0.1; // HOME
 
