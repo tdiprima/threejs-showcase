@@ -8,7 +8,10 @@ let THREE;
 MY3D.preInit = function(_THREE) {
   THREE = _THREE;
 
-  document.body.style.margin = 0;
+  // https://tr.javascript.info/styles-and-classes#mind-the-units
+  // document.body.style.margin = 0; // doesn't work!
+  // now add the CSS unit (px) - and it works
+  document.body.style.margin = "0px";
   document.body.style.overflow = "hidden";
 
   renderer = new THREE.WebGLRenderer({ antialias: false });
