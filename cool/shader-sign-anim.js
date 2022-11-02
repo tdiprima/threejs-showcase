@@ -45,7 +45,6 @@ const RAIN_AOE = 0.004;
 const RAIN_SPEED = 0.08;
 const SKY_SIZE = 9000;
 
-// https://raw.githubusercontent.com/chrismcg61/TechDemos/master/Media/CloudParticle.jpg
 let pointTexture = new THREE.TextureLoader().load("CloudParticle.jpg");
 
 let skyParticles, cloudParticles, rainParticles, rainFloorParticles;
