@@ -120,8 +120,7 @@ function initRainShader(nbLights) {
     `;
 }
 
-let vShaderSky,
-fShaderSky;
+let vShaderSky, fShaderSky;
 {
   vShaderSky = `
     attribute vec3 color;
@@ -173,7 +172,7 @@ fShaderSky;
 let shaderUniformList = [];
 
 function initGpuParticlesSky(bNormalize, pointNb, size, aoeRatio, pointSize, speed, _col, _colA, vShader, fShader) {
-  // var vertices = new THREE.BoxGeometry( 50,50,50, 10,10,10 ).vertices;
+  // let vertices = new THREE.BoxGeometry( 50,50,50, 10,10,10 ).vertices;
   let positions = new Float32Array(pointNb * 3);
   let colors = new Float32Array(pointNb * 3);
   for (let i = 0, l = pointNb; i < l; i++) {
@@ -215,9 +214,7 @@ function initGpuParticlesSky(bNormalize, pointNb, size, aoeRatio, pointSize, spe
   });
 
   shaderUniformList.push(newShaderUniforms);
-  let particles = new THREE.Points(geometry, shaderMaterialSky);
-  // scene.add( particles );
-  return particles;
+  return new THREE.Points(geometry, shaderMaterialSky); // particles
 }
 
 /*** TEXT Shader ***/
