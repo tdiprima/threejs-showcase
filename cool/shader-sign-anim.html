@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>r124 - Shader Sign Anim</title>
+  <!-- https://codepen.io/chrismcg61/details/JjEdxJV -->
+  <!-- https://cdn.rawgit.com/chrismcg61/TechDemos/1.83/MyLibs/Three/My3D.js -->
+  <script src="My3D.js"></script>
+</head>
+<body>
+<script type="module">
+  import * as THREE from "https://cdn.rawgit.com/mrdoob/three.js/r124/build/three.module.js";
+  import Stats from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/libs/stats.module.js";
+  // import { Reflector } from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/objects/Reflector.js";
+  // import { GPUComputationRenderer } from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/misc/GPUComputationRenderer.js";
+  import { GUI } from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/libs/dat.gui.module.js";
+
+  console.log(`%cREV: ${THREE.REVISION}`, "color: #ff00cc;");
+
+  MY3D.preInit(THREE);
+
+  let stats = new Stats();
+  document.body.appendChild(stats.dom);
+
+  let params = {
+    // isDay: false,
+    // cloudAlpha: 0.15,
+    init: init,
+
+    camY: 1,
+    testColor: 0xff00ff, // "#ff00ff"
+    // cityH: 40,
+    // addCityMesh: addCityMesh,
+
+    FOG: {
+      skyCol: 0x010808, // "#010808"
+      fogCol: 0x11ffff, // "#11ffff"
+      fogDensity: 0.3
+    },
+
+    SKY: {
+      cloudAlpha: 0.33,
+      cloudSize: 180,
+      _cloudNb: 800
+    },
+
+    RAIN: {
+      pointRatio: 0.01,
+      rainSize: 60,
+      rainAlpha: 0.45
+    }
+  };
+
+  let rainVars = params.RAIN;
+  let fogVars = params.FOG;
+  let skyVars = params.SKY;
+
+  let gui = new GUI();
+  MY3D.addGuiParams(gui, params);
+
+  let RAIN_AOE = 0.004;
+  let RAIN_SPEED = 0.08;
+  let SKY_SIZE = 9000;
+
+  // https://raw.githubusercontent.com/chrismcg61/TechDemos/master/Media/CloudParticle.jpg
+  let pointTexture = new THREE.TextureLoader().load("CloudParticle.jpg");
+
+  let skyParticles, cloudParticles, rainParticles, rainFloorParticles;
+  function init() {
+    shaderUniformList = [];
+
+    MY3D.onWindowResize();
+
+    // camera.far = 900000;
+    camera.position.set(0, 1, 2);
+
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.BasicShadowMap;
+
+    document.body.onkeydown = myKeyPress;
+
+    scene = new THREE.Scene();
+    scene.add(camera);
+
+    init2();
+  }
+
+  function init2() {
+    let floorGeometry = new THREE.PlaneBufferGeometry(900, 900, 30, 30);
+    floorGeometry.rotateX(-Math.PI / 2);
+    let vertices = floorGeometry.attributes.position.array;
+
+    for (let i = 0, l = vertices.length; i < l; i += 3) {
+      // vertices[i + 1] = -1 + Math.random() * 2;
+      let xx = Math.abs(vertices[i]);
+      let zz = Math.abs(vertices[i + 2]);
+      if (xx > 50) vertices[i + 1] = zz * zz * 0.0005 * Math.random();
+    }
+
+    let floorMesh = new THREE.Mesh(floorGeometry, new THREE.MeshPhongMaterial({ color: 0xcc8866 }));
+    scene.add(floorMesh);
+
+    /* Stars-Sky */
+    skyParticles = initGpuParticlesSky(
+      1,
+      500 * 1000,
+      SKY_SIZE,
+      1,
+      1,
+      0.02,
+      new THREE.Color(0.3, 0.5, 0.9),
+      { r: 1, g: 0, b: 0 },
+      vShaderSky,
+      fShaderSky
+    );
+    scene.add(skyParticles);
+
+    /* Clouds-Sky */
+    cloudParticles = initGpuParticlesSky(
+      1,
+      skyVars._cloudNb,
+      SKY_SIZE * 0.03,
+      1,
+      skyVars.cloudSize,
+      0.005,
+      new THREE.Color(0.4, 0.8, 0.8),
+      { r: 0.6, g: 0.1, b: 0.1 },
+      vShaderSky,
+      fShaderSky,
+    );
+    cloudParticles.material.uniforms.pointTexture.value = pointTexture;
+    scene.add(cloudParticles);
+
+    /* Rain Fall */
+    rainParticles = initGpuParticlesSky(
+      0,
+      100 * 1000,
+      SKY_SIZE,
+      RAIN_AOE,
+      rainVars.rainSize,
+      RAIN_SPEED,
+      new THREE.Color(0.1, 0.1, 0.1),
+      new THREE.Color(0),
+      vShaderRain,
+      fShaderRain,
+    );
+    scene.add(rainParticles);
+
+    /* Rain Floor */
+    rainFloorParticles = initGpuParticlesSky(
+      0,
+      30 * 1000,
+      SKY_SIZE,
+      RAIN_AOE,
+      1,
+      RAIN_SPEED,
+      new THREE.Color(0.1, 0.1, 0.1),
+      new THREE.Color(0),
+      vShaderRain,
+      fShaderRain,
+    );
+    scene.add(rainFloorParticles);
+
+    /*** Text Panels ***/
+    let textPanel0 = txtPanel_Init();
+    scene.add(textPanel0);
+
+    let textPanel1 = txtPanel_Init();
+    scene.add(textPanel1);
+    textPanel1.position.set(0, 1, 0);
+    txtPanel_Custom(textPanel1.material);
+  }
+
+  function txtPanel_Init() {
+    let textTexture = addTexture(1024);
+    let textShaderMaterial = initTextShaderMaterial(textTexture);
+    let newTextPanel = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), textShaderMaterial);
+    // scene.add(textPanel1);
+    return newTextPanel;
+  }
+
+  function txtPanel_Custom(textShaderMaterial) {
+    initTexture_Text(textShaderMaterial.uniforms.tex0.value, 84, "TITLE_0", [
+      "Skill1",
+      "Skill2",
+      "Skill3",
+      "Skill_Abcdef_ghijkl",
+      "E",
+      "F",
+      "g",
+      "H",
+      "I",
+      "j"
+    ]);
+
+    textShaderMaterial.uniforms.uColor.value = new THREE.Vector4(1, 0, 1, 0.95);
+    textShaderMaterial.uniforms.speed.value = 0.1;
+    textShaderMaterial.transparent = true;
+  }
+
+  function animate() {
+    let now = Date.now() * 0.001;
+    camera.position.y = params.camY;
+    {
+      scene.background = new THREE.Color(fogVars.skyCol);
+      scene.fog = new THREE.FogExp2(fogVars.fogCol, fogVars.fogDensity * 0.01);
+      // scene.fog.color.setHex(fogVars.fogCol);
+    }
+
+    if (cloudParticles) {
+      cloudParticles.material.uniforms.alpha.value = skyVars.cloudAlpha;
+      cloudParticles.material.uniforms.pointSize.value = skyVars.cloudSize;
+    }
+
+    if (rainParticles) {
+      rainFloorParticles.material.uniforms.alpha.value = rainVars.rainAlpha;
+      rainParticles.material.uniforms.alpha.value = rainVars.rainAlpha;
+      rainParticles.material.uniforms.pointSize.value = rainVars.rainSize;
+      rainParticles.material.uniforms.pointRatio.value = rainVars.pointRatio;
+    }
+
+    for (let i = 0; i < shaderUniformList.length; i++) {
+      shaderUniformList[i].time.value += 1.0;
+      shaderUniformList[i].camPos = { value: camera.position };
+    }
+
+    /* Test LightMesh */
+    rainParticles.material.uniforms.lightMeshes = {
+      value: [{ pos: new THREE.Vector3(), color: new THREE.Color(params.testColor) }]
+    };
+
+    // gpuCompute.compute();
+    stats.update();
+    renderer.render(scene, camera);
+    // composer.render();
+    requestAnimationFrame(animate);
+  }
+
+  let camSpeed = 1;
+  function myKeyPress(event) {
+    let key = event.which || event.keyCode;
+    // 224 = Apple command key on Firefox; in Chrome it's 91.
+    // The left command key is 91 and the right command key 93.
+    // So in your code please check for both.
+    console.log(key);
+
+    // if (key === 16) spawnLight(1); // SHIFT
+    // if (key === 17) spawnBlocks(); // CTRL
+    if (key === 35) camera.rotation.x -= 0.1; // END
+    if (key === 36) camera.rotation.x += 0.1; // HOME
+
+    if (key === 38) camera.position.z -= camSpeed; // UP
+    if (key === 40) camera.position.z += camSpeed; // DOWN
+    if (key === 37) camera.position.x -= camSpeed; // LEFT
+    if (key === 39) camera.position.x += camSpeed; // R
+  }
+
+  function setShadow(obj, isLight) {
+    obj.castShadow = true;
+    obj.receiveShadow = true;
+
+    if (isLight) {
+      obj.shadow.camera.near = 0.01;
+      obj.shadow.bias = -0.0001; // reduces self-shadowing on double-sided objects
+      // obj.shadow.autoUpdate = false;
+      // obj.shadow.needsUpdate = true;
+    }
+  }
+
+  init();
+  animate();
+
+  /*
+  let vShaderSky, fShaderSky;
+  {
+    vShaderSky = `
+      attribute vec3 color;
+      varying vec3 vColor;
+      uniform float time;
+      uniform float speed;
+      uniform float pointSize;
+      void main() {
+        vColor = color;
+        float aa = vColor.r;
+
+        vec3 tmpPos = position;
+        vec4 mvPosition = modelViewMatrix * vec4( tmpPos, 1.0 );
+
+        gl_PointSize = pointSize * (1.0+2.0*aa);
+        if(pointSize<=1.0) gl_PointSize *= cos(time*speed*aa);
+        // gl_PointSize /= -mvPosition.z;
+
+        gl_Position = projectionMatrix * mvPosition;
+      }
+      `;
+
+    fShaderSky = `
+      uniform sampler2D pointTexture;
+      uniform float time;
+      uniform float speed;
+      uniform float alpha;
+      uniform float pointSize;
+      varying vec3 vColor;
+      void main() {
+        float aa = vColor.r;
+        float aaa = cos(time*speed*aa);
+        float bb = 0.25*aa;
+        vec2 tmpPtCoord = gl_PointCoord - vec2(0.5,0.5);
+        tmpPtCoord = vec2(tmpPtCoord.x * cos(bb) + tmpPtCoord.y * sin(bb), tmpPtCoord.y * cos(bb) + tmpPtCoord.x * sin(bb));
+        gl_FragColor = vec4( vColor, alpha );
+        if(pointSize>1.0) {
+          gl_FragColor.a = alpha + aaa*0.5*alpha;
+          gl_FragColor *= texture2D( pointTexture, vec2(0.5, 0.5) + tmpPtCoord );
+        }
+        else{
+          float rr = length( gl_PointCoord - vec2( 0.5, 0.5 ) );
+          if ( rr > 0.5 ) discard; // Draw Disc
+        }
+      }
+      `;
+  }
+  */
+
+  /*
+  let shaderUniformList = [];
+  function initGpuParticlesSky(bNormalize, pointNb, size, aoeRatio, pointSize, speed, _col, _colA, vShader, fShader) {
+    // var vertices = new THREE.BoxGeometry( 50,50,50, 10,10,10 ).vertices;
+    let positions = new Float32Array(pointNb * 3);
+    let colors = new Float32Array(pointNb * 3);
+
+    for (let i = 0, l = pointNb; i < l; i++) {
+      let vertex = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5);
+      if (bNormalize) vertex.normalize();
+      vertex.multiplyScalar(size);
+      vertex.toArray(positions, i * 3);
+      let color = new THREE.Color(
+        _col.r + Math.random() * _colA.r,
+        _col.g + Math.random() * _colA.g,
+        _col.b + Math.random() * _colA.b
+      );
+      color.toArray(colors, i * 3);
+    }
+
+    let geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+    let newShaderUniforms = {
+      time: { value: 0.0 },
+      speed: { value: speed },
+      alpha: { value: 0.9 },
+      pointSize: { value: pointSize },
+      pointRatio: { value: 1.0 },
+      pointTexture: { value: null },
+      aoeRatio: { value: aoeRatio }
+    };
+
+    let shaderMaterialSky = new THREE.ShaderMaterial({
+      uniforms: newShaderUniforms,
+      vertexShader: vShader,
+      fragmentShader: fShader,
+      transparent: true,
+      // alphaTest: 0.9,
+      blending: THREE.AdditiveBlending,
+      // depthTest: true,
+      depthWrite: false,
+    });
+
+    shaderUniformList.push(newShaderUniforms);
+    let particles = new THREE.Points(geometry, shaderMaterialSky);
+    // scene.add( particles );
+    return particles;
+  }
+  */
+
+  /*
+  let vShaderRain, fShaderRain;
+  initRainShader(1);
+
+  function initRainShader(nbLights) {
+    vShaderRain = `
+      attribute vec3 color;
+      varying vec3 vColor;
+      attribute float texIndex;
+      varying float fTexIndex;
+      uniform float time;
+      uniform float pointSize;
+      uniform float speed;
+      uniform float aoeRatio;
+      struct lightMesh
+      {
+        vec3 pos;
+        vec3 color;
+        // sampler2D emissiveMap;
+      };
+
+      uniform lightMesh lightMeshes[${nbLights}];
+      uniform vec3 camPos;
+      void main() {
+        vColor = color;
+        vec3 tmpPos = aoeRatio * position;
+        tmpPos.y = mod(tmpPos.y - time*speed, 10.0);
+        if(pointSize === 1.0) tmpPos.y = 0.2 * cos(time * speed + position.y);
+        tmpPos += vec3(camPos.x, 0.0, camPos.z);
+        vec4 mvPosition = modelViewMatrix * vec4( tmpPos, 1.0 );
+
+        gl_PointSize = pointSize / -mvPosition.z;
+
+        gl_Position = projectionMatrix * mvPosition;
+
+
+        // vColor = vec3(0.0,0.0,0.0);
+        for (int i=0; i<2; i++ )
+        {
+          float dist = length( tmpPos - lightMeshes[i].pos );
+          vColor += lightMeshes[i].color * 2.0/pow(dist,2.0);
+        }
+      }
+      `;
+
+    fShaderRain = `
+      uniform sampler2D pointTexture;
+      uniform float alpha;
+      uniform float pointRatio;
+      varying vec3 vColor;
+      varying float fTexIndex;
+      void main() {
+        float rr = length( gl_PointCoord - vec2( 0.5, 0.5 ) );
+        float ww = gl_PointCoord.x;
+        float aa = 0.1;
+        // aa = 1.0 - 2.0*rr; // Alpha-Disc
+        // aa = 0.1 - 2.0*ww; // Alpha V-Rect
+        gl_FragColor = vec4( vColor + vec3(aa,aa,aa), alpha );
+
+        // if ( rr > 0.5 ) discard; //Draw Disc
+        if ( ww > pointRatio ) discard;  //Draw V-Rect
+
+        // if(fTexIndex === 1.0) gl_FragColor = vec4(gl_FragColor.xyz, 0.1) * texture2D( pointTexture, gl_PointCoord );
+      }
+      `;
+  }
+  */
+
+  /*
+  let vShaderText, fShaderText;
+  {
+    vShaderText = `
+    varying vec2 vUv;
+    void main()
+    {
+        vUv = uv;
+        vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+        gl_Position = projectionMatrix * mvPosition;
+    }`;
+    fShaderText = `
+    uniform float time;
+    uniform float speed;
+    uniform vec4 uColor;
+    uniform sampler2D tex0;
+    varying vec2 vUv;
+    void main(void)
+    {
+        vec4 vColor0 = texture2D(tex0, vUv);
+        float aa = 1.0 + 0.9*cos(90.0*vUv.x + time*speed);
+
+        gl_FragColor = vec4( uColor.a*uColor.xyz*vColor0.xyz,    vColor0.a );
+        gl_FragColor.xyz *= aa;
+        if(uColor.a*vColor0.a < 0.05) discard;
+    }`;
+  }
+
+  function initTextShaderMaterial(textTexture) {
+    let textShaderUniforms = {
+      time: { value: 0.0 },
+      speed: { value: 0.04 },
+      uColor: { value: new THREE.Vector4(1, 1, 1, 1) },
+      tex0: { value: textTexture },
+    };
+    let textShaderMaterial = new THREE.ShaderMaterial({
+      side: THREE.DoubleSide,
+      uniforms: textShaderUniforms,
+      vertexShader: vShaderText,
+      fragmentShader: fShaderText,
+    });
+    shaderUniformList.push(textShaderUniforms);
+    return textShaderMaterial;
+  }
+
+  function addTexture(_ww) {
+    let texCanvas = document.createElement("canvas");
+    texCanvas.width = texCanvas.height = _ww;
+    let newTexture = new THREE.Texture(texCanvas);
+    newTexture.texCanvas = texCanvas;
+    newTexture.anisotropy = 8;
+    // newTexture.magFilter = THREE.NearestFilter;
+    // newTexture.wrapS = newTexture.wrapT = THREE.RepeatWrapping;
+    // newTexture.repeat.set( 1, 1 );
+    // newTexture.offset.set( 0, 0 );
+    initTexture_Text(newTexture, _ww * 0.1, "TITLE_TITLE", ["A", "B", "C", "D", "E", "F", "g", "H", "I", "j"]);
+    return newTexture;
+  }
+
+  function initTexture_Text(texture, _fontSize, title, txtLines) {
+    let ctx = texture.texCanvas.getContext("2d");
+    let ww = texture.texCanvas.width;
+    ctx.clearRect(0, 0, ww, ww);
+    ctx.fillStyle = "rgba(0,0,0, 0.1)";
+    ctx.fillRect(0, 0, ww, ww);
+    ctx.fillStyle = "rgba(255,255,255, 1)";
+    ctx.textAlign = "center";
+    let titleSize = _fontSize * 1.5;
+    let yPos = titleSize;
+    ctx.font = `bold ${titleSize}px Verdana`;
+    ctx.fillText(title, ww * 0.5, yPos);
+    // ctx.lineWidth = 8;
+    ctx.font = `bold ${_fontSize}px Verdana`;
+    yPos += _fontSize * 0.5;
+    for (let i = 0; i < txtLines.length; i++) {
+      yPos += _fontSize;
+      let txt = txtLines[i];
+      ctx.fillText(txt, ww * 0.5, yPos);
+    }
+    // ctx.strokeText("A", ww * 0.5, ww * 0.35);
+    texture.needsUpdate = true;
+  }
+  */
+</script>
+</body>
+</html>
