@@ -1,3 +1,5 @@
+console.log(`%cREV: ${THREE.REVISION}`, "color: #997fff;"); // Medium slate blue
+
 function main() {
   let canvas = document.querySelector('#c');
   let renderer = new THREE.WebGLRenderer({ canvas });
