@@ -7,8 +7,14 @@ How do I know:
 ```js
 import { GPUComputationRenderer } from "https://cdn.rawgit.com/mrdoob/three.js/r124/examples/jsm/misc/GPUComputationRenderer.js";
 
-skyParticles = initGpuParticlesSky(1, 500*1000, SKY_SIZE, 1, 1, 0.02, new THREE.Color( 0.3,0.5,0.9 ),  {r:1,g:0,b:0}, vShaderSky,fShaderSky );
+// bNormalize, pointNb, size, aoeRatio, pointSize, speed, color, _colorA, vertex shader, fragment shader
+skyParticles = initGpuParticlesSky(1, 500 * 1000, SKY_SIZE, 1, 1, 0.02, new THREE.Color(0.3, 0.5, 0.9), {
+  r: 1,
+  g: 0,
+  b: 0
+}, vShaderSky, fShaderSky);
 
+// He removed the initialization of "gpuCompute"
 gpuCompute.compute();
 ```
 
