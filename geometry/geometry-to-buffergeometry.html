@@ -17,8 +17,12 @@
   </style>
 </head>
 <body>
+
 <div id="info">BufferGeometry</div>
+
 <script>
+  console.log(`%cREV: ${THREE.REVISION}`, "color: #ccff00;");
+
   // TODO: UNCOMMENT FUNCTIONS
 
   // flipScript(); // except this one
@@ -174,7 +178,7 @@
     let myScript = document.createElement('script');
     myScript.onload = myScript.onchange = function () {
       // do stuff with the script
-      console.log(`%c${THREE.REVISION}`, "color: #ccff00;");
+      console.log(`%cREV: ${THREE.REVISION}`, "color: #ccff00;");
     };
     myScript.src = "/js/three.87.js";
 
