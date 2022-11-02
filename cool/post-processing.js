@@ -34,10 +34,16 @@ function main() {
   }
 
   // Aqua, Purple, and Gold
+  // let cubes = [
+  //   makeInstance(geometry, 0x00ffff, 0),
+  //   makeInstance(geometry, 0xa020f0, -2),
+  //   makeInstance(geometry, 0xffd700, 2)
+  // ];
+
   let cubes = [
-    makeInstance(geometry, 0x00ffff, 0),
-    makeInstance(geometry, 0xa020f0, -2),
-    makeInstance(geometry, 0xffd700, 2)
+    makeInstance(geometry, "#fcff00", 0),
+    makeInstance(geometry, "#ff0000", -2),
+    makeInstance(geometry, "#00c6ff", 2) // Deep sky blue
   ];
 
   let composer = new THREE.EffectComposer(renderer);
