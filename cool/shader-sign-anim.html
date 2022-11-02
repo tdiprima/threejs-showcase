@@ -98,31 +98,31 @@
 
     /* Stars-Sky */
     skyParticles = initGpuParticlesSky(
-      1,
-      500 * 1000,
-      SKY_SIZE,
-      1,
-      1,
-      0.02,
-      new THREE.Color(0.3, 0.5, 0.9),
-      { r: 1, g: 0, b: 0 },
-      vShaderSky,
-      fShaderSky
+      1, // bNormalize
+      500 * 1000, // pointNb
+      SKY_SIZE, // size
+      1, // aoeRatio
+      1, // pointSize
+      0.02, // speed
+      new THREE.Color(0.3, 0.5, 0.9), // color
+      { r: 1, g: 0, b: 0 }, // _colorA
+      vShaderSky, // vertex shader
+      fShaderSky // fragment shader
     );
     scene.add(skyParticles);
 
     /* Clouds-Sky */
     cloudParticles = initGpuParticlesSky(
-      1,
-      skyVars._cloudNb,
-      SKY_SIZE * 0.03,
-      1,
-      skyVars.cloudSize,
-      0.005,
-      new THREE.Color(0.4, 0.8, 0.8),
-      { r: 0.6, g: 0.1, b: 0.1 },
-      vShaderSky,
-      fShaderSky
+      1, // bNormalize
+      skyVars._cloudNb, // pointNb
+      SKY_SIZE * 0.03, // size
+      1, // aoeRatio
+      skyVars.cloudSize, // pointSize
+      0.005, // speed
+      new THREE.Color(0.4, 0.8, 0.8), // color
+      { r: 0.6, g: 0.1, b: 0.1 }, // _colorA
+      vShaderSky, // vertex shader
+      fShaderSky // fragment shader
     );
 
     cloudParticles.material.uniforms.pointTexture.value = pointTexture;
@@ -130,32 +130,32 @@
 
     /* Rain Fall */
     rainParticles = initGpuParticlesSky(
-      0,
-      100 * 1000,
-      SKY_SIZE,
-      RAIN_AOE,
-      rainVars.rainSize,
-      RAIN_SPEED,
-      new THREE.Color(0.1, 0.1, 0.1),
-      new THREE.Color(0),
-      vShaderRain,
-      fShaderRain
+      0, // bNormalize
+      100 * 1000, // pointNb
+      SKY_SIZE, // size
+      RAIN_AOE, // aoeRatio
+      rainVars.rainSize, // pointSize
+      RAIN_SPEED, // speed
+      new THREE.Color(0.1, 0.1, 0.1), // color
+      new THREE.Color(0), // _colorA
+      vShaderRain, // vertex shader
+      fShaderRain // fragment shader
     );
 
     scene.add(rainParticles);
 
     /* Rain Floor */
     rainFloorParticles = initGpuParticlesSky(
-      0,
-      30 * 1000,
-      SKY_SIZE,
-      RAIN_AOE,
-      1,
-      RAIN_SPEED,
-      new THREE.Color(0.1, 0.1, 0.1),
-      new THREE.Color(0),
-      vShaderRain,
-      fShaderRain,
+      0, // bNormalize
+      30 * 1000, // pointNb
+      SKY_SIZE, // size
+      RAIN_AOE, // aoeRatio
+      1, // pointSize
+      RAIN_SPEED, // speed
+      new THREE.Color(0.1, 0.1, 0.1), // color
+      new THREE.Color(0), // _colorA
+      vShaderRain, // vertex shader
+      fShaderRain // fragment shader
     );
     scene.add(rainFloorParticles);
 
