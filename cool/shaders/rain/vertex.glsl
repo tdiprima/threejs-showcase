@@ -13,7 +13,7 @@ struct lightMesh {
   // sampler2D emissiveMap;
 };
 
-// uniform lightMesh lightMeshes[${nbLights}]; // Heh?
+// uniform lightMesh lightMeshes[${nbLights}]; // TODO: Heh?
 uniform vec3 camPos;
 
 void main() {
