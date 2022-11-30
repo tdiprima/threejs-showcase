@@ -20,34 +20,40 @@
 <div id="info">BufferGeometry</div>
 <script>
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight, // camera aspect
+    0.1,
+    1000
+  );
 
   const renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  renderer.setSize(window.innerWidth, window.innerHeight); // canvas size
+  document.body.appendChild(renderer.domElement); // canvas
 
   // BUFFER GEOMETRY
   const geometry = new THREE.BufferGeometry();
-  // create a simple square shape. We duplicate the top left and bottom right
-  // vertices because each vertex needs to appear once per triangle.
+
+  // TODO: See points-plotter.png
+  // We duplicate vertices because each vertex needs to appear once per triangle.
   const vertices = new Float32Array([
     -1.0, -1.0, 1.0,
     1.0, -1.0, 1.0,
     1.0, 1.0, 1.0,
 
-    1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0, // dupe top right
     -1.0, 1.0, 1.0,
-    -1.0, -1.0, 1.0
+    -1.0, -1.0, 1.0 // dupe bottom left
   ]);
 
   // itemSize = 3 because there are 3 values (components) per vertex
-  // geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
-  // TODO: Why not?
-  geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
+  // Can do it like this too:
+  // geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
 
   // LOG OUTPUT
   const positionAttribute = geometry.getAttribute("position");
-  console.log("positionAttribute", positionAttribute);
+  console.log("position", positionAttribute);
 
   const positions = positionAttribute.array;
   console.log("positions", positions);
@@ -55,8 +61,8 @@
   const vertexCount = positionAttribute.count;
   console.log("vertexCount", vertexCount);
 
-  // MATERIAL
-  const material = new THREE.MeshBasicMaterial({color: 0x6699FF});
+  // MATERIAL Cornflower Blue
+  const material = new THREE.MeshBasicMaterial({ color: 0x6699ff });
   const mesh = new THREE.Mesh(geometry, material);
 
   scene.add(mesh);
