@@ -9,7 +9,6 @@
   <link href="/stylesheets/main.css" rel="stylesheet">
   <!-- TODO: SWITCH BETWEEN SCRIPTS -->
   <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.124/build/three.js"></script> -->
-  <!-- <script src="/js/three.87.js"></script> -->
   <script src="/js/three.js"></script>
   <style>
     body { margin: 0; }
@@ -36,21 +35,27 @@
 
   let geometry;
   let points = [];
+
+  // Line
   points.push(new THREE.Vector3(-5, 0, 0));
   points.push(new THREE.Vector3(5, 0, 0));
 
-  // points.push(new THREE.Vector3(-10, 0, 0));
-  // points.push(new THREE.Vector3(0, 10, 0));
-  // points.push(new THREE.Vector3(10, 0, 0));
+  // Triangle
+  // points.push(new THREE.Vector3(-3, 3, 0));
+  // points.push(new THREE.Vector3(3, 3, 0));
+  // points.push(new THREE.Vector3(0, -3, 0));
+  // points.push(new THREE.Vector3(-3, 3, 0));
 
-  function getLine(c) {
-    return new THREE.Line(geometry, new THREE.LineBasicMaterial({color: c}));
-  }
-
+  /**
+   * Use r124
+   * THREE.Geometry
+   */
   function createLine() {
     geometry = new THREE.Geometry();
     points.forEach(p => geometry.vertices.push(p));
-    scene.add(getLine(0xff00cc));
+
+    // Purple Pizzazz
+    scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0xff00cc })));
 
     // console.log("%cgeometry", "color: #ff00cc;", geometry);
     // Array of Vector3's
@@ -58,24 +63,40 @@
     console.log("%cvertexCount", "color: #ffff00;", geometry.vertices.length);
   }
 
-  // THREE.Geometry
   // createLine();
 
+  /**
+   * Use r144
+   * THREE.BufferGeometry
+   */
   function createLine1() {
     geometry = new THREE.BufferGeometry().setFromPoints(points);
-    scene.add(getLine(0xccff00));
+    // Electric Lime
+    scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0xccff00 })));
 
-    const positionAttribute = geometry.getAttribute( 'position' );
+    const positionAttribute = geometry.getAttribute( "position" );
     // console.log("%cposition attribute", "color: #ff00cc;", positionAttribute);
+
+    // TODO: See points-plotter-1.png
     // Float32Array, like canvas data
     console.log("%cpositions", "color: #00ff00;", positionAttribute.array);
+
+    // [
+    //   -5, 0, 0,
+    //    5, 0, 0
+    // ]
+
     // Actual vertex count (convenient)
     console.log("%cvertexCount", "color: #ffff00;", positionAttribute.count);
   }
 
-  // THREE.BufferGeometry
   createLine1();
 
+  /**
+   * Use r124
+   * THREE.Geometry
+   * Make it bigger
+   */
   function explodePoints() {
     let vertices = geometry.vertices;
     // console.log("%cvertices", "color: #00ff00;", vertices);
@@ -86,9 +107,13 @@
     geometry.verticesNeedUpdate = true;
   }
 
-  // THREE.Geometry
   // explodePoints();
 
+  /**
+   * Use r144
+   * THREE.BufferGeometry
+   * Make it bigger
+   */
   function explodePoints1() {
     let positions = geometry.attributes.position.array; // another way to say it.
     // console.log("%cpositions", "color: #00ff00;", positions);
@@ -107,19 +132,22 @@
     geometry.attributes.position.needsUpdate = true;
   }
 
-  // THREE.BufferGeometry
   // explodePoints1();
 
+  /**
+   * Use r124
+   * THREE.Geometry
+   */
   function tetrahedron() {
     let material = new THREE.MeshNormalMaterial();
     geometry = new THREE.Geometry();
 
     // VERTICES
     geometry.vertices.push(
-      new THREE.Vector3(1, 1, 1), // a
+      new THREE.Vector3(1, 1, 1),   // a
       new THREE.Vector3(-1, -1, 1), // b
       new THREE.Vector3(-1, 1, -1), // c
-      new THREE.Vector3(1, -1, -1) // d
+      new THREE.Vector3(1, -1, -1)  // d
     );
 
     // FACES
@@ -135,9 +163,12 @@
     scene.add(mesh);
   }
 
-  // THREE.Geometry
   // tetrahedron();
 
+  /**
+   * Use r144
+   * THREE.BufferGeometry
+   */
   function tetrahedron1() {
     let material = new THREE.MeshNormalMaterial();
     geometry = new THREE.BufferGeometry();
@@ -145,19 +176,19 @@
     let points1 = [
       new THREE.Vector3(-1, 1, -1), // c
       new THREE.Vector3(-1, -1, 1), // b
-      new THREE.Vector3(1, 1, 1), // a
+      new THREE.Vector3(1, 1, 1),   // a
 
-      new THREE.Vector3(1, 1, 1), // a
+      new THREE.Vector3(1, 1, 1),   // a
       new THREE.Vector3(1, -1, -1), // d
       new THREE.Vector3(-1, 1, -1), // c
 
       new THREE.Vector3(-1, -1, 1), // b
       new THREE.Vector3(1, -1, -1), // d
-      new THREE.Vector3(1, 1, 1), // a
+      new THREE.Vector3(1, 1, 1),   // a
 
       new THREE.Vector3(-1, 1, -1), // c
       new THREE.Vector3(1, -1, -1), // d
-      new THREE.Vector3(-1, -1, 1) // b
+      new THREE.Vector3(-1, -1, 1)  // b
     ];
 
     geometry.setFromPoints(points1);
@@ -167,7 +198,6 @@
     scene.add(mesh);
   }
 
-  // THREE.BufferGeometry
   // tetrahedron1();
 
   camera.position.z = 5;
