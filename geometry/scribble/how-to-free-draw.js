@@ -10,9 +10,6 @@ let coords = new THREE.Vector3();
 
 let mouseIsPressed;
 
-let material; // A line material
-let selected; // Object that was picked
-
 init();
 render();
 
@@ -41,7 +38,8 @@ function init() {
   positionAttribute.setUsage(THREE.DynamicDrawUsage);
   geometry.setAttribute("position", positionAttribute);
 
-  material = new THREE.LineBasicMaterial();
+  // A line material
+  let material = new THREE.LineBasicMaterial();
 
   line = new THREE.Line(geometry, material);
   scene.add(line); // todo: do this in mousedown
@@ -121,15 +119,6 @@ function onPointerMove(event) {
   }
 }
 
-function print() {
-  console.log("%ccamera", "color: deeppink;", {
-    "left": camera.left,
-    "right": camera.right,
-    "top": camera.top,
-    "bottom": camera.bottom}
-  );
-}
-
 /* Resize callback */
 function onWindowResize() {
   let aspect = window.innerWidth / window.innerHeight;
@@ -149,3 +138,13 @@ function onWindowResize() {
 function render() {
   renderer.render(scene, camera);
 }
+
+function print() {
+  console.log("%ccamera", "color: deeppink;", {
+    "left": camera.left,
+    "right": camera.right,
+    "top": camera.top,
+    "bottom": camera.bottom}
+  );
+}
+
