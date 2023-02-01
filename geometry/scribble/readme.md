@@ -1,4 +1,4 @@
-The code from the resource is highly inefficient; since you continuously allocate geometry all the time, without disposal management, which will lead to a memory leak.
+The code from [the resource](https://github.com/esperanc/scribble/blob/master/main.js) is highly inefficient; since you continuously allocate geometry all the time, without disposal management, which will lead to a memory leak.
 
 Try the following approach:
 
@@ -8,13 +8,12 @@ You can set `frustumSize` to whatever value you need. It just defines the size o
 
 Might be helpful:
 
-https://stackoverflow.com/questions/17558085/three-js-orthographic-camera
+[Orthogonal camera for 2D drawing](https://stackoverflow.com/questions/17558085/three-js-orthographic-camera)
 
 `webgl_camera.html`
 
-https://discoverthreejs.com/
-
-[animation-loop](discoverthreejs-site/static/examples/worlds/inline-scenes/first-steps/animation-loop.js)
+<!-- discoverthreejs-site/static/examples/worlds/inline-scenes/first-steps/animation-loop.js -->
+[animation-loop](https://discoverthreejs.com/static/examples/worlds/inline-scenes/first-steps/animation-loop.js) try to find.
 
 ```js
 // Camera that uses perspective projection.
