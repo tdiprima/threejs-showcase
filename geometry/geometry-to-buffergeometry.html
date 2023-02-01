@@ -4,230 +4,25 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>BufferGeometry</title>
+  <title>Document</title>
   <!-- https://sbcode.net/threejs/geometry-to-buffergeometry/ -->
   <link href="/stylesheets/main.css" rel="stylesheet">
-  <!-- TODO: SWITCH BETWEEN SCRIPTS -->
-  <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.124/build/three.js"></script> -->
-  <script src="/js/three.js"></script>
   <style>
     body { margin: 0; }
     canvas { width: 100%; height: 100% }
   </style>
 </head>
 <body>
-
 <div id="info">BufferGeometry</div>
+
+<!-- <script src="https://cdn.jsdelivr.net/npm/three@0.124/build/three.js"></script>
+<script src="geometry-124.js"></script> -->
+
+<script src="/js/three.js"></script>
+<script src="buff-geom-144.js"></script>
 
 <script>
   console.log(`%cREV: ${THREE.REVISION}`, "color: #ccff00;");
-
-  // TODO: UNCOMMENT FUNCTIONS
-
-  // flipScript(); // except this one
-
-  let scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
-  let renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  let geometry;
-  let points = [];
-
-  // Line
-  points.push(new THREE.Vector3(-5, 0, 0));
-  points.push(new THREE.Vector3(5, 0, 0));
-
-  // Triangle
-  // points.push(new THREE.Vector3(-3, 3, 0));
-  // points.push(new THREE.Vector3(3, 3, 0));
-  // points.push(new THREE.Vector3(0, -3, 0));
-  // points.push(new THREE.Vector3(-3, 3, 0));
-
-  /**
-   * Use r124
-   * THREE.Geometry
-   */
-  function createLine() {
-    geometry = new THREE.Geometry();
-    points.forEach(p => geometry.vertices.push(p));
-
-    // Purple Pizzazz
-    scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0xff00cc })));
-
-    // console.log("%cgeometry", "color: #ff00cc;", geometry);
-    // Array of Vector3's
-    console.log("%cpositions", "color: #00ff00;", geometry.vertices); // JSON.stringify(geometry.vertices)
-    console.log("%cvertexCount", "color: #ffff00;", geometry.vertices.length);
-  }
-
-  // createLine();
-
-  /**
-   * Use r144
-   * THREE.BufferGeometry
-   */
-  function createLine1() {
-    geometry = new THREE.BufferGeometry().setFromPoints(points);
-    // Electric Lime
-    scene.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: 0xccff00 })));
-
-    const positionAttribute = geometry.getAttribute( "position" );
-    // console.log("%cposition attribute", "color: #ff00cc;", positionAttribute);
-
-    // TODO: See points-plotter-1.png
-    // Float32Array, like canvas data
-    console.log("%cpositions", "color: #00ff00;", positionAttribute.array);
-
-    // [
-    //   -5, 0, 0,
-    //    5, 0, 0
-    // ]
-
-    // Actual vertex count (convenient)
-    console.log("%cvertexCount", "color: #ffff00;", positionAttribute.count);
-  }
-
-  createLine1();
-
-  /**
-   * Use r124
-   * THREE.Geometry
-   * Make it bigger
-   */
-  function explodePoints() {
-    let vertices = geometry.vertices;
-    // console.log("%cvertices", "color: #00ff00;", vertices);
-    for (let i = 0; i < vertices.length; i++) {
-      // console.log(vertices[i]);
-      vertices[i].multiplyScalar(2);
-    }
-    geometry.verticesNeedUpdate = true;
-  }
-
-  // explodePoints();
-
-  /**
-   * Use r144
-   * THREE.BufferGeometry
-   * Make it bigger
-   */
-  function explodePoints1() {
-    let positions = geometry.attributes.position.array; // another way to say it.
-    // console.log("%cpositions", "color: #00ff00;", positions);
-    for (let i = 0; i < positions.length; i += 3) {
-      // console.log(positions[i]);
-      let v = new THREE.Vector3(
-        positions[i],
-        positions[i + 1],
-        positions[i + 2]
-      ).multiplyScalar(2);
-
-      positions[i] = v.x;
-      positions[i + 1] = v.y;
-      positions[i + 2] = v.z;
-    }
-    geometry.attributes.position.needsUpdate = true;
-  }
-
-  // explodePoints1();
-
-  /**
-   * Use r124
-   * THREE.Geometry
-   */
-  function tetrahedron() {
-    let material = new THREE.MeshNormalMaterial();
-    geometry = new THREE.Geometry();
-
-    // VERTICES
-    geometry.vertices.push(
-      new THREE.Vector3(1, 1, 1),   // a
-      new THREE.Vector3(-1, -1, 1), // b
-      new THREE.Vector3(-1, 1, -1), // c
-      new THREE.Vector3(1, -1, -1)  // d
-    );
-
-    // FACES
-    geometry.faces.push(
-      new THREE.Face3(2, 1, 0),
-      new THREE.Face3(0, 3, 2),
-      new THREE.Face3(1, 3, 0),
-      new THREE.Face3(2, 3, 1)
-    );
-
-    geometry.computeFlatVertexNormals();
-    let mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-  }
-
-  // tetrahedron();
-
-  /**
-   * Use r144
-   * THREE.BufferGeometry
-   */
-  function tetrahedron1() {
-    let material = new THREE.MeshNormalMaterial();
-    geometry = new THREE.BufferGeometry();
-
-    let points1 = [
-      new THREE.Vector3(-1, 1, -1), // c
-      new THREE.Vector3(-1, -1, 1), // b
-      new THREE.Vector3(1, 1, 1),   // a
-
-      new THREE.Vector3(1, 1, 1),   // a
-      new THREE.Vector3(1, -1, -1), // d
-      new THREE.Vector3(-1, 1, -1), // c
-
-      new THREE.Vector3(-1, -1, 1), // b
-      new THREE.Vector3(1, -1, -1), // d
-      new THREE.Vector3(1, 1, 1),   // a
-
-      new THREE.Vector3(-1, 1, -1), // c
-      new THREE.Vector3(1, -1, -1), // d
-      new THREE.Vector3(-1, -1, 1)  // b
-    ];
-
-    geometry.setFromPoints(points1);
-    geometry.computeVertexNormals();
-
-    let mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-  }
-
-  // tetrahedron1();
-
-  camera.position.z = 5;
-
-  renderer.render(scene, camera);
-
-  function flipScript() {
-    let myScript = document.createElement('script');
-    myScript.onload = myScript.onchange = function () {
-      // do stuff with the script
-      console.log(`%cREV: ${THREE.REVISION}`, "color: #ccff00;");
-    };
-    myScript.src = "/js/three.87.js";
-
-    // document.body.appendChild(myScript);
-    document.head.appendChild(myScript);
-
-    function geoScript() {
-      console.log("geoScript");
-      myScript.src = "/js/three.87.js";
-    }
-
-    function buffScript() {
-      console.log("buffScript");
-      myScript.src = "/js/three.js"
-    }
-
-    document.getElementById("geo").addEventListener("click", geoScript);
-    document.getElementById("buff").addEventListener("click", buffScript);
-  }
 </script>
 </body>
 </html>
