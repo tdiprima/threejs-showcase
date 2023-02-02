@@ -96,7 +96,7 @@ function init() {
 }
 
 //
-// Reshape callback
+// Resize callback
 //
 function resize() {
   width = window.innerWidth;
