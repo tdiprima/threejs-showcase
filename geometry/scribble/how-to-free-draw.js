@@ -7,16 +7,15 @@ let line;
 let frustumSize = 4;
 
 let index = 0; // number of indices to render
-let coords = new THREE.Vector3();
+let coords = new THREE.Vector3(); // keep track of mouse coordinates
 
-let mouseIsPressed;
+let mouseIsPressed = false;
 
 init();
 render();
 
 function init() {
-  console.log("%cinit", "color: yellow");
-  // Scene object
+  // console.log("%cinit", "color: yellow");
   scene = new THREE.Scene();
 
   let aspect = window.innerWidth / window.innerHeight;
@@ -35,10 +34,9 @@ function init() {
 
   let geometry = new THREE.BufferGeometry();
 
-  // Allocate large enough buffer (1000 points)
+  // Set a BufferAttribute, allocate some stuff, then give it to our geometry
   let positionAttribute = new THREE.BufferAttribute(new Float32Array(1000 * 3), 3);
-  // optimize performance
-  positionAttribute.setUsage(THREE.DynamicDrawUsage); // user will set data occasionally
+  positionAttribute.setUsage(THREE.DynamicDrawUsage);
   geometry.setAttribute("position", positionAttribute);
 
   // A line material
@@ -67,44 +65,57 @@ function init() {
   window.addEventListener("resize", onWindowResize);
 }
 
+//------------------------------------------------------------
 // Set up mouse callbacks.
-mouseIsPressed = false;
+//------------------------------------------------------------
 
+/**
+ * Mouseup
+ * onPointerDown is still called.
+ */
 function mouseReleased() {
-  console.log("%cmouseReleased", "color: cyan");
+  // console.log("%cmouseReleased", "color: cyan");
   mouseIsPressed = false;
   // todo: clear last point, but don't erase the drawn object
-  // index = 0; <- Nope. this erases it.
-  // let position = line.geometry.getAttribute("position");
-  // position.setXYZ(index, x, y, z);
-  // position.needsUpdate = true;
-  // index++;
-  // line.geometry.setDrawRange(0, index);
 }
 
-/* Add Point */
+/**
+ * Add Point
+ * Happens onPointerDown.
+ */
 function addPoint(x, y, z) {
-  console.log("%caddPoint", "color: orange");
+  // console.log("%caddPoint", "color: orange");
+  // Get current position, and set the next 3 elements, where our mouse pointer is.
   let position = line.geometry.getAttribute("position");
   position.setXYZ(index, x, y, z);
+
+  // Now change the position data values
   position.needsUpdate = true;
 
   index++;
 
+  // Now change the number of points rendered
   line.geometry.setDrawRange(0, index);
 }
 
+/**
+ * Update Point
+ * Happens onPointerMove.
+ */
 function updatePoint(x, y, z) {
-  console.log("%cupdatePoint", "color: cyan")
+  // console.log("%cupdatePoint", "color: cyan")
   let position = line.geometry.getAttribute("position");
   position.setXYZ(index - 1, coords.x, coords.y, 0);
   position.needsUpdate = true;
 }
 
-/* Mousedown */
+/**
+ * Mousedown
+ * Add point & render.
+ */
 function onPointerDown(event) {
-  // Add point & render.
-  console.log("%conPointerDown", "color: orange")
+  //
+   // console.log("%conPointerDown", "color: orange")
   mouseIsPressed = true;
 
   coords.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -118,10 +129,12 @@ function onPointerDown(event) {
   render();
 }
 
-/* Mousemove */
+/**
+ * Mousemove
+ * Update point & render.
+ */
 function onPointerMove(event) {
-  // Update point & render.
-  console.log("%conPointerMove", "color: cyan");
+  // console.log("%conPointerMove", "color: cyan");
   if (mouseIsPressed) {
     coords.x = (event.clientX / window.innerWidth) * 2 - 1;
     coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -136,10 +149,12 @@ function onPointerMove(event) {
   }
 }
 
-/* Resize callback */
+/**
+ * Resize callback
+ * Fix size & render.
+ */
 function onWindowResize() {
-  // Fix size & render
-  console.log("%conWindowResize", "color: violet")
+  // console.log("%conWindowResize", "color: violet")
   let aspect = window.innerWidth / window.innerHeight;
 
   camera.left = (-frustumSize * aspect) / 2;
@@ -153,14 +168,19 @@ function onWindowResize() {
   render();
 }
 
-/* Render callback */
+/**
+ * Render callback
+ */
 function render() {
-  console.log("%crender", "color: red")
+   // console.log("%crender", "color: red")
   renderer.render(scene, camera);
 }
 
+/**
+ * Print camera attributes
+ */
 function print() {
-  console.log("%ccamera", "color: deeppink;", {
+   console.log("%ccamera", "color: deeppink;", {
       "left": camera.left,
       "right": camera.right,
       "top": camera.top,
