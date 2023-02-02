@@ -49,6 +49,16 @@ line.geometry.name = "Deedee";
 line.geometry.getAttribute("position").name = "Lulu";
 ```
 
+# Convert coordinates
+
+```js
+// Convert the mouse coordinates
+// (which go from 0 to containerWidth, and from 0 to containerHeight)
+// to (-1, 1) in both axes.
+coords.x = (event.clientX / window.innerWidth) * 2 - 1;
+coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
+```
+
 # Buffer Geometry
 
 **"Square"**
