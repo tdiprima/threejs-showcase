@@ -4,7 +4,9 @@ let scene;
 let renderer;
 let line;
 
-let frustumSize = 4;
+const frustumSize = 4;
+const varTop = frustumSize / 2; // Because it always wigs out if you declare a "top"
+const varBottom = frustumSize / -2; // It's fine with "bottom", but idc
 
 let index = 0; // number of indices to render
 let coords = new THREE.Vector3(); // keep track of current mouse position
@@ -22,12 +24,12 @@ function init() {
 
   // Orthogonal camera for 2D drawing
   camera = new THREE.OrthographicCamera(
-    frustumSize * aspect / -2,
-    frustumSize * aspect / 2,
-    frustumSize / 2,
-    frustumSize / -2,
-    0.1,
-    20
+    frustumSize * aspect / -2, // left
+    frustumSize * aspect / 2,  // right
+    varTop,                    // top
+    varBottom,                 // bottom
+    0.1,                       // near
+    20                         // far
   );
 
   camera.position.z = 5;
@@ -85,16 +87,16 @@ function mouseReleased() {
  */
 function addPoint(x, y, z) {
   // console.log("%caddPoint", "color: orange");
-  // Get current position, and set the next 3 elements, where our mouse pointer is.
+  // Get current position, and set the next 3 array elements
   let position = line.geometry.getAttribute("position");
   position.setXYZ(index, x, y, z);
 
-  // Now change the position data values
+  // Change the position data values
   position.needsUpdate = true;
 
   index++;
 
-  // Now change the number of points rendered
+  // Change the number of points rendered
   line.geometry.setDrawRange(0, index);
 }
 
@@ -105,7 +107,7 @@ function addPoint(x, y, z) {
 function updatePoint(x, y, z) {
   // console.log("%cupdatePoint", "color: cyan");
   let position = line.geometry.getAttribute("position");
-  position.setXYZ(index - 1, coords.x, coords.y, 0);
+  position.setXYZ(index - 1, coords.x, coords.y, 0); // we're just updating the same point
   position.needsUpdate = true;
 }
 
@@ -117,11 +119,13 @@ function onPointerDown(event) {
   // console.log("%conPointerDown", "color: orange");
   mouseIsPressed = true;
 
+  // Convert the mouse coordinates to (-1, 1)
   coords.x = (event.clientX / window.innerWidth) * 2 - 1;
   coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
   coords.z = (camera.near + camera.far) / (camera.near - camera.far);
-  print("coords", coords);
+  // print("coords", coords);
 
+  // You do not project. You un-project. The position into world space.
   coords.unproject(camera);
 
   addPoint(coords.x, coords.y, 0);
@@ -136,14 +140,13 @@ function onPointerDown(event) {
 function onPointerMove(event) {
   // console.log("%conPointerMove", "color: cyan");
   if (mouseIsPressed) {
-    // Convert the mouse coordinates
-    // (which go from 0 to containerWidth, and from 0 to containerHeight)
-    // to (-1, 1) in both axes.
+    // Convert the mouse coordinates to (-1, 1)
     coords.x = (event.clientX / window.innerWidth) * 2 - 1;
     coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
     coords.z = (camera.near + camera.far) / (camera.near - camera.far);
     // print("coords", coords);
 
+    // un-project to world space
     coords.unproject(camera);
 
     updatePoint(coords.x, coords.y, 0);
@@ -162,8 +165,8 @@ function onWindowResize() {
 
   camera.left = (-frustumSize * aspect) / 2;
   camera.right = (frustumSize * aspect) / 2;
-  camera.top = frustumSize / 2;
-  camera.bottom = -frustumSize / 2;
+  camera.top = varTop;
+  camera.bottom = varBottom;
   camera.updateProjectionMatrix(); // Update the camera's frustum
   // print("camera", camera);
 
