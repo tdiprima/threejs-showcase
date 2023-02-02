@@ -1,3 +1,26 @@
+# Space 🛸👾
+
+In three.js there are only the terms local and world space.
+
+Object space is used as a synonym for local space.
+
+World space is the coordinate system for the entire scene.
+#
+One way to understand local space is to imagine an object sitting within a box.
+
+All of the points on the object's surface are then given with respect to one corner of the box.
+
+If you pick up the entire box and move it around the room,
+the coordinates of the object &ndash; with respect to the box &ndash; do not change:
+
+the coordinates of the box with respect to the room are changing.
+
+Focus on the two different descriptions:
+
+the object with respect to the box (the object's position in local space),
+
+and the box with respect to the room (the position of the object in world space).
+
 # Geometry attr position
 
 ```c
