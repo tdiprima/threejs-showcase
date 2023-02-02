@@ -1,3 +1,4 @@
+// todo: make the last points connect
 let camera;
 let scene;
 let renderer;
@@ -5,7 +6,7 @@ let line;
 
 let frustumSize = 4;
 
-let index = 0;
+let index = 0; // number of indices to render
 let coords = new THREE.Vector3();
 
 let mouseIsPressed;
@@ -14,6 +15,7 @@ init();
 render();
 
 function init() {
+  console.log("%cinit", "color: yellow");
   // Scene object
   scene = new THREE.Scene();
 
@@ -33,9 +35,10 @@ function init() {
 
   let geometry = new THREE.BufferGeometry();
 
-  // Allocate large enough buffer
+  // Allocate large enough buffer (1000 points)
   let positionAttribute = new THREE.BufferAttribute(new Float32Array(1000 * 3), 3);
-  positionAttribute.setUsage(THREE.DynamicDrawUsage);
+  // optimize performance
+  positionAttribute.setUsage(THREE.DynamicDrawUsage); // user will set data occasionally
   geometry.setAttribute("position", positionAttribute);
 
   // A line material
@@ -44,16 +47,16 @@ function init() {
   line = new THREE.Line(geometry, material);
   scene.add(line); // todo: do this in mousedown
 
-  // Initial points
-  addPoint(0, 0, 0); // start point
-  addPoint(1, 0, 0); // current pointer coordinate
+  // First of all, add 2 points
+  addPoint(0, 0, 0); // center
+  addPoint(1, 0, 0); // 1 unit to the right
 
   // Renderer will use a canvas taking the whole window
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  // Append canvas to the page
+  // Add canvas to page
   document.body.appendChild(renderer.domElement);
 
   // Event listeners
@@ -68,11 +71,20 @@ function init() {
 mouseIsPressed = false;
 
 function mouseReleased() {
+  console.log("%cmouseReleased", "color: cyan");
   mouseIsPressed = false;
+  // todo: clear last point, but don't erase the drawn object
+  // index = 0; <- Nope. this erases it.
+  // let position = line.geometry.getAttribute("position");
+  // position.setXYZ(index, x, y, z);
+  // position.needsUpdate = true;
+  // index++;
+  // line.geometry.setDrawRange(0, index);
 }
 
 /* Add Point */
 function addPoint(x, y, z) {
+  console.log("%caddPoint", "color: orange");
   let position = line.geometry.getAttribute("position");
   position.setXYZ(index, x, y, z);
   position.needsUpdate = true;
@@ -83,6 +95,7 @@ function addPoint(x, y, z) {
 }
 
 function updatePoint(x, y, z) {
+  console.log("%cupdatePoint", "color: cyan")
   let position = line.geometry.getAttribute("position");
   position.setXYZ(index - 1, coords.x, coords.y, 0);
   position.needsUpdate = true;
@@ -90,6 +103,8 @@ function updatePoint(x, y, z) {
 
 /* Mousedown */
 function onPointerDown(event) {
+  // Add point & render.
+  console.log("%conPointerDown", "color: orange")
   mouseIsPressed = true;
 
   coords.x = (event.clientX / window.innerWidth) * 2 - 1;
@@ -105,6 +120,8 @@ function onPointerDown(event) {
 
 /* Mousemove */
 function onPointerMove(event) {
+  // Update point & render.
+  console.log("%conPointerMove", "color: cyan");
   if (mouseIsPressed) {
     coords.x = (event.clientX / window.innerWidth) * 2 - 1;
     coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -121,6 +138,8 @@ function onPointerMove(event) {
 
 /* Resize callback */
 function onWindowResize() {
+  // Fix size & render
+  console.log("%conWindowResize", "color: violet")
   let aspect = window.innerWidth / window.innerHeight;
 
   camera.left = (-frustumSize * aspect) / 2;
@@ -136,15 +155,16 @@ function onWindowResize() {
 
 /* Render callback */
 function render() {
+  console.log("%crender", "color: red")
   renderer.render(scene, camera);
 }
 
 function print() {
   console.log("%ccamera", "color: deeppink;", {
-    "left": camera.left,
-    "right": camera.right,
-    "top": camera.top,
-    "bottom": camera.bottom}
+      "left": camera.left,
+      "right": camera.right,
+      "top": camera.top,
+      "bottom": camera.bottom
+    }
   );
 }
-
