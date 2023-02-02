@@ -7,7 +7,7 @@ let line;
 let frustumSize = 4;
 
 let index = 0; // number of indices to render
-let coords = new THREE.Vector3(); // keep track of mouse coordinates
+let coords = new THREE.Vector3(); // keep track of current mouse position
 
 let mouseIsPressed = false;
 
@@ -103,7 +103,7 @@ function addPoint(x, y, z) {
  * Happens onPointerMove.
  */
 function updatePoint(x, y, z) {
-  // console.log("%cupdatePoint", "color: cyan")
+  // console.log("%cupdatePoint", "color: cyan");
   let position = line.geometry.getAttribute("position");
   position.setXYZ(index - 1, coords.x, coords.y, 0);
   position.needsUpdate = true;
@@ -114,13 +114,13 @@ function updatePoint(x, y, z) {
  * Add point & render.
  */
 function onPointerDown(event) {
-  //
-   // console.log("%conPointerDown", "color: orange")
+  // console.log("%conPointerDown", "color: orange");
   mouseIsPressed = true;
 
   coords.x = (event.clientX / window.innerWidth) * 2 - 1;
   coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
   coords.z = (camera.near + camera.far) / (camera.near - camera.far);
+  print("coords", coords);
 
   coords.unproject(camera);
 
@@ -136,16 +136,19 @@ function onPointerDown(event) {
 function onPointerMove(event) {
   // console.log("%conPointerMove", "color: cyan");
   if (mouseIsPressed) {
+    // Convert the mouse coordinates
+    // (which go from 0 to containerWidth, and from 0 to containerHeight)
+    // to (-1, 1) in both axes.
     coords.x = (event.clientX / window.innerWidth) * 2 - 1;
     coords.y = -(event.clientY / window.innerHeight) * 2 + 1;
     coords.z = (camera.near + camera.far) / (camera.near - camera.far);
+    // print("coords", coords);
 
     coords.unproject(camera);
 
     updatePoint(coords.x, coords.y, 0);
 
     render();
-    // print();
   }
 }
 
@@ -154,7 +157,7 @@ function onPointerMove(event) {
  * Fix size & render.
  */
 function onWindowResize() {
-  // console.log("%conWindowResize", "color: violet")
+  // console.log("%conWindowResize", "color: violet");
   let aspect = window.innerWidth / window.innerHeight;
 
   camera.left = (-frustumSize * aspect) / 2;
@@ -162,6 +165,7 @@ function onWindowResize() {
   camera.top = frustumSize / 2;
   camera.bottom = -frustumSize / 2;
   camera.updateProjectionMatrix(); // Update the camera's frustum
+  // print("camera", camera);
 
   // Update the size of the renderer and the canvas
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -172,19 +176,31 @@ function onWindowResize() {
  * Render callback
  */
 function render() {
-   // console.log("%crender", "color: red")
+  // console.log("%crender", "color: red");
   renderer.render(scene, camera);
 }
 
 /**
  * Print camera attributes
  */
-function print() {
-   console.log("%ccamera", "color: deeppink;", {
-      "left": camera.left,
-      "right": camera.right,
-      "top": camera.top,
-      "bottom": camera.bottom
-    }
-  );
+function print(type, object) {
+  if (type === "camera") {
+    // Print camera attributes
+    console.log(`%c${type}`, "color: deeppink;", {
+        "left": camera.left,
+        "right": camera.right,
+        "top": camera.top,
+        "bottom": camera.bottom
+      }
+    );
+  }
+
+  if (type === "coords") {
+    // Print coordinates
+    console.log(`%c${type}`, "color: #ff00cc;", {
+      x: parseFloat(coords.x.toFixed(2)),
+      y: parseFloat(coords.y.toFixed(2)),
+      z: parseFloat(coords.x.toFixed(2))
+    });
+  }
 }
