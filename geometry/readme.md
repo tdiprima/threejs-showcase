@@ -105,8 +105,11 @@ Might be helpful:
 
 `webgl_camera.html`
 
-<!-- discoverthreejs-site/static/examples/worlds/inline-scenes/first-steps/animation-loop.js -->
-[animation-loop](https://discoverthreejs.com/static/examples/worlds/inline-scenes/first-steps/animation-loop.js) try to find.
+[animation-loop.js](https://github.com/looeee/discoverthreejs-site/blob/main/static/examples/worlds/inline-scenes/first-steps/animation-loop.js)
+
+[animation-loop tutorial](https://discoverthreejs.com/book/first-steps/animation-loop/)
+
+<!-- https://discoverthreejs.com/book/first-steps/animation-system/ -->
 
 ```js
 // Camera that uses perspective projection.
