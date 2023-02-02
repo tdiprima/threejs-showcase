@@ -1,13 +1,29 @@
 # Geometry attr position
 
-```json
-{
-    "itemSize": 3, 
-    "type": "Float32Array", 
-    "array": [0, 0, 0...], 
-    "normalized": false, 
-    "usage": 35048
-}
+```c
+array: Float32Array(3000) [ 0, 0, 0, ... ]
+
+count: 1000
+
+isBufferAttribute: true
+
+itemSize: 3
+
+name: "Lulu"
+
+normalized: false
+
+updateRange: Object { offset: 0, count: -1 }
+
+usage: 35048
+
+version: 2
+```
+
+```js
+// Set name
+line.geometry.name = "Deedee";
+line.geometry.getAttribute("position").name = "Lulu";
 ```
 
 # Buffer Geometry
