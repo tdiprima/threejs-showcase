@@ -1,3 +1,57 @@
+# Geometry attr position
+
+```json
+{
+    "itemSize": 3, 
+    "type": "Float32Array", 
+    "array": [0, 0, 0...], 
+    "normalized": false, 
+    "usage": 35048
+}
+```
+
+# Buffer Geometry
+
+**"Square"**
+
+```json
+{
+  "metadata": {
+    "version": 4.5,
+    "type": "BufferGeometry",
+    "generator": "BufferGeometry.toJSON"
+  },
+  "uuid": "17d69f73-b9db-45e0-90c9-755f941df660",
+  "type": "BufferGeometry",
+  "data": {
+    "attributes": {
+      "position": {
+        "itemSize": 3,
+        "type": "Float32Array",
+        "array": [
+          -1, -1, 1,
+           1, -1, 1,
+           1,  1, 1,
+
+           1,  1, 1,
+          -1,  1, 1,
+          -1, -1, 1
+        ],
+        "normalized": false
+      }
+    },
+    "boundingSphere": {
+      "center": [
+        0, 0, 1
+      ],
+      "radius": 1.4142135623730951
+    }
+  }
+}
+```
+
+# Scribble
+
 The code from [the resource](https://github.com/esperanc/scribble/blob/master/main.js) is highly inefficient; since you continuously allocate geometry all the time, without disposal management, which will lead to a memory leak.
 
 Try the following approach:
