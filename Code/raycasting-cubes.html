@@ -106,7 +106,8 @@
     window.addEventListener('resize', onWindowResize, false);
 
     let controls = new OrbitControls(camera, renderer.domElement);
-    controls.zoomSpeed = 0.1;
+    // controls.zoomSpeed = 0.1;
+    controls.enableDamping = true; // Simon's Cat
 
     // And go!
     animate();
