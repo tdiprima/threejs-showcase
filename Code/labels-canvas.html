@@ -37,6 +37,7 @@
     let camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     camera.position.set(0, 2, 5);
 
+    // Add some OrbitControls so we can move the camera
     let controls = new OrbitControls(camera, canvas);
     controls.target.set(0, 2, 0);
     controls.update();
@@ -176,10 +177,11 @@
         flatShading: true
       });
 
+      // Put the body, head, and label on a root Object3D
       let root = new THREE.Object3D();
       root.position.x = x;
 
-      // NOTE THE POSITIONING
+      // Adjust their positions
       let body = new THREE.Mesh(bodyGeometry, bodyMaterial);
       root.add(body);
       body.position.y = bodyHeight / 2;
@@ -193,8 +195,7 @@
       label.position.y = (bodyHeight * 4) / 5;
       label.position.z = bodyRadiusTop * 1.01;
 
-      // if units are meters then 0.01 here makes size
-      // of the label into centimeters.
+      // If units are meters, then 0.01 converts size of label into centimeters
       let labelBaseScale = 0.01;
       label.scale.x = canvas.width * labelBaseScale;
       label.scale.y = canvas.height * labelBaseScale;
@@ -203,9 +204,9 @@
       return root;
     }
 
-    makePerson(-3, 150, 32, "Purple People Eater", "purple");
-    makePerson(-0, 150, 32, "Green Machine", "green");
-    makePerson(+3, 150, 32, "Red Menace", "red");
+    makePerson(-3, 150, 32, "Kate Bishop", "purple");
+    makePerson(-0, 150, 32, "Green Lantern", "green");
+    makePerson(+3, 150, 32, "Scarlet Witch", "red");
 
     /**
      * Resize

@@ -92,6 +92,7 @@
       let y = event.clientY - canvas.offsetTop;
       context.lineTo(x, y);
       context.stroke();
+      // Tell three.js to update the texture with the latest contents of the canvas
       canvasTexture.needsUpdate = true;
     }
   }
