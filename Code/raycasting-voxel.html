@@ -25,7 +25,7 @@
   let mouse, raycaster, isShiftDown = false;
 
   let cubeGeometry = new THREE.BoxGeometry(50, 50, 50);
-  let cubeMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff80 });
+  let cubeMaterial = new THREE.MeshLambertMaterial({color: 0x00ff80});
 
   let objects = [];
 
@@ -41,8 +41,7 @@
     info.style.top = '10px';
     info.style.width = '100%';
     info.style.textAlign = 'center';
-    info.innerHTML =
-      '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - voxel painter<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel, <a href="javascript:save()">save .png</a>';
+    info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> - voxel painter<br><strong>click</strong>: add voxel, <strong>shift + click</strong>: remove voxel</a>';
     container.appendChild(info);
 
     camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000);
@@ -88,7 +87,7 @@
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement); // TODO
+    container.appendChild(renderer.domElement);
 
     document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('keydown', onDocumentKeyDown, false);
@@ -157,11 +156,6 @@
     }
   }
 
-  function save() {
-    // gotta use the canvas renderer
-    window.open(renderer.domElement.toDataURL("image/png"), "myWindow");
-    return false;
-  }
 
   function render() {
     renderer.render(scene, camera);

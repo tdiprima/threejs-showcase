@@ -123,8 +123,7 @@
 
     // make instances
     new THREE.BufferGeometryLoader()
-      // .setPath("/models/json/")
-      .load("https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/models/json/suzanne_buffergeometry.json", function (geometry) {
+      .load("/data/suzanne_buffergeometry.json", function (geometry) {
 
         material = new THREE.MeshNormalMaterial();
 
