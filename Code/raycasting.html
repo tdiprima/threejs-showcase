@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>object picking with three.js</title>
+  <link href="/favicon.ico" rel="icon" type="image/x-icon">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      overflow: hidden;
+    }
+
+    h1 {
+      font-family: Helvetica, Arial, sans;
+      font-size: 1.5rem;
+      font-weight: normal;
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      text-shadow: 1px 1px 1px #fff;
+    }
+
+    #container {
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+<script type="importmap">{
+    "imports": {
+      "three": "/build/three.module.js",
+      "three/addons/": "/jsm/"
+    }
+  }
+</script>
+<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
+
+<h1>object picking with three.js</h1>
+<div id="container"></div>
+
+<script type="module">
+  import * as THREE from "three";
+  import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+
+  window.onload = function () {
+    console.log(`%cTHREE REV: ${THREE.REVISION}`, "color: #ccff00;");
+
+    const range = 50;
+    const numObjects = 100;
+    let raycaster;
+
+    let div = document.getElementById("container");
+    let divWidth = div.clientWidth;
+    let divHeight = div.clientHeight;
+    console.log("%cdiv", "color: lime;", divWidth, divHeight, div);
+
+    let renderer = new THREE.WebGLRenderer();
+    renderer.setSize(divWidth, divHeight);
+    renderer.setClearColor(0xeeeedd, 1.0);
+
+    div.appendChild(renderer.domElement);
+
+    let scene = new THREE.Scene();
+
+    let camera = new THREE.PerspectiveCamera(45, divWidth / divHeight, 1, 10000);
+    camera.position.set(0, 0, range * 2);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    let geom = new THREE.BoxGeometry(5, 5, 5);
+
+    let cubes = new THREE.Object3D(); // "cubes", plural
+    scene.add(cubes);
+
+    // NOTE! Adding multiple objects into an Object3D, instead of adding each object separately into the scene.
+    for (let i = 0; i < numObjects; i++) {
+
+      let grayness = Math.random() * 0.5 + 0.25; // Because multiplying by 0.5 is faster than dividing by 2.
+      // The RAND function produces a number between 0.0 and 1.0.
+      // We're dividing by 2.
+      // Since half of nothing is nothing, add 0.25 to keep it above zero.  I guess that's the reason.
+
+      let mat = new THREE.MeshBasicMaterial();
+      mat.color.setRGB(grayness, grayness, grayness);
+
+      let cube = new THREE.Mesh(geom, mat); // "cube", singular...
+      cube.position.set(range * (0.5 - Math.random()), range * (0.5 - Math.random()), range * (0.5 - Math.random()));
+      cube.rotation.set(Math.random(), Math.random(), Math.random());
+      cube.grayness = grayness; // We'll use it later!
+
+      cubes.add(cube); // Adding a cube to the cubes object (effectively, a container).
+    }
+
+    raycaster = new THREE.Raycaster(); // create once
+    let mouse = new THREE.Vector2(); // create once
+
+    // User interaction
+    window.addEventListener('mousemove', onMouseMove, false);
+    window.addEventListener('resize', onWindowResize, false);
+
+    let controls = new OrbitControls(camera, renderer.domElement);
+    controls.zoomSpeed = 0.1;
+
+    // And go!
+    animate();
+
+    function getMousePos(e) {
+      // Convert the mouse coordinates, which go from 0 to divWidth, and from 0 to divHeight, to (-1, 1) in both axes.
+      mouse.x = 2 * (e.clientX / divWidth) - 1;
+      mouse.y = 1 - 2 * (e.clientY / divHeight);
+      // Y is negated, because in the classic DOM coordinate system, the Y axis grows from top to bottom (i.e. top is 0),
+      // whereas in 3D it grows from bottom to top (i.e. bottom is 0).
+    }
+
+    function findIntersection() {
+      // Casting a ray and using it to find objects in its path
+      raycaster.setFromCamera(mouse, camera);
+
+      // Find intersections of the ray with objects
+      let intersects = raycaster.intersectObjects(cubes.children);
+
+      cubes.children.forEach(cube => {
+        // console.log("setRGB", cube.grayness, cube.grayness, cube.grayness);
+        cube.material.color.setRGB(cube.grayness, cube.grayness, cube.grayness); // Reset color
+      });
+
+      // console.log("intersects.length", intersects.length);
+      for (let i = 0; i < intersects.length; i++) {
+        let intersection = intersects[i];
+
+        // console.log({
+        //   "distance": intersection.distance,
+        //   "point": intersection.point,
+        //   "face": intersection.face,
+        //   "object": intersection.object
+        // });
+
+        // Paint the intersected cubes redder as they get closer to the camera
+        let obj = intersection.object;
+        let shade = 1.0 - i / intersects.length;
+        // console.log(`1.0 - ${i} / ${intersects.length} = `, shade);
+        obj.material.color.setRGB(shade, 0, 0);
+      }
+    }
+
+    function onMouseMove(evt) {
+      getMousePos(evt);
+      findIntersection();
+    }
+
+    function onWindowResize() {
+      divWidth = div.clientWidth;
+      divHeight = div.clientHeight;
+      renderer.setSize(divWidth, divHeight);
+      camera.aspect = divWidth / divHeight;
+      camera.updateProjectionMatrix();
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+  };
+</script>
+</body>
+</html>

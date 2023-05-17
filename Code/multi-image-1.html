@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>01000001 01101100 01100101 01101010 01100001 01101110 01100100 01110010 01100001</title>
+  <link href="main.css" rel="stylesheet" type="text/css">
+  <script src="../build/three.min.js"></script>
+</head>
+<body>
+<table>
+  <tr>
+    <td><div id="image1"></div>&nbsp;</td>
+    <td><div id="image2"></div>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><div id="image3"></div>&nbsp;</td>
+    <td><div id="image4"></div>&nbsp;</td>
+  </tr>
+</table>
+<!-- <div id="image1"></div>
+<div id="image2"></div>
+<div id="image3"></div>
+<div id="image4"></div> -->
+<script>
+  // <script type="module">
+  // todo: BTW, if you try orbit controls, no image displays.
+  // import { OrbitControls } from './jsm/controls/OrbitControls.js';
+
+  // create four instances of the WebGLRenderer
+  let renderer1 = new THREE.WebGLRenderer();
+  let renderer2 = new THREE.WebGLRenderer();
+  let renderer3 = new THREE.WebGLRenderer();
+  let renderer4 = new THREE.WebGLRenderer();
+
+  // todo: we didn't do "size" and whatever, so I added it, but now the image doesn't show
+  // let renderer = new THREE.WebGLRenderer();
+  // renderer.setSize(window.innerWidth, window.innerHeight);
+  // document.body.appendChild(renderer.domElement);
+
+  // add the renderer's DOM element to four HTML elements
+  document.getElementById('image1').appendChild(renderer1.domElement);
+  document.getElementById('image2').appendChild(renderer2.domElement);
+  document.getElementById('image3').appendChild(renderer3.domElement);
+  document.getElementById('image4').appendChild(renderer4.domElement);
+  // document.getElementById('image4').appendChild(renderer.domElement);
+
+  // create four instances of the Scene
+  let scene1 = new THREE.Scene();
+  let scene2 = new THREE.Scene();
+  let scene3 = new THREE.Scene();
+  let scene4 = new THREE.Scene();
+
+  // load your images as textures
+  let texture1 = new THREE.TextureLoader().load('/images/image1.jpg');
+  let texture2 = new THREE.TextureLoader().load('/images/image2.jpg');
+  let texture3 = new THREE.TextureLoader().load('/images/image3.jpg');
+  let texture4 = new THREE.TextureLoader().load('/images/image4.jpg');
+
+  // create four instances of the Mesh, using your textures
+  let material1 = new THREE.MeshBasicMaterial({map: texture1});
+  let material2 = new THREE.MeshBasicMaterial({map: texture2});
+  let material3 = new THREE.MeshBasicMaterial({map: texture3});
+  let material4 = new THREE.MeshBasicMaterial({map: texture4});
+
+  // Create a PlaneGeometry object and a Mesh object using the material and geometry.
+  let geometry = new THREE.PlaneGeometry(5, 5);
+  let mesh1 = new THREE.Mesh(geometry, material1);
+  let mesh2 = new THREE.Mesh(geometry, material2);
+  let mesh3 = new THREE.Mesh(geometry, material3);
+  let mesh4 = new THREE.Mesh(geometry, material4);
+
+  // Set the position and scale of the mesh so that it fits within the canvas for that image.
+  // Now all 4 images show up...
+  mesh1.position.set(-2, 2, 0);
+  mesh2.position.set(2, 2, 0);
+  mesh3.position.set(-2, -2, 0);
+  mesh4.position.set(2, -2, 0);
+
+  // ...BUT!  They all end up in the last quadrant.
+  // create a group object and add all four image meshes to it
+  // let group = new THREE.Group();
+  // group.add(mesh1);
+  // group.add(mesh2);
+  // group.add(mesh3);
+  // group.add(mesh4);
+
+  // create a camera and position it to view the group object
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
+  // camera.lookAt(group.position);
+
+  // add the group object to all four scenes
+  // todo: en serio?  How does this work, when we're putting 1 image per scene?
+  // porque it *doesn't* work!
+  // scene1.add(group);
+  // scene2.add(group);
+  // scene3.add(group);
+  // scene4.add(group);
+
+  // BETTER!
+  scene1.add(mesh1);
+  scene2.add(mesh2);
+  scene3.add(mesh3);
+  scene4.add(mesh4);
+
+  // render the scenes
+  function render() {
+    renderer1.render(scene1, camera);
+    renderer2.render(scene2, camera);
+    renderer3.render(scene3, camera);
+    renderer4.render(scene4, camera);
+  }
+
+  // todo: this doesn't actually work well
+  // update the position and zoom of the group object on hover
+  function onHover(event) {
+    // calculate the position of the mouse on the screen
+    let mouse = new THREE.Vector2();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // use the Raycaster to detect which image the mouse is hovering over
+    let raycaster = new THREE.Raycaster();
+    // let raycaster = new THREE.Raycaster(undefined, undefined, 0, undefined); // todo: parameters
+    raycaster.setFromCamera(mouse, camera);
+
+    let intersects = raycaster.intersectObjects([mesh1, mesh2, mesh3, mesh4]);
+    if (intersects.length > 0) {
+      // console.log("%cintersects:", "color: #ccff00;", intersects);
+      // TODO: IDK what to do here without the group...
+      // update the position and zoom of the group object based on the mouse position
+      // let offset = intersects[0].point.clone().sub(group.position);
+      // group.position.add(offset.multiplyScalar(-0.1));
+      // group.scale.setScalar(1 + intersects[0].distance * 0.1);
+    }
+  }
+
+  // add the onHover function as a listener for the mousemove event
+  document.addEventListener('mousemove', onHover);
+
+  // call the render function in a loop to update the scenes
+  function animate() {
+    requestAnimationFrame(animate);
+    render();
+  }
+
+  animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Labels and Sprite Material</title>
+  <!-- https://threejs.org/manual/#en/billboards -->
+  <link href="/css/manual.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="info">Use Sprite and SpriteMaterial to make labels that always face the camera.</div>
+
+<canvas id="c"></canvas>
+
+<script type="importmap">{
+  "imports": {
+    "three": "/build/three.module.js",
+    "three/addons/": "/jsm/"
+  }
+}
+</script>
+<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
+
+<script type="module">
+  import * as THREE from "three";
+  import {OrbitControls} from "three/addons/controls/OrbitControls.js";
+
+  function main() {
+    let canvas = document.querySelector("#c");
+    let renderer = new THREE.WebGLRenderer({canvas});
+
+    let fov = 75;
+    let aspect = 2; // the canvas default
+    let near = 0.1;
+    let far = 50;
+    let camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    camera.position.set(0, 2, 5);
+
+    let controls = new OrbitControls(camera, canvas);
+    controls.target.set(0, 2, 0);
+    controls.update();
+
+    let scene = new THREE.Scene();
+    scene.background = new THREE.Color("#cce0ff");
+
+    /**
+     * Light
+     */
+    function addLight(position) {
+      let color = 0xffffff;
+      let intensity = 1;
+      let light = new THREE.DirectionalLight(color, intensity);
+      light.position.set(...position);
+      scene.add(light);
+      scene.add(light.target);
+    }
+
+    addLight([-3, 1, 1]);
+    addLight([2, 1, 0.5]);
+
+    // CYLINDER
+    let bodyRadiusTop = 0.4;
+    let bodyHeight = 2;
+    let bodyGeometry = new THREE.CylinderGeometry(
+      bodyRadiusTop, // bodyRadiusTop
+      0.2, // bodyRadiusBottom
+      bodyHeight, // bodyHeight
+      6 // bodyRadialSegments
+    );
+
+    // SPHERE
+    let headRadius = bodyRadiusTop * 0.8;
+    let headGeometry = new THREE.SphereGeometry(
+      headRadius,
+      12, // headLonSegments
+      5 // headLatSegments
+    );
+
+    /**
+     * Generate labels
+     */
+    function makeLabelCanvas(baseWidth, size, name) {
+      let borderSize = 2;
+      let ctx = document.createElement("canvas").getContext("2d");
+      let font = `${size}px bold sans-serif`;
+      ctx.font = font;
+
+      // measure how long the name will be
+      let textWidth = ctx.measureText(name).width;
+
+      let doubleBorderSize = borderSize * 2;
+      let width = baseWidth + doubleBorderSize;
+      let height = size + doubleBorderSize;
+      ctx.canvas.width = width;
+      ctx.canvas.height = height;
+
+      // need to set font again after resizing canvas
+      ctx.font = font;
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+
+      ctx.fillStyle = "blue";
+      ctx.fillRect(0, 0, width, height);
+
+      // scale to fit but don't stretch
+      let scaleFactor = Math.min(1, baseWidth / textWidth);
+      ctx.translate(width / 2, height / 2);
+      ctx.scale(scaleFactor, 1);
+      ctx.fillStyle = "white";
+      ctx.fillText(name, 0, 0);
+
+      return ctx.canvas;
+    }
+
+    /**
+     * Make person
+     */
+    function makePerson(x, labelWidth, size, name, color) {
+      let canvas = makeLabelCanvas(labelWidth, size, name);
+      let texture = new THREE.CanvasTexture(canvas);
+      // because our canvas is likely not a power of 2
+      // in both dimensions set the filtering appropriately.
+      texture.minFilter = THREE.LinearFilter;
+      texture.wrapS = THREE.ClampToEdgeWrapping;
+      texture.wrapT = THREE.ClampToEdgeWrapping;
+
+      // SPRITE
+      let labelMaterial = new THREE.SpriteMaterial({
+        map: texture,
+        transparent: true
+      });
+
+      let bodyMaterial = new THREE.MeshPhongMaterial({
+        color,
+        flatShading: true
+      });
+
+      let root = new THREE.Object3D();
+      root.position.x = x;
+
+      let body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+      root.add(body);
+      body.position.y = bodyHeight / 2;
+
+      let head = new THREE.Mesh(headGeometry, bodyMaterial);
+      root.add(head);
+      head.position.y = bodyHeight + headRadius * 1.1;
+
+      // if units are meters then 0.01 here makes size
+      // of the label into centimeters.
+      let labelBaseScale = 0.01;
+
+      let label = new THREE.Sprite(labelMaterial); // SPRITE
+      root.add(label);
+      // label.position.y = (bodyHeight * 4) / 5; // From certain angles the labels now intersect the characters.
+      // label.position.z = bodyRadiusTop * 1.01;
+      label.position.y = head.position.y + headRadius + size * labelBaseScale; // Move the position of the labels to fix.
+
+      label.scale.x = canvas.width * labelBaseScale;
+      label.scale.y = canvas.height * labelBaseScale;
+
+      scene.add(root);
+      return root;
+    }
+
+    makePerson(-3, 150, 32, "Purple People Eater", "purple");
+    makePerson(-0, 150, 32, "Green Machine", "green");
+    makePerson(+3, 150, 32, "Red Menace", "red");
+
+    /**
+     * Resize
+     */
+    function resizeRendererToDisplaySize(renderer) {
+      let canvas = renderer.domElement;
+      let width = canvas.clientWidth;
+      let height = canvas.clientHeight;
+      let needResize = canvas.width !== width || canvas.height !== height;
+      if (needResize) {
+        renderer.setSize(width, height, false);
+      }
+      return needResize;
+    }
+
+    /**
+     * Render
+     */
+    function render() {
+      if (resizeRendererToDisplaySize(renderer)) {
+        let canvas = renderer.domElement;
+        camera.aspect = canvas.clientWidth / canvas.clientHeight;
+        camera.updateProjectionMatrix();
+      }
+
+      renderer.render(scene, camera);
+
+      requestAnimationFrame(render);
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  main();
+</script>
+</body>
+</html>
