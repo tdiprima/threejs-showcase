@@ -22,9 +22,6 @@
   let renderer;
   let canvas, material, mesh, loader;
 
-  const width = window.innerWidth / 2;
-  const height = window.innerHeight / 2;
-
   init();
   animate();
 
@@ -65,17 +62,17 @@
   }
 
   function init() {
-    camera = new THREE.PerspectiveCamera(30, width / height, 0.01, 10);
-    camera.position.z = 2;
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+    camera.position.z = 5;
 
     scene = new THREE.Scene();
 
     loader = new THREE.TextureLoader();
-    const texture = loader.load("https://threejs.org/examples/textures/uv_grid_opengl.jpg", texture => {
+    loader.load("/images/uv_grid_opengl.jpg", texture => {
 
       pixelFun(texture.image);
 
-      const geometry = new THREE.PlaneGeometry();
+      const geometry = new THREE.PlaneGeometry(5, 5);
       material = new THREE.MeshBasicMaterial({map: texture});
 
       mesh = new THREE.Mesh(geometry, material);
@@ -85,7 +82,7 @@
 
     renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(width, height);
+    renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
   }
 
