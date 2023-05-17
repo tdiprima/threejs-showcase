@@ -1,13 +1,11 @@
 # three.js annotation example
 
-https://sbcode.net/threejs/annotations/
+[Annotations House](https://sbcode.net/threejs/annotations/)
 
-https://codepen.io/Lorti/pen/Vbppap
+[Simple Cube Code](https://codepen.io/Lorti/pen/Vbppap)
 
-https://manu.ninja/webgl-three-js-annotations/
+[Simple Cube Article](https://manu.ninja/webgl-three-js-annotations/)
 
-https://discourse.threejs.org/t/how-to-create-sketchfab-like-annotations-with-three-js/12595
+[How to create Sketchfab like annotations](https://discourse.threejs.org/t/how-to-create-sketchfab-like-annotations-with-three-js/12595)
 
-(wtf is sketchfab?)
-
-https://discourse.threejs.org/t/how-to-make-annotations-move-with-the-3d-model/17359
+[How to make annotations move with the 3D model](https://discourse.threejs.org/t/how-to-make-annotations-move-with-the-3d-model/17359)
