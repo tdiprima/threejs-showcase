@@ -8,8 +8,7 @@
   <style>
     body {
       margin: 0;
-      /* woodsmoke */
-      background-color: #171717;
+      background-color: #2b2b2b;
     }
 
     canvas {
@@ -19,6 +18,16 @@
   </style>
 </head>
 <body>
+<table>
+  <tr>
+    <td><div id="image1"></div>&nbsp;</td>
+    <td><div id="image2"></div>&nbsp;</td>
+  </tr>
+  <tr>
+    <td><div id="image3"></div>&nbsp;</td>
+    <td><div id="image4"></div>&nbsp;</td>
+  </tr>
+</table>
 <script type="importmap">{
   "imports": {
     "three": "/build/three.module.js",
@@ -48,7 +57,7 @@
 
     data.renderer = new THREE.WebGLRenderer();
     data.renderer.setSize(RENDER_WIDTH, RENDER_HEIGHT);
-    document.body.appendChild(data.renderer.domElement);
+    document.getElementById(image.replace(/\.[^/.]+$/, "")).appendChild(data.renderer.domElement);
 
     // Event handler for changes in controls
     function onControlsChange() {
@@ -66,9 +75,8 @@
     // Load the second image texture
     let texture = new THREE.TextureLoader().load(`/images/${image}`);
     let material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide});
-    let geometry = new THREE.PlaneGeometry(3, 2);
+    let geometry = new THREE.PlaneGeometry(4, 3);
     let mesh = new THREE.Mesh(geometry, material);
-    // mesh.position.set(position.x, position.y, position.z); // Nope.
     data.scene.add(mesh);
   }
 
@@ -86,10 +94,10 @@
   let set3 = f();
   let set4 = f();
 
-  create("image1.jpg", "#2b2b2b", set1, [set2, set3, set4], {x: -1, y: 1, z: 0})
-  create("image2.jpg", "#484848", set2, [set1, set3, set4], {x: 1, y: 1, z: 0})
-  create("image3.jpg", "#2b2b2b", set3, [set1, set2, set4], {x: -1, y: -1, z: 0})
-  create("image4.jpg", "#484848", set4, [set1, set2, set3], {x: 1, y: -1, z: 0})
+  create("image1.jpg", "#171717", set1, [set2, set3, set4])
+  create("image2.jpg", "#171717", set2, [set1, set3, set4])
+  create("image3.jpg", "#171717", set3, [set1, set2, set4])
+  create("image4.jpg", "#171717", set4, [set1, set2, set3])
 
   let arr = [set1, set2, set3, set4];
 
