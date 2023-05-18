@@ -70,7 +70,7 @@
     let material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide});
     let geometry = new THREE.PlaneGeometry(3, 2);
     let mesh = new THREE.Mesh(geometry, material);
-    // mesh.position.set(position.x, position.y, position.z);
+    // mesh.position.set(position.x, position.y, position.z); // Nope.
     data.scene.add(mesh);
   }
 
@@ -90,8 +90,8 @@
 
   create("image1.jpg", "#2b2b2b", set1, [set2, set3, set4], {x: -1, y: 1, z: 0})
   create("image2.jpg", "#484848", set2, [set1, set3, set4], {x: 1, y: 1, z: 0})
-  create("image3.jpg", "#2b2b2b", set3, [set1, set2, set4], {x: -1, y: 11, z: 0})
-  create("image4.jpg", "#484848", set4, [set1, set2, set3], {x: 1, y: 11, z: 0})
+  create("image3.jpg", "#2b2b2b", set3, [set1, set2, set4], {x: -1, y: -1, z: 0})
+  create("image4.jpg", "#484848", set4, [set1, set2, set3], {x: 1, y: -1, z: 0})
 
   let arr = [set1, set2, set3, set4];
 
