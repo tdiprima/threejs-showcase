@@ -25,88 +25,83 @@
     "three/addons/": "/jsm/"
   }
 }
+
+
 </script>
 <script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
 <script type="module">
   import * as THREE from "three";
-  import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+  import {OrbitControls} from "three/addons/controls/OrbitControls.js";
 
   let VIEW_ANGLE = 75;
   let NEAR = 0.1;
   let FAR = 1000;
   let ASPECT = (window.innerWidth / 2) / (window.innerHeight / 2);
-  // let ASPECT = window.innerWidth / window.innerHeight;
-  // let ASPECT = window.innerWidth / 2;
   let RENDER_WIDTH = window.innerWidth / 2;
   let RENDER_HEIGHT = window.innerHeight / 2;
-  // let RENDER_WIDTH = window.innerWidth;
-  // let RENDER_HEIGHT = window.innerHeight;
 
-  let mineShaft = "#2b2b2b"
-  let outerSpace = "#484848"
+  function create(image, bgColor, data, secondary, position) {
+    // Create the scene
+    data.scene = new THREE.Scene();
+    data.scene.background = new THREE.Color(bgColor);
 
-  // Create the first scene
-  let scene1 = new THREE.Scene();
-  scene1.background = new THREE.Color(mineShaft);
+    data.camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    data.camera.position.z = 2;
 
-  let camera1 = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-  camera1.position.z = 2;
+    data.renderer = new THREE.WebGLRenderer();
+    data.renderer.setSize(RENDER_WIDTH, RENDER_HEIGHT);
+    document.body.appendChild(data.renderer.domElement);
 
-  let renderer1 = new THREE.WebGLRenderer();
-  renderer1.setSize(RENDER_WIDTH, RENDER_HEIGHT);
-  document.body.appendChild(renderer1.domElement);
+    // Event handler for changes in controls
+    function onControlsChange() {
+      for (let i = 0; i < secondary.length; i++) {
+        let dt = secondary[i]
+        dt.camera.copy(data.camera);
+        dt.camera.updateProjectionMatrix();
+      }
+    }
 
-  // Load the first image texture
-  let texture1 = new THREE.TextureLoader().load('/images/image1.jpg');
-  let material1 = new THREE.MeshBasicMaterial({ map: texture1, side: THREE.DoubleSide });
-  let geometry1 = new THREE.PlaneGeometry(3, 2);
-  let mesh1 = new THREE.Mesh(geometry1, material1);
-  scene1.add(mesh1);
+    // Create the OrbitControls instances for each scene
+    data.controls = new OrbitControls(data.camera, data.renderer.domElement);
+    data.controls.addEventListener('change', onControlsChange);
 
-  // Create the second scene
-  let scene2 = new THREE.Scene();
-  scene2.background = new THREE.Color(outerSpace);
-
-  let camera2 = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
-  camera2.position.z = 2;
-
-  let renderer2 = new THREE.WebGLRenderer();
-  renderer2.setSize(RENDER_WIDTH, RENDER_HEIGHT);
-  document.body.appendChild(renderer2.domElement);
-
-  // Create the OrbitControls instances for each scene
-  let controls1 = new OrbitControls(camera1, renderer1.domElement);
-  controls1.addEventListener('change', onControlsChange1);
-
-  let controls2 = new OrbitControls(camera2, renderer2.domElement);
-  controls2.addEventListener('change', onControlsChange2);
-
-  // Load the second image texture
-  let texture2 = new THREE.TextureLoader().load('/images/image2.jpg');
-  let material2 = new THREE.MeshBasicMaterial({ map: texture2, side: THREE.DoubleSide });
-  let geometry2 = new THREE.PlaneGeometry(3, 2);
-  let mesh2 = new THREE.Mesh(geometry2, material2);
-  scene2.add(mesh2);
-
-  // Event handler for changes in controls1
-  function onControlsChange1() {
-    camera2.copy(camera1);
-    camera2.updateProjectionMatrix();
+    // Load the second image texture
+    let texture = new THREE.TextureLoader().load(`/images/${image}`);
+    let material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide});
+    let geometry = new THREE.PlaneGeometry(3, 2);
+    let mesh = new THREE.Mesh(geometry, material);
+    // mesh.position.set(position.x, position.y, position.z);
+    data.scene.add(mesh);
   }
 
-  // Event handler for changes in controls2
-  function onControlsChange2() {
-    camera1.copy(camera2);
-    camera1.updateProjectionMatrix();
+  function f() {
+    return {
+      scene: {},
+      camera: {},
+      renderer: {},
+      controls: {}
+    }
   }
+
+  let set1 = f();
+  let set2 = f();
+  let set3 = f();
+  let set4 = f();
+
+  create("image1.jpg", "#2b2b2b", set1, [set2, set3, set4], {x: -1, y: 1, z: 0})
+  create("image2.jpg", "#484848", set2, [set1, set3, set4], {x: 1, y: 1, z: 0})
+  create("image3.jpg", "#2b2b2b", set3, [set1, set2, set4], {x: -1, y: 11, z: 0})
+  create("image4.jpg", "#484848", set4, [set1, set2, set3], {x: 1, y: 11, z: 0})
+
+  let arr = [set1, set2, set3, set4];
 
   // Update function for rendering the scenes
   function update() {
-    controls1.update();
-    renderer1.render(scene1, camera1);
-
-    controls2.update();
-    renderer2.render(scene2, camera2);
+    for (let i = 0; i < arr.length; i++) {
+      let dt = arr[i];
+      dt.controls.update();
+      dt.renderer.render(dt.scene, dt.camera);
+    }
 
     requestAnimationFrame(update);
   }
