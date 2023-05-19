@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Rain - BufferGeometry</title>
+  <!-- https://stackoverflow.com/questions/60935920/converting-three-js-rainGeo-into-buffergeometry -->
+  <script src="/js/three.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/three@0.115/build/three.js"></script> -->
+  <link href="/stylesheets/main.css" rel="stylesheet">
+</head>
+<body>
+<div id="info">Converting THREE.js Geometry into BufferGeometry</div>
+<script>
+  console.log(`%cREVISION ${THREE.REVISION}`, "color: #ccff00;");
+
+  let camera, scene, renderer, rain;
+  let rainDrop = new THREE.Vector3(); // vertex
+  let rainGeo = new THREE.BufferGeometry(); // geometry
+  const rainCount = 10; // 1000
+
+  init();
+  animate();
+
+  function init() {
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 100;
+
+    scene = new THREE.Scene();
+
+    let vertices = [];
+    for (let i = 0; i < rainCount; i++) {
+      vertices.push(
+        Math.random() * 120 - 60,
+        Math.random() * 180 - 80,
+        Math.random() * 130 - 60
+      );
+    }
+
+    rainGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+    // let rainMaterial = new THREE.PointsMaterial({color: "#ffffff"}); // material
+    let rainMaterial = new THREE.PointsMaterial({color: "lightblue"});
+
+    rain = new THREE.Points(rainGeo, rainMaterial);
+    console.log("%cposition", "color: lightblue;", rain.geometry.attributes.position);
+    scene.add(rain);
+
+    renderer = new THREE.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+  }
+
+  function rainVariation() {
+    let positionAttribute = rain.geometry.getAttribute("position");
+
+    for (let i = 0; i < positionAttribute.count; i++) {
+      // Geometry position to Vector3
+      rainDrop.fromBufferAttribute(positionAttribute, i);
+      // console.log("%cVector3", "color: lightblue;", rainDrop);
+
+      rainDrop.y -= 1;
+      if (rainDrop.y < -60) {
+        rainDrop.y = 90;
+      }
+
+      positionAttribute.setXYZ(i, rainDrop.x, rainDrop.y, rainDrop.z);
+    }
+
+    positionAttribute.needsUpdate = true; // needsUpdate
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+
+    rainVariation();
+
+    renderer.render(scene, camera);
+  }
+</script>
+</body>
+</html>

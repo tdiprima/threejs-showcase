@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Super Bear</title>
+  <!-- https://addyosmani.com/blog/lazy-loading/ -->
+  <!-- https://mathiasbynens.be/demo/img-loading-lazy -->
+  <!-- https://youtu.be/ZBvvCdhLKdw -->
+</head>
+<body>
+<!-- Chrome's lazy-loading implementation is based not just on how near the current scroll position is, but also
+the connection speed. -->
+
+<!-- It fetches the first 2KB of images on page-load. If the server supports range requests, the first 2KB likely
+contains image dimensions. This enables us to generate/display a placeholder with the same dimensions. First 2KB also
+likely includes the whole image for assets like icons. -->
+
+<!-- Chrome fetches the rest of the image bytes when the user is about to see them. A caveat for Chrome DevTools is
+that this can result in (1) double fetches to 'appear' in the DevTools Network panel and (2) Resource Timing to have
+2 requests for each image. -->
+
+<!-- avoid triggering an eager load in browsers that don't support the new `loading` attribute -->
+<img alt="super" class="lazyload" data-src="super-woman-1885016__340.webp" id="super" loading="lazy"/>
+
+<script>
+  // let img = document.getElementById("super");
+  if ('loading' in HTMLImageElement.prototype) {
+    console.log("%cBrowser supports `loading`.", "color: #00ff00;");
+    // img.src = img["data-src"]; // doesn't work! see below.
+    // img.src = "super-woman-1885016__340.webp";
+    let images = document.querySelectorAll("img.lazyload");
+    images.forEach(img => {
+      img.src = img.dataset.src;
+      console.log(img);
+    });
+
+  } else {
+    // Fetch and apply a polyfill/JavaScript library
+    // for lazy-loading instead.
+    console.log("%cFetch and apply a polyfill for lazy-loading instead.", "color: #ff00cc;");
+    // lazySizes();
+    alternative();
+  }
+
+  function lazySizes() {
+    // Dynamically import the LazySizes library
+    let script = document.createElement("script");
+    script.async = true;
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/lazysizes/4.1.8/lazysizes.min.js";
+    document.body.appendChild(script);
+  }
+
+  async function alternative() {
+    // Dynamically import the LazySizes library
+    let lazySizesLib = await import('./lazysizes.min.js');
+    // Initiate LazySizes (reads data-src & class=lazyload)
+    lazySizes.init(); // lazySizes works off a global.
+  }
+</script>
+</body>
+</html>
