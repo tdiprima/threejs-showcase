@@ -17,10 +17,10 @@
 
 <script type="module">
   import * as THREE from "three";
+  console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
 
   let isDrawing = false;
   let planeMaterial;
-  console.log(THREE.REVISION);
 
   let scene = new THREE.Scene();
 
@@ -37,10 +37,10 @@
   scene.add(light);
 
   {
-    // create a plane geometry with a texture
+    // todo: why. ffs why not loading.
     let planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
-    let texture = new THREE.TextureLoader().load("../pixels/uv_grid_opengl.jpg");
-    planeMaterial = new THREE.MeshLambertMaterial({
+    let texture = new THREE.TextureLoader().load("/images/uv_grid_opengl.jpg");
+    planeMaterial = new THREE.MeshBasicMaterial({
       map: texture,
       side: THREE.DoubleSide
     });
