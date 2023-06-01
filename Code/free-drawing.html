@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Three.js Image Annotation</title>
+  <title>Free-Drawing</title>
   <meta charset="utf-8">
   <link href="/css/main.css" rel="stylesheet">
 </head>
@@ -17,17 +17,16 @@
 
 <script type="module">
   import * as THREE from "three";
+
   console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
 
   let isDrawing = false;
-  let planeMaterial;
-
   let scene = new THREE.Scene();
 
   let camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
   camera.position.z = 10;
 
-  let renderer = new THREE.WebGLRenderer({antialias: true});
+  let renderer = new THREE.WebGLRenderer(); // { antialias: true }
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x101010);
   document.body.appendChild(renderer.domElement);
@@ -36,17 +35,14 @@
   light.position.setScalar(10);
   scene.add(light);
 
-  {
-    // todo: why. ffs why not loading.
-    let planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
-    let texture = new THREE.TextureLoader().load("/images/uv_grid_opengl.jpg");
-    planeMaterial = new THREE.MeshBasicMaterial({
-      map: texture,
-      side: THREE.DoubleSide
-    });
-    let plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    scene.add(plane);
-  }
+  // todo: why. ffs why not loading.
+  let planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
+  let texture = new THREE.TextureLoader().load("/images/uv_grid_opengl.jpg");
+  let planeMaterial = new THREE.MeshBasicMaterial({
+    map: texture
+  });
+  let plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  scene.add(plane);
 
   // Create a canvas element and add it as a texture to the plane geometry
   let canvas = document.createElement('canvas');
@@ -98,7 +94,6 @@
     requestAnimationFrame(render);
     renderer.render(scene, camera);
   })();
-
 </script>
 </body>
 </html>
