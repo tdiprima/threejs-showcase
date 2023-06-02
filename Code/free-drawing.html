@@ -26,7 +26,7 @@
   let camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
   camera.position.z = 10;
 
-  let renderer = new THREE.WebGLRenderer(); // { antialias: true }
+  let renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x101010);
   document.body.appendChild(renderer.domElement);
@@ -37,10 +37,8 @@
 
   // todo: why. ffs why not loading.
   let planeGeometry = new THREE.PlaneGeometry(10, 10, 1, 1);
-  let texture = new THREE.TextureLoader().load("/images/uv_grid_opengl.jpg");
-  let planeMaterial = new THREE.MeshBasicMaterial({
-    map: texture
-  });
+  let texture = new THREE.TextureLoader().load("/images/earth.jpg");
+  let planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
   let plane = new THREE.Mesh(planeGeometry, planeMaterial);
   scene.add(plane);
 
@@ -48,6 +46,9 @@
   let canvas = document.createElement('canvas');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
+
+  // Append the canvas to the body
+  // document.body.appendChild(canvas); // Nope! And then the draw doesn't work.
 
   let context = canvas.getContext("2d");
 
@@ -77,14 +78,14 @@
     }
   }
 
-  // canvas.addEventListener
-  // window.addEventListener
-  // document.addEventListener
-  document.addEventListener('mousemove', onCanvasMouseMove);
-  document.addEventListener('mousedown', onCanvasMouseDown);
+  // let element = canvas;
+  // let element = window;
+  let element = document;
+  element.addEventListener('mousemove', onCanvasMouseMove);
+  element.addEventListener('mousedown', onCanvasMouseDown);
 
   // Add mouseup
-  document.addEventListener('mouseup', function () {
+  element.addEventListener('mouseup', function () {
     isDrawing = false;
     context.closePath();
     context.stroke();
