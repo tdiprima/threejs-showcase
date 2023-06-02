@@ -1,43 +1,46 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Free-Drawing</title>
-  <meta charset="utf-8">
   <link href="/css/main.css" rel="stylesheet">
 </head>
-<script src="/build/three.min.js"></script>
 <body>
+<script src="/build/three.min.js"></script>
 <script>
   console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
   let isDrawing = false;
-
   let scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
-  camera.position.z = 10;
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
 
   let renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0x101010);
   document.body.appendChild(renderer.domElement);
 
-  const planeGeometry = new THREE.PlaneGeometry(10, 10);
-  let texture = new THREE.TextureLoader().load("/images/earth.jpg");
-  let planeMaterial = new THREE.MeshBasicMaterial({map: texture});
-  let plane = new THREE.Mesh(planeGeometry, planeMaterial);
-  scene.add(plane);
-
-  // Create a canvas element and add it as a texture to the plane geometry
   let canvas = document.createElement('canvas');
+  // todo: if you don't make it full screen, then you gotta do some extra offset magic
+  // canvas.width = 512;
+  // canvas.height = 512;
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
 
-  let context = canvas.getContext("2d");
+  let context = canvas.getContext('2d');
+  context.strokeStyle = "#ff0000";
+  context.lineWidth = 2;
 
-  let canvasTexture = new THREE.CanvasTexture(canvas);
-  planeMaterial.map = canvasTexture; // This is what killed the image. Yet, if I don't put it, it doesn't work.
+  // add the canvas as a texture to a plane geometry
+  let texture = new THREE.Texture(canvas);
+  let material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide});
+  let geometry = new THREE.PlaneGeometry(10, 10);
+  let mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
 
-  context.strokeStyle = "#FF0000";
-  context.lineWidth = 5;
+  // let element = canvas;
+  let element = document;
 
   // allow the user to draw on the canvas
   function onCanvasMouseDown(event) {
@@ -48,24 +51,20 @@
     context.moveTo(x, y);
   }
 
+  element.addEventListener('mousedown', onCanvasMouseDown);
+
   function onCanvasMouseMove(event) {
     if (isDrawing) {
       let x = event.clientX - canvas.offsetLeft;
       let y = event.clientY - canvas.offsetTop;
       context.lineTo(x, y);
       context.stroke();
-      // Tell three.js to update the texture with the latest contents of the canvas
-      canvasTexture.needsUpdate = true;
+      texture.needsUpdate = true;
     }
   }
 
-  // let element = canvas; // doesn't work because of course... "what canvas?"
-  // let element = window; // yeah, but meh...
-  let element = document;
   element.addEventListener('mousemove', onCanvasMouseMove);
-  element.addEventListener('mousedown', onCanvasMouseDown);
 
-  // Add mouseup
   element.addEventListener('mouseup', function () {
     isDrawing = false;
     context.closePath();
@@ -73,7 +72,7 @@
   });
 
   /* Resize Event */
-  window.addEventListener('resize', () => {
+  window.addEventListener("resize", function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -84,7 +83,7 @@
   (function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
-  }());
+  })();
 </script>
 </body>
 </html>
