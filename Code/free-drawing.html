@@ -22,7 +22,7 @@
 
   const planeGeometry = new THREE.PlaneGeometry(10, 10);
   let texture = new THREE.TextureLoader().load("/images/earth.jpg");
-  let planeMaterial = new THREE.MeshBasicMaterial({ map: texture });
+  let planeMaterial = new THREE.MeshBasicMaterial({map: texture});
   let plane = new THREE.Mesh(planeGeometry, planeMaterial);
   scene.add(plane);
 
@@ -72,10 +72,19 @@
     context.stroke();
   });
 
-  (function render() {
-    requestAnimationFrame(render);
+  /* Resize Event */
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
     renderer.render(scene, camera);
-  })();
+  });
+
+  /* Animate */
+  (function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }());
 </script>
 </body>
 </html>
