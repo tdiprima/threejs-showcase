@@ -34,7 +34,7 @@
 
   // add the canvas as a texture to a plane geometry
   let texture = new THREE.Texture(canvas);
-  let material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide});
+  let material = new THREE.MeshBasicMaterial({ map: texture });
   let geometry = new THREE.PlaneGeometry(10, 10);
   let mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
