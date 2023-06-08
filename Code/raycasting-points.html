@@ -26,9 +26,9 @@
   document.body.appendChild(renderer.domElement);
 
   // Set up geometry to raycast against
-  let geometry1 = new THREE.BoxGeometry(window.innerWidth, window.innerHeight, 1);
-  let material1 = new THREE.MeshBasicMaterial({ color: 0xcae9f5 });
-  let cube = new THREE.Mesh(geometry1, material1);
+  let boxGeometry = new THREE.BoxGeometry(window.innerWidth, window.innerHeight, 1);
+  let material = new THREE.MeshBasicMaterial({ color: "#cae9f5" });
+  let cube = new THREE.Mesh(boxGeometry, material);
   scene.add(cube);
 
   // Set up the raycaster and mouse vector
@@ -36,16 +36,16 @@
   let mouse = new THREE.Vector2();
 
   // Set up line material and geometry
-  let material = new THREE.LineBasicMaterial({ color: 0x0000ff });
-  let geometry = new THREE.BufferGeometry();
+  let lineMaterial = new THREE.LineBasicMaterial({ color: "#0000ff" });
+  let bufferGeometry = new THREE.BufferGeometry();
 
   // Set up arrays to hold line data
   let positions = [];
-  let colors = [];
-  let color = new THREE.Color();
+  // let colors = [];
+  // let color = new THREE.Color();
 
   // Set up line object
-  let line = new THREE.Line(geometry, material);
+  let line = new THREE.Line(bufferGeometry, lineMaterial);
   scene.add(line);
 
   // Set up the mouse event listeners
@@ -63,13 +63,12 @@
     // console.log(intersects.length);
 
     if (intersects.length > 0) {
-      // console.log("Intersected!");
       let point = intersects[0].point;
       positions.push(point.x, point.y, point.z);
-      color.setHex(Math.random() * 0xffffff);
-      colors.push(color.r, color.g, color.b);
       line.geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-      line.geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      // color.setHex(Math.random() * 0xffffff);
+      // colors.push(color.r, color.g, color.b);
+      // line.geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
     }
   }
 
