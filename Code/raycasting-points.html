@@ -13,6 +13,7 @@
   </style>
 </head>
 <body>
+<!-- <script src="https://cdn.jsdelivr.net/npm/three@0.131.2/build/three.min.js"></script> -->
 <script src="/build/three.min.js"></script>
 <script>
   // Set up scene and camera
@@ -60,7 +61,6 @@
     // Use raycaster to get intersection point with scene
     raycaster.setFromCamera(mouse, camera);
     let intersects = raycaster.intersectObjects(scene.children, true);
-    // console.log(intersects.length);
 
     if (intersects.length > 0) {
       let point = intersects[0].point;
