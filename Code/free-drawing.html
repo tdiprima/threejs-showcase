@@ -4,72 +4,95 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Free-Drawing</title>
-  <link href="/css/main.css" rel="stylesheet">
+  <title>Free-draw on Image</title>
+  <!-- Load image, draw using raycasting -->
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
 </head>
 <body>
 <script src="/build/three.min.js"></script>
 <script>
   console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
-  let isDrawing = false;
   let scene = new THREE.Scene();
+  let imageSource = "/images/image1.jpg";
+
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
+  camera.lookAt(new THREE.Vector3(0, 0, 0));
 
   let renderer = new THREE.WebGLRenderer();
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x101010);
   document.body.appendChild(renderer.domElement);
 
-  let canvas = document.createElement('canvas');
-  // todo: if you don't make it full screen, then you gotta do some extra offset magic
-  // canvas.width = 512;
-  // canvas.height = 512;
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+  // Set up geometry to raycast against
+  const loader = new THREE.TextureLoader();
+  let mesh;
+  const planeGeom = new THREE.PlaneGeometry(10, 10);
 
-  let context = canvas.getContext('2d');
-  context.strokeStyle = "#ff0000";
-  context.lineWidth = 2;
+  // Get texture
+  const tex = loader.load(imageSource, tex => {
+    tex.needsUpdate = true;
+    console.log('aspect', tex.image.height / tex.image.width);
+    mesh.scale.set(1.0, tex.image.height / tex.image.width, 1.0);
+  });
 
-  // add the canvas as a texture to a plane geometry
-  let texture = new THREE.Texture(canvas);
-  let material = new THREE.MeshBasicMaterial({ map: texture });
-  let geometry = new THREE.PlaneGeometry(10, 10);
-  let mesh = new THREE.Mesh(geometry, material);
+  // Set material texture
+  const material = new THREE.MeshBasicMaterial({
+    map: tex,
+    side: THREE.DoubleSide
+  });
+
+  mesh = new THREE.Mesh(planeGeom, material);
   scene.add(mesh);
 
-  // let element = canvas;
-  let element = document;
+  // Set up the raycaster and mouse vector
+  let raycaster = new THREE.Raycaster();
+  let mouse = new THREE.Vector2();
 
-  // allow the user to draw on the canvas
-  function onCanvasMouseDown(event) {
-    isDrawing = true;
-    let x = event.clientX - canvas.offsetLeft;
-    let y = event.clientY - canvas.offsetTop;
-    context.beginPath();
-    context.moveTo(x, y);
-  }
+  // Set up line material and geometry
+  let lineMaterial = new THREE.LineBasicMaterial({color: "#0000ff"});
+  let bufferGeometry = new THREE.BufferGeometry();
 
-  element.addEventListener('mousedown', onCanvasMouseDown);
+  // Set up arrays to hold line data
+  let positions = [];
 
-  function onCanvasMouseMove(event) {
-    if (isDrawing) {
-      let x = event.clientX - canvas.offsetLeft;
-      let y = event.clientY - canvas.offsetTop;
-      context.lineTo(x, y);
-      context.stroke();
-      texture.needsUpdate = true;
+  // Set up line object
+  let line = new THREE.Line(bufferGeometry, lineMaterial);
+  scene.add(line);
+
+  // Set up the mouse event listeners
+  document.addEventListener("mousemove", onMouseMove, false);
+  document.addEventListener("mouseup", onMouseUp, false);
+
+  function onMouseMove(event) {
+    // Calculate mouse position in normalized device coordinates
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Use raycaster to get intersection point with scene
+    raycaster.setFromCamera(mouse, camera);
+    let intersects = raycaster.intersectObjects(scene.children, true);
+
+    if (intersects.length > 0) {
+      let point = intersects[0].point;
+      positions.push(point.x, point.y, point.z);
+      line.geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
     }
   }
 
-  element.addEventListener('mousemove', onCanvasMouseMove);
+  function onMouseUp() {
+    // Remove the mouse event listeners
+    // todo: You don't have to.
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
 
-  element.addEventListener('mouseup', function () {
-    isDrawing = false;
-    context.closePath();
-    context.stroke();
-  });
+    // Draw the final line
+    console.log("positions", positions);
+    line.geometry.setDrawRange(0, positions.length / 3);
+    line.geometry.computeBoundingSphere();
+  }
 
   /* Resize Event */
   window.addEventListener("resize", function () {
