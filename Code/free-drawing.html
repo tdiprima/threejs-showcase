@@ -28,23 +28,15 @@
 
   // Set up geometry to raycast against
   const loader = new THREE.TextureLoader();
-  let mesh;
   const planeGeom = new THREE.PlaneGeometry(10, 10);
 
   // Get texture
-  const tex = loader.load(imageSource, tex => {
-    tex.needsUpdate = true;
-    console.log('aspect', tex.image.height / tex.image.width);
-    mesh.scale.set(1.0, tex.image.height / tex.image.width, 1.0);
-  });
+  const texture = loader.load(imageSource);
 
   // Set material texture
-  const material = new THREE.MeshBasicMaterial({
-    map: tex,
-    side: THREE.DoubleSide
-  });
+  const material = new THREE.MeshBasicMaterial({ map: texture });
 
-  mesh = new THREE.Mesh(planeGeom, material);
+  const mesh = new THREE.Mesh(planeGeom, material);
   scene.add(mesh);
 
   // Set up the raycaster and mouse vector
