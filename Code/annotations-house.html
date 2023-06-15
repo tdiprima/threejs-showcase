@@ -247,7 +247,6 @@
     }
   );
 
-  window.addEventListener("resize", onWindowResize, false);
   function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -256,7 +255,8 @@
     render();
   }
 
-  renderer.domElement.addEventListener("pointerdown", onClick, false);
+  window.addEventListener("resize", onWindowResize, false);
+
   function onClick(event) {
     raycaster.setFromCamera(
       {
@@ -277,8 +277,9 @@
     }
   }
 
+  renderer.domElement.addEventListener("pointerdown", onClick, false);
+
   // Brings whatever you clicked on, to the center of the screen.
-  renderer.domElement.addEventListener("dblclick", onDoubleClick, false);
   function onDoubleClick(event) {
     raycaster.setFromCamera(
       {
@@ -308,6 +309,8 @@
         });
     }
   }
+
+  renderer.domElement.addEventListener("dblclick", onDoubleClick, false);
 
   function gotoAnnotation(a) {
     new TWEEN.Tween(camera.position)
