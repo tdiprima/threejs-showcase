@@ -81,9 +81,12 @@
     document.removeEventListener("mouseup", onMouseUp);
 
     // Draw the final line
-    console.log("positions", positions);
     line.geometry.setDrawRange(0, positions.length / 3);
     line.geometry.computeBoundingSphere();
+
+    // Output to console
+    console.log("positions", positions);
+    // console.log("positions", JSON.stringify(positions));
   }
 
   /* Resize Event */
