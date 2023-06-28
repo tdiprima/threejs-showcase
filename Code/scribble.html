@@ -20,7 +20,7 @@
 
 <script src="/build/three.min.js"></script>
 <script>
-  console.log(`%cREV ${THREE.REVISION}`, "color: #ccff00;");
+  console.log(`%cREV ${THREE.REVISION}`, 'color: #ccff00;');
 
   // Global variables
   let scene;
@@ -31,9 +31,69 @@
   let mouseIsPressed;
   let mouseX;
   let mouseY;
-  let pmouseX;
-  let pmouseY;
 
+  let material; // A line material
+  let selected; // Object that was picked
+
+  function setup() {
+    material = new THREE.LineBasicMaterial({ color: 0xffffff, depthWrite: false, linewidth: 4 });
+  }
+
+  function mousePressed() {
+    const point = new THREE.Vector3(mouseX, mouseY, 0);
+    const geometry = new THREE.BufferGeometry().setFromPoints([point]);
+
+    const line = new THREE.Line(geometry, material);
+    scene.add(line);
+    selected = line;
+  }
+
+  function mouseDragged() {
+    const line = selected;
+    const point = new THREE.Vector3(mouseX, mouseY, 0);
+
+    const oldGeometry = line.geometry;
+    const oldPositionArray = oldGeometry.attributes.position.array;
+    const numVertices = oldPositionArray.length / 3;
+
+    // Create a new array with the updated vertices
+    const newPositionArray = new Float32Array(numVertices * 3 + 3);
+    newPositionArray.set(oldPositionArray);
+
+    newPositionArray[numVertices * 3] = point.x;
+    newPositionArray[numVertices * 3 + 1] = point.y;
+    newPositionArray[numVertices * 3 + 2] = point.z;
+
+    // Assign new array back to the position attribute of the geometry
+    const newGeometry = new THREE.BufferGeometry();
+    newGeometry.setAttribute('position', new THREE.BufferAttribute(newPositionArray, 3));
+
+    // Set needsUpdate to true for the position attribute
+    newGeometry.attributes.position.needsUpdate = true;
+
+    line.geometry = newGeometry;
+  }
+
+  function render() {
+    requestAnimationFrame(render);
+    renderer.render(scene, camera);
+  }
+
+  function resize() {
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    camera.right = width;
+    camera.bottom = height;
+
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+    render();
+  }
+
+  window.addEventListener('resize', resize);
+
+  //*** THE MAIN EVENT ***
   function init() {
     scene = new THREE.Scene();
 
@@ -50,33 +110,17 @@
 
     document.body.appendChild(renderer.domElement);
 
-    function resize() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-
-      camera.right = width;
-      camera.bottom = height;
-
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-      render();
-    }
-
-    window.addEventListener('resize', resize);
-
     // Set up mouse callbacks.
     mouseIsPressed = false;
     mouseX = 0;
     mouseY = 0;
-    pmouseX = 0;
-    pmouseY = 0;
 
-    const setMouse = function (event) {
+    function setMouse(event) {
       mouseX = event.clientX;
       mouseY = event.clientY;
-    };
+    }
 
-    renderer.domElement.addEventListener('pointerdown', (event) => {
+    renderer.domElement.addEventListener('pointerdown', event => {
       setMouse(event);
       mouseIsPressed = true;
       if (typeof mousePressed !== 'undefined') {
@@ -84,9 +128,7 @@
       }
     });
 
-    renderer.domElement.addEventListener('pointermove', (event) => {
-      pmouseX = mouseX;
-      pmouseY = mouseY;
+    renderer.domElement.addEventListener('pointermove', event => {
       setMouse(event);
 
       if (mouseIsPressed) {
@@ -106,51 +148,6 @@
     }
 
     render();
-  }
-
-  function render() {
-    requestAnimationFrame(render);
-    renderer.render(scene, camera);
-  }
-
-  let material; // A line material
-  let selected; // Object that was picked
-
-  function setup() {
-    material = new THREE.LineBasicMaterial({ color: 0xffffff, depthWrite: false, linewidth: 4 });
-  }
-
-  function mousePressed() {
-    let point = new THREE.Vector3(mouseX, mouseY, 0);
-    let geometry = new THREE.BufferGeometry().setFromPoints([point]);
-
-    let line = new THREE.Line(geometry, material);
-    scene.add(line);
-    selected = line;
-  }
-
-  function mouseDragged() {
-    let line = selected;
-    let point = new THREE.Vector3(mouseX, mouseY, 0);
-
-    let oldGeometry = line.geometry;
-    let oldPositionArray = oldGeometry.attributes.position.array;
-    let numVertices = oldPositionArray.length / 3;
-
-    let newPositionArray = new Float32Array(numVertices * 3 + 3);
-    newPositionArray.set(oldPositionArray);
-
-    newPositionArray[numVertices * 3] = point.x;
-    newPositionArray[numVertices * 3 + 1] = point.y;
-    newPositionArray[numVertices * 3 + 2] = point.z;
-
-    let newGeometry = new THREE.BufferGeometry();
-    newGeometry.setAttribute('position', new THREE.BufferAttribute(newPositionArray, 3));
-
-    // Set needsUpdate to true for the position attribute
-    newGeometry.attributes.position.needsUpdate = true;
-
-    line.geometry = newGeometry;
   }
 
   init();
