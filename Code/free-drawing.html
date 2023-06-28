@@ -30,27 +30,20 @@
   const loader = new THREE.TextureLoader();
   const planeGeom = new THREE.PlaneGeometry(10, 10);
 
-  // Get texture
+  // Texture material and mesh
   const texture = loader.load(imageSource);
-
-  // Set material texture
   const material = new THREE.MeshBasicMaterial({ map: texture });
-
   const mesh = new THREE.Mesh(planeGeom, material);
   scene.add(mesh);
 
-  // Set up the raycaster and mouse vector
+  // Raycaster
   let raycaster = new THREE.Raycaster();
   let mouse = new THREE.Vector2();
 
-  // Set up line material and geometry
+  // Line
   let lineMaterial = new THREE.LineBasicMaterial({color: "#0000ff"});
   let bufferGeometry = new THREE.BufferGeometry();
-
-  // Set up arrays to hold line data
   let positions = [];
-
-  // Set up line object
   let line = new THREE.Line(bufferGeometry, lineMaterial);
   scene.add(line);
 
@@ -89,7 +82,6 @@
     // console.log("positions", JSON.stringify(positions));
   }
 
-  /* Resize Event */
   window.addEventListener("resize", function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -97,7 +89,6 @@
     renderer.render(scene, camera);
   });
 
-  /* Animate */
   (function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
