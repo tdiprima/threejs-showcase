@@ -50,23 +50,23 @@ function init() {
   pmouseX = 0;
   pmouseY = 0;
 
-  const setMouse = function() {
+  const setMouse = function(event) {
     mouseX = event.clientX;
     mouseY = event.clientY;
   };
 
-  renderer.domElement.addEventListener('mousedown', () => {
-    setMouse();
+  renderer.domElement.addEventListener('mousedown', (event) => {
+    setMouse(event);
     mouseIsPressed = true;
     if (typeof mousePressed !== 'undefined') {
       mousePressed();
     }
   });
 
-  renderer.domElement.addEventListener('mousemove', () => {
+  renderer.domElement.addEventListener('mousemove', (event) => {
     pmouseX = mouseX;
     pmouseY = mouseY;
-    setMouse();
+    setMouse(event);
 
     if (mouseIsPressed) {
       if (typeof mouseDragged !== 'undefined') {
