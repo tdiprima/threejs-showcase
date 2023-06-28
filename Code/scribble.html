@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Scribble</title>
+  <link href="/css/main.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Montserrat-SemiBold', 'Montserrat', 'Open Sans', 'Helvetica', 'Arial', 'sans-serif';
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+<div id="info">
+  Draw!
+</div>
+
+<script src="/build/three.min.js"></script>
+<script>
+  console.log(`%cREV ${THREE.REVISION}`, "color: #ccff00;");
+
+  // Global variables
+  let scene;
+  let width;
+  let height;
+  let camera;
+  let renderer;
+  let mouseIsPressed;
+  let mouseX;
+  let mouseY;
+  let pmouseX;
+  let pmouseY;
+
+  function init() {
+    scene = new THREE.Scene();
+
+    width = window.innerWidth;
+    height = window.innerHeight;
+
+    camera = new THREE.OrthographicCamera(0, width, 0, height, -height, height);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.sortObjects = false;
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(width, height);
+
+    document.body.appendChild(renderer.domElement);
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+
+      camera.right = width;
+      camera.bottom = height;
+
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+      render();
+    }
+
+    window.addEventListener('resize', resize);
+
+    // Set up mouse callbacks.
+    mouseIsPressed = false;
+    mouseX = 0;
+    mouseY = 0;
+    pmouseX = 0;
+    pmouseY = 0;
+
+    const setMouse = function (event) {
+      mouseX = event.clientX;
+      mouseY = event.clientY;
+    };
+
+    renderer.domElement.addEventListener('pointerdown', (event) => {
+      setMouse(event);
+      mouseIsPressed = true;
+      if (typeof mousePressed !== 'undefined') {
+        mousePressed();
+      }
+    });
+
+    renderer.domElement.addEventListener('pointermove', (event) => {
+      pmouseX = mouseX;
+      pmouseY = mouseY;
+      setMouse(event);
+
+      if (mouseIsPressed) {
+        if (typeof mouseDragged !== 'undefined') {
+          mouseDragged();
+        }
+      }
+    });
+
+    renderer.domElement.addEventListener('pointerup', () => {
+      mouseIsPressed = false;
+    });
+
+    // If a setup function is defined, call it
+    if (typeof setup !== 'undefined') {
+      setup();
+    }
+
+    render();
+  }
+
+  function render() {
+    requestAnimationFrame(render);
+    renderer.render(scene, camera);
+  }
+
+  let material; // A line material
+  let selected; // Object that was picked
+
+  function setup() {
+    material = new THREE.LineBasicMaterial({ color: 0xffffff, depthWrite: false, linewidth: 4 });
+  }
+
+  function mousePressed() {
+    let point = new THREE.Vector3(mouseX, mouseY, 0);
+    let geometry = new THREE.BufferGeometry().setFromPoints([point]);
+
+    let line = new THREE.Line(geometry, material);
+    scene.add(line);
+    selected = line;
+  }
+
+  function mouseDragged() {
+    let line = selected;
+    let point = new THREE.Vector3(mouseX, mouseY, 0);
+
+    let oldGeometry = line.geometry;
+    let oldPositionArray = oldGeometry.attributes.position.array;
+    let numVertices = oldPositionArray.length / 3;
+
+    let newPositionArray = new Float32Array(numVertices * 3 + 3);
+    newPositionArray.set(oldPositionArray);
+
+    newPositionArray[numVertices * 3] = point.x;
+    newPositionArray[numVertices * 3 + 1] = point.y;
+    newPositionArray[numVertices * 3 + 2] = point.z;
+
+    let newGeometry = new THREE.BufferGeometry();
+    newGeometry.setAttribute('position', new THREE.BufferAttribute(newPositionArray, 3));
+
+    // Set needsUpdate to true for the position attribute
+    newGeometry.attributes.position.needsUpdate = true;
+
+    line.geometry = newGeometry;
+  }
+
+  init();
+</script>
+</body>
+</html>
