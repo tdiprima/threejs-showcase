@@ -57,7 +57,6 @@
   /* Textures */
   imageAspectRatio();
 
-  /* Resize Event */
   window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -65,7 +64,6 @@
     renderer.render(scene, camera);
   });
 
-  /* Animate */
   (function animate() {
     requestAnimationFrame(animate);
     controls.update();
