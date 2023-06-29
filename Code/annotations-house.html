@@ -269,10 +269,13 @@
     // annotationMarkers = The object to check for intersection with the ray.
     // intersectObjects(): returns an array of intersected objects
     let intersects = raycaster.intersectObjects(annotationMarkers, true);
+
+    let intersected = intersects[0].object;
+
     if (intersects.length > 0) {
-      console.log("%cGot One", "color: #ff00cc;", intersects[0].object.type);
-      if (intersects[0].object.userData && intersects[0].object.userData.id) {
-        gotoAnnotation(annotations[intersects[0].object.userData.id]);
+      console.log("%cGot One", "color: #ff00cc;", intersected.type);
+      if (intersected.userData && intersected.userData.id) {
+        gotoAnnotation(annotations[intersected.userData.id]);
       }
     }
   }
