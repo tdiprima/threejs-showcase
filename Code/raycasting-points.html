@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Raycasting Example</title>
+  <title>Draw with Raycasting</title>
   <style>
     body {
       margin: 0;
@@ -50,8 +50,8 @@
   scene.add(line);
 
   // Set up the mouse event listeners
-  document.addEventListener("mousemove", onMouseMove, false);
-  document.addEventListener("mouseup", onMouseUp, false);
+  renderer.domElement.addEventListener("mousemove", onMouseMove, false);
+  renderer.domElement.addEventListener("mouseup", onMouseUp, false);
 
   function onMouseMove(event) {
     // Calculate mouse position in normalized device coordinates
@@ -74,8 +74,8 @@
 
   function onMouseUp() {
     // Remove the mouse event listeners
-    document.removeEventListener("mousemove", onMouseMove);
-    document.removeEventListener("mouseup", onMouseUp);
+    renderer.domElement.removeEventListener("mousemove", onMouseMove);
+    renderer.domElement.removeEventListener("mouseup", onMouseUp);
 
     // Draw the final line
     console.log("positions", positions);
@@ -83,7 +83,6 @@
     line.geometry.computeBoundingSphere();
   }
 
-  /* Resize Event */
   window.addEventListener("resize", function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -91,7 +90,6 @@
     renderer.render(scene, camera);
   });
 
-  /* Animate */
   (function animate() {
     requestAnimationFrame(animate);
     renderer.render(scene, camera);
