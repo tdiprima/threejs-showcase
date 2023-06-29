@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>three.js canvas - interactive - voxel painter</title>
+  <title>Interactive voxel painter</title>
   <meta charset="utf-8">
   <meta content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" name="viewport">
   <style>
@@ -9,13 +9,12 @@
       font-family: Monospace, sans-serif;
       overflow: hidden;
       margin: 0;
-      background-color: #f0f0f0;
+      /* background-color: #f0f0f0; */
     }
   </style>
-  <script src="/build/three.js"></script>
 </head>
 <body>
-
+<script src="/build/three.js"></script>
 <script type="module">
   let container;
   let camera, scene, renderer;
@@ -36,6 +35,7 @@
     container = document.createElement('div');
     document.body.appendChild(container);
 
+    // Dynamic info div
     let info = document.createElement('div');
     info.style.position = 'absolute';
     info.style.top = '10px';
@@ -49,7 +49,7 @@
     camera.lookAt(0, 0, 0);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf0f0f0);
+    // scene.background = new THREE.Color(0xf0f0f0);
 
     // Grid
     let gridHelper = new THREE.GridHelper(1000, 20);
@@ -61,7 +61,7 @@
     let geometry = new THREE.PlaneGeometry(1000, 1000);
     geometry.rotateX(-Math.PI / 2);
 
-    plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({visible: false}));
+    plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }));
     scene.add(plane);
 
     objects.push(plane);
@@ -89,6 +89,7 @@
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
+    // It has to be "document" because "renderer.domElement" doesn't know shift-click
     document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('keydown', onDocumentKeyDown, false);
     document.addEventListener('keyup', onDocumentKeyUp, false);
@@ -119,7 +120,9 @@
       let intersect = intersects[0];
 
       if (isShiftDown) {
+        // console.log("shift down");
         if (intersect.object !== plane) {
+          // console.log("intersect");
           scene.remove(intersect.object);
           objects.splice(objects.indexOf(intersect.object), 1);
         }
@@ -156,11 +159,10 @@
     }
   }
 
-
   function render() {
+    // Notice - requestAnimationFrame not needed.
     renderer.render(scene, camera);
   }
 </script>
-
 </body>
 </html>
