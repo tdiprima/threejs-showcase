@@ -5,19 +5,31 @@
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Free-draw on Image</title>
-  <!-- Load image, draw using raycasting -->
-  <style>
-    body { margin: 0; }
-    canvas { display: block; }
-  </style>
+  <link rel="stylesheet" href="/css/main.css">
 </head>
 <body>
-<script src="/build/three.min.js"></script>
-<script>
-  console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
-  let scene = new THREE.Scene();
-  let imageSource = "/images/image1.jpg";
+<button id="toggleButton">drawing toggle</button>
+<script type="importmap">{
+  "imports": {
+    "three": "/build/three.module.js",
+    "three/addons/": "/jsm/"
+  }
+}
+</script>
+<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+  console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
+  let btnDraw = document.getElementById("toggleButton");
+  let imageSource = "/images/image1.jpg";
+  let isDrawing = false;
+  let mouseIsPressed = false;
+  let positions = []; // Set up arrays to hold line data
+  let controls;
+
+  let scene = new THREE.Scene();
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
   camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -26,59 +38,90 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
 
-  // Set up geometry to raycast against
+  controls = new OrbitControls(camera, renderer.domElement);
+
+  btnDraw.addEventListener('click', function () {
+    console.log("%cbutton clicked", "color: #ccff00;");
+    positions = [];
+    if (isDrawing) {
+      isDrawing = false;
+      controls.enabled = true;
+
+      // Remove the mouse event listeners
+      renderer.domElement.removeEventListener("mousemove", onMouseMove);
+      renderer.domElement.removeEventListener("mouseup", onMouseUp);
+    } else {
+      // Drawing on
+      isDrawing = true;
+      controls.enabled = false;
+
+      // Set up the mouse event listeners
+      renderer.domElement.addEventListener("mousemove", onMouseMove);
+      renderer.domElement.addEventListener("mouseup", onMouseUp);
+    }
+    // console.log("isDrawing?", isDrawing, "\ncontrols enabled?", controls.enabled);
+  });
+
   const loader = new THREE.TextureLoader();
   const planeGeom = new THREE.PlaneGeometry(10, 10);
-
-  // Texture material and mesh
   const texture = loader.load(imageSource);
-  const material = new THREE.MeshBasicMaterial({ map: texture });
+  const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
   const mesh = new THREE.Mesh(planeGeom, material);
   scene.add(mesh);
 
-  // Raycaster
   let raycaster = new THREE.Raycaster();
   let mouse = new THREE.Vector2();
 
-  // Line
-  let lineMaterial = new THREE.LineBasicMaterial({color: "#0000ff"});
-  let bufferGeometry = new THREE.BufferGeometry();
-  let positions = [];
-  let line = new THREE.Line(bufferGeometry, lineMaterial);
-  scene.add(line);
+  let lineMaterial = new THREE.LineBasicMaterial({ color: "#0000ff" });
+  let line;
 
-  // Set up the mouse event listeners
-  renderer.domElement.addEventListener("mousemove", onMouseMove, false);
-  renderer.domElement.addEventListener("mouseup", onMouseUp, false);
+  renderer.domElement.addEventListener('pointerdown', event => {
+    if (isDrawing) {
+      mouseIsPressed = true;
+
+      // Create a new BufferAttribute for each line
+      let bufferGeometry = new THREE.BufferGeometry();
+      line = new THREE.Line(bufferGeometry, lineMaterial);
+      scene.add(line);
+    }
+  });
 
   function onMouseMove(event) {
-    // Calculate mouse position in normalized device coordinates
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    if (isDrawing && mouseIsPressed) {
+      // Calculate mouse position in normalized device coordinates
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-    // Use raycaster to get intersection point with scene
-    raycaster.setFromCamera(mouse, camera);
-    let intersects = raycaster.intersectObjects(scene.children, true);
+      // Use raycaster to get intersection point with scene
+      raycaster.setFromCamera(mouse, camera);
+      let intersects = raycaster.intersectObjects(scene.children, true);
 
-    if (intersects.length > 0) {
-      let point = intersects[0].point;
-      positions.push(point.x, point.y, point.z);
-      line.geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+      if (intersects.length > 0) {
+        let point = intersects[0].point;
+        positions.push(point.x, point.y, point.z);
+
+        let bufferGeometry =  line.geometry;
+        line.geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+
+        // Set needsUpdate to true for the position attribute
+        bufferGeometry.attributes.position.needsUpdate = true;
+      }
     }
   }
 
   function onMouseUp() {
-    // Remove the mouse event listeners
-    renderer.domElement.removeEventListener("mousemove", onMouseMove);
-    renderer.domElement.removeEventListener("mouseup", onMouseUp);
+    if (isDrawing) {
+      mouseIsPressed = false;
+      // todo: make fewer points
 
-    // Draw the final line
-    line.geometry.setDrawRange(0, positions.length / 3);
-    line.geometry.computeBoundingSphere();
+      // Draw the final line
+      line.geometry.setDrawRange(0, positions.length / 3);
+      line.geometry.computeBoundingSphere();
 
-    // Output to console
-    console.log("positions", positions);
-    // console.log("positions", JSON.stringify(positions));
+      console.log(`%cNum vertices:`, 'color: #997fff', positions.length);
+      console.log("positions", line.geometry.getAttribute("position").array);
+      positions = [];
+    }
   }
 
   window.addEventListener("resize", function () {
@@ -90,6 +133,7 @@
 
   (function animate() {
     requestAnimationFrame(animate);
+    controls.update();
     renderer.render(scene, camera);
   })();
 </script>
