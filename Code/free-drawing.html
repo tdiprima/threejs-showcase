@@ -29,6 +29,7 @@
   let mouseIsPressed = false;
   let positions = []; // Set up arrays to hold line data
   let controls;
+  let color = "#0000ff";
 
   let scene = new THREE.Scene();
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -75,8 +76,14 @@
   // NOTE: Due to limitations of the OpenGL Core Profile with the WebGL renderer on most platforms,
   // 'linewidth' will always be 1 regardless of the set value.
   // See: https://threejs.org/docs/#api/en/materials/LineBasicMaterial.linewidth
-  let lineMaterial = new THREE.LineBasicMaterial({ color: "#0000ff" });
-  let line;
+
+  // Make a line
+  let material = new THREE.LineBasicMaterial({ color });
+
+  // Make a sphere
+  // let material = new THREE.MeshBasicMaterial( { color } );
+
+  let mesh; // whichever we decide
 
   renderer.domElement.addEventListener('pointerdown', event => {
     if (isDrawing) {
@@ -84,8 +91,15 @@
 
       // Create a new BufferAttribute for each line
       let bufferGeometry = new THREE.BufferGeometry();
-      line = new THREE.Line(bufferGeometry, lineMaterial);
-      scene.add(line);
+      mesh = new THREE.Line(bufferGeometry, material);
+
+      // Sphere as line - todo: doesn't work
+      // let geometry = new THREE.SphereGeometry(0.1, 32, 32);
+      // mesh = new THREE.Mesh( geometry, material );
+
+      // console.log("%cmesh.geometry", "color: #ccff00;", mesh.geometry);
+
+      scene.add( mesh );
     }
   });
 
@@ -103,8 +117,8 @@
         let point = intersects[0].point;
         positions.push(point.x, point.y, point.z);
 
-        let bufferGeometry =  line.geometry;
-        line.geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        let bufferGeometry =  mesh.geometry;
+        mesh.geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
 
         // Set needsUpdate to true for the position attribute
         bufferGeometry.attributes.position.needsUpdate = true;
@@ -118,11 +132,11 @@
       // todo: make fewer points
 
       // Draw the final line
-      line.geometry.setDrawRange(0, positions.length / 3);
-      line.geometry.computeBoundingSphere();
+      mesh.geometry.setDrawRange(0, positions.length / 3);
+      mesh.geometry.computeBoundingSphere();
 
       console.log(`%cNum vertices:`, 'color: #997fff', positions.length);
-      console.log("positions", line.geometry.getAttribute("position").array);
+      console.log("positions", mesh.geometry.getAttribute("position").array);
       positions = [];
     }
   }
