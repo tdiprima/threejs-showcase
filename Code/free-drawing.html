@@ -21,6 +21,9 @@
 <script type="module">
   import * as THREE from "three";
   import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+  // import { Line2 } from 'three/addons/lines/Line2.js';
+  // import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
+  // import { LineGeometry } from 'three/addons/lines/LineGeometry.js';
 
   console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
   let btnDraw = document.getElementById("toggleButton");
@@ -80,8 +83,13 @@
   // Make a line
   let material = new THREE.LineBasicMaterial({ color });
 
+  // Make a Line2 (uncomment imports)
+  // let material = new LineMaterial({ color, linewidth: 5 });
+
   // Make a sphere
   // let material = new THREE.MeshBasicMaterial( { color } );
+
+  // TubeBufferGeometry - working on it in another app
 
   let mesh; // whichever we decide
 
@@ -93,11 +101,16 @@
       let bufferGeometry = new THREE.BufferGeometry();
       mesh = new THREE.Line(bufferGeometry, material);
 
-      // Sphere as line - todo: doesn't work
+      // Line2 - todo: at intersect: 'can't access property "count", instanceStart is undefined'
+      // let bufferGeometry = new LineGeometry();
+      // mesh = new Line2(bufferGeometry, material);
+      // scene.add(mesh);
+
+      // Sphere as line - todo: doesn't draw
       // let geometry = new THREE.SphereGeometry(0.1, 32, 32);
       // mesh = new THREE.Mesh( geometry, material );
 
-      // console.log("%cmesh.geometry", "color: #ccff00;", mesh.geometry);
+      console.log("%cmesh.geometry", "color: #ccff00;", mesh.geometry);
 
       scene.add( mesh );
     }
