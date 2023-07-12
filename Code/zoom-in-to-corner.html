@@ -10,19 +10,20 @@
 </head>
 <body>
 <button id="startButton">Start Animation</button>
+
+<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
 <script type="importmap">{
   "imports": {
-    "three": "/build/three.module.js",
-    "three/examples/": "/jsm/"
+    "three": "/build/three.module.js"
   }
 }
 </script>
-<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tween.js/20.0.0/tween.umd.js"></script>
 <script type="module">
   import * as THREE from "three";
   // When you add orbit controls, that's how it gets twisted.
-  import { OrbitControls } from "three/examples/controls/OrbitControls.js";
+  import { OrbitControls } from "/jsm/controls/OrbitControls.js";
 
   let imgSrc = "/images/uv_grid_opengl.jpg";
   let animationStarted = false;

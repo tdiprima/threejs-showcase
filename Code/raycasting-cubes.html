@@ -36,8 +36,7 @@
 <body>
 <script type="importmap">{
     "imports": {
-      "three": "/build/three.module.js",
-      "three/examples/": "/jsm/"
+      "three": "/build/three.module.js"
     }
   }
 </script>
@@ -48,7 +47,7 @@
 
 <script type="module">
   import * as THREE from "three";
-  import {OrbitControls} from "three/examples/controls/OrbitControls.js";
+  import {OrbitControls} from "/jsm/controls/OrbitControls.js";
 
   window.onload = function () {
     console.log(`%cTHREE REV: ${THREE.REVISION}`, "color: #ccff00;");
