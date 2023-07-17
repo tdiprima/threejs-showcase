@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Image Annotation</title>
-  <!-- Interactive image annotation -->
+  <title>Free-draw on Image</title>
+  <!-- Note: it still tries to connect lines sometimes -->
   <link href="/css/main.css" rel="stylesheet">
 </head>
 <body>
@@ -15,19 +15,21 @@
     "three": "/build/three.module.js"
   }
 }
-
 </script>
 <script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
 <script type="module">
   import * as THREE from "three";
   import { OrbitControls } from "/jsm/controls/OrbitControls.js";
+  // import { Line2 } from '/jsm/lines/Line2.js';
+  // import { LineMaterial } from '/jsm/lines/LineMaterial.js';
+  // import { LineGeometry } from '/jsm/lines/LineGeometry.js';
 
   console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
   let btnDraw = document.getElementById("toggleButton");
-  let imageSource = "/images/image1.jpg";
+  let imageSource = "/images/image2.jpg";
   let isDrawing = false;
   let mouseIsPressed = false;
-  let positions = [];
+  let positions = []; // Set up arrays to hold line data
   let controls;
   let color = "#0000ff";
 
@@ -42,23 +44,27 @@
 
   controls = new OrbitControls(camera, renderer.domElement);
 
-  btnDraw.addEventListener("click", function () {
+  btnDraw.addEventListener('click', function () {
     positions = [];
     if (isDrawing) {
       isDrawing = false;
       controls.enabled = true;
 
+      // Remove the mouse event listeners
       renderer.domElement.removeEventListener("mousemove", onMouseMove);
       renderer.domElement.removeEventListener("mouseup", onMouseUp);
     } else {
+      // Drawing on
       isDrawing = true;
       controls.enabled = false;
 
+      // Set up the mouse event listeners
       renderer.domElement.addEventListener("mousemove", onMouseMove);
       renderer.domElement.addEventListener("mouseup", onMouseUp);
     }
   });
 
+  // Load image to plane
   let loader = new THREE.TextureLoader();
   let planeGeom = new THREE.PlaneGeometry(10, 10);
   let texture = loader.load(imageSource);
@@ -69,16 +75,22 @@
   let raycaster = new THREE.Raycaster();
   let mouse = new THREE.Vector2();
 
-  // Dashed Line Issue Solution
-  let lineMaterial = new THREE.LineBasicMaterial({color});
-  lineMaterial.polygonOffset = true;
-  lineMaterial.polygonOffsetFactor = -1;
-  lineMaterial.depthTest = false;
-  lineMaterial.depthWrite = false;
-  lineMaterial.transparent = true;
-  lineMaterial.alphaTest = 0.5; // Adjust this value as needed
+  // NOTE: Due to limitations of the OpenGL Core Profile with the WebGL renderer on most platforms,
+  // 'linewidth' will always be 1 regardless of the set value.
+  // See: https://threejs.org/docs/#api/en/materials/LineBasicMaterial.linewidth
 
-  let line;
+  // Make a line
+  let material = new THREE.LineBasicMaterial({color});
+
+  // Make a Line2 (uncomment imports)
+  // let material = new LineMaterial({ color, linewidth: 5 });
+
+  // Make a sphere
+  // let material = new THREE.MeshBasicMaterial( { color } );
+
+  // TubeBufferGeometry - working on it in another app
+
+  let mesh; // whichever we decide
 
   renderer.domElement.addEventListener('pointerdown', event => {
     if (isDrawing) {
@@ -86,18 +98,30 @@
 
       // Create a new BufferAttribute for each line
       let bufferGeometry = new THREE.BufferGeometry();
-      line = new THREE.Line(bufferGeometry, lineMaterial);
-      scene.add(line);
+      mesh = new THREE.Line(bufferGeometry, material);
 
-      console.log("%cmesh.geometry", "color: #ccff00;", line.geometry);
+      // Line2 - todo: at intersect: 'can't access property "count", instanceStart is undefined'
+      // let bufferGeometry = new LineGeometry();
+      // mesh = new Line2(bufferGeometry, material);
+      // scene.add(mesh);
+
+      // Sphere as line - todo: doesn't draw
+      // let geometry = new THREE.SphereGeometry(0.1, 32, 32);
+      // mesh = new THREE.Mesh( geometry, material );
+
+      console.log("%cmesh.geometry", "color: #ccff00;", mesh.geometry);
+
+      scene.add(mesh);
     }
   });
 
   function onMouseMove(event) {
     if (isDrawing && mouseIsPressed) {
+      // Calculate mouse position in normalized device coordinates
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
+      // Use raycaster to get intersection point with scene
       raycaster.setFromCamera(mouse, camera);
       let intersects = raycaster.intersectObjects(scene.children, true);
 
@@ -105,9 +129,10 @@
         let point = intersects[0].point;
         positions.push(point.x, point.y, point.z);
 
-        let bufferGeometry = line.geometry;
-        line.geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+        let bufferGeometry = mesh.geometry;
+        mesh.geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
 
+        // Set needsUpdate to true for the position attribute
         bufferGeometry.attributes.position.needsUpdate = true;
       }
     }
@@ -116,13 +141,14 @@
   function onMouseUp() {
     if (isDrawing) {
       mouseIsPressed = false;
+      // todo: make fewer points
 
       // Draw the final line
-      line.geometry.setDrawRange(0, positions.length / 3);
-      line.geometry.computeBoundingSphere();
+      mesh.geometry.setDrawRange(0, positions.length / 3);
+      mesh.geometry.computeBoundingSphere();
 
       console.log(`%cNum vertices:`, 'color: #997fff', positions.length);
-      console.log("positions", line.geometry.getAttribute("position").array);
+      console.log("positions", mesh.geometry.getAttribute("position").array);
       positions = [];
     }
   }
