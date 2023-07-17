@@ -2,7 +2,6 @@
 import * as THREE from "three";
 import { OrbitControls } from "/jsm/controls/OrbitControls.js";
 
-console.log(`%cREVISION: ${THREE.REVISION}`, "color: #ccff00;");
 let btnDraw = document.getElementById("toggleButton");
 let imageSource = "/images/image1.jpg";
 let isDrawing = false;
