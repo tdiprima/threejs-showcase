@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>WebGL Annotations (three.js)</title>
-  <!-- https://codepen.io/Lorti/pen/Vbppap -->
-  <!-- <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css" rel="stylesheet"> -->
+  <title>Annotation Sprite</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css" rel="stylesheet">
   <style>
     canvas {
       display: block;
@@ -55,16 +54,14 @@
 </head>
 <body>
 
-<!-- <div class="annotation"> -->
 <div class="annotation" style="top: 104px; left: 546px; opacity: 1;">
   <p><strong>Cube</strong></p>
-  <p>In geometry, a cube is a three-dimensional solid object bounded by six square faces, facets or sides, with three
-    meeting at each vertex.</p>
+  <p>This is a 3-dimensional object known as a cube, or a Frinkahedron, in honor of its discoverer.</p>
 </div>
 
 <canvas height="64" id="number" width="64"></canvas>
 
-<script async src="/extra_html/utils/es-module-shims.js"></script>
+<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
 <script type="importmap">
   {
     "imports": {
@@ -108,7 +105,7 @@
   let renderer;
   let sprite;
   let mesh;
-  let spriteBehindObject;
+  let isSpriteBehindObject;
   let annotation = document.querySelector(".annotation");
 
   init();
@@ -154,7 +151,6 @@
       new THREE.WireframeGeometry(cubeGeometry),
       new THREE.LineBasicMaterial({
         color: 0xffffff,
-        linewidth: 1,
         opacity: 0.25,
         transparent: true
       }));
@@ -215,11 +211,8 @@
   function updateAnnotationOpacity() {
     let meshDistance = camera.position.distanceTo(mesh.position);
     let spriteDistance = camera.position.distanceTo(sprite.position);
-    spriteBehindObject = spriteDistance > meshDistance;
-    sprite.material.opacity = spriteBehindObject ? 0.25 : 1;
-
-    // Do you want a number that changes size according to its position?
-    // Comment out the following line and the `::before` pseudo-element.
+    isSpriteBehindObject = spriteDistance > meshDistance;
+    // sprite.material.opacity = isSpriteBehindObject ? 0.25 : 1; // below
     sprite.material.opacity = 0;
   }
 
@@ -234,7 +227,7 @@
 
     annotation.style.top = `${vector.y}px`;
     annotation.style.left = `${vector.x}px`;
-    annotation.style.opacity = spriteBehindObject ? 0.25 : 1;
+    annotation.style.opacity = isSpriteBehindObject ? "0.25" : "1";
   }
 </script>
 </body>
