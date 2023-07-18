@@ -139,11 +139,13 @@
     // Mesh
     let cubeGeometry = new THREE.BoxGeometry(500, 500, 500);
 
+    // Blue: 0x156289 Orient, 0x072534 Daintree
+    // Green: 0x157F4C Salem, 0x063F29 Sherwood Green
     mesh = new THREE.Mesh(
       cubeGeometry,
       new THREE.MeshPhongMaterial({
-        color: 0x156289, // Orient
-        emissive: 0x072534, // Daintree
+        color: 0xC83232, // Flush Mahogany
+        emissive: 0x891515, // Old Brick
         side: THREE.DoubleSide,
         shading: THREE.FlatShading
       }));
