@@ -72,6 +72,7 @@
 <script type="module">
   import * as THREE from "three";
   import { OrbitControls } from "/jsm/controls/OrbitControls.js";
+
   // Number
   let canvas = document.getElementById("number");
   let ctx = canvas.getContext("2d");
@@ -141,8 +142,8 @@
     mesh = new THREE.Mesh(
       cubeGeometry,
       new THREE.MeshPhongMaterial({
-        color: 0x156289,
-        emissive: 0x072534,
+        color: 0x156289, // Orient
+        emissive: 0x072534, // Daintree
         side: THREE.DoubleSide,
         shading: THREE.FlatShading
       }));
