@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>save and restore canvas</title>
+  <link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+<script src="/build/three.min.js"></script>
+<script>
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
+
+  let renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  let geometry = new THREE.BoxGeometry(1, 1, 1);
+  let material = new THREE.MeshBasicMaterial({color: "red"});
+  let cube = new THREE.Mesh(geometry, material);
+  cube.position.set(2, 0.5, 0);
+  scene.add(cube);
+
+  function method1() {
+    // Serializing
+    let serializedData = {meshes: []};
+
+    scene.traverse(object => {
+      if (object instanceof THREE.Mesh) {
+        serializedData.meshes.push({
+          position: object.position.toArray()
+          // Include other necessary properties
+        });
+      }
+    });
+
+    let jsonString = JSON.stringify(serializedData);
+    console.log("%cscene to json", "color: lime;", jsonString);
+    console.log("%ccube", "color: blue;", cube);
+
+    // Storing jsonString to the database
+
+    // Restore the scene, clear first
+    scene.clear();
+
+    // Deserializing
+    let restoredData = JSON.parse(jsonString);
+
+    restoredData.meshes.forEach(meshData => {
+      let mesh = new THREE.Mesh(geometry, material);
+      mesh.position.fromArray(meshData.position);
+      // Set other necessary properties
+
+      scene.add(mesh);
+    });
+  }
+
+  // method1();
+
+  function method2() {
+    const customSerialization = {
+      objects: scene.children.map(child => ({
+        position: child.position,
+        rotation: child.rotation,
+        //...other properties
+      })),
+      //...other scene data
+    };
+    const customSerializationString = JSON.stringify(customSerialization);
+
+    const customDeserialization = JSON.parse(customSerializationString);
+    customDeserialization.objects.forEach(objData => {
+      const cube = new THREE.Mesh(geometry, material);
+      cube.position.copy(objData.position);
+      //...set other properties
+      // Pretend - create a new scene...
+      // const scene = new THREE.Scene();
+      scene.add(cube);
+    });
+  }
+
+  method2();
+
+  window.addEventListener("resize", function () {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.render(scene, camera);
+  });
+
+  (function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  })();
+</script>
+</body>
+</html>
