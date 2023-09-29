@@ -46,7 +46,7 @@
   let point1 = vertices[0];
   let point2 = vertices[vertices.length - 1];
 
-  // "vertices" has what we need; reduce it.
+  // "vertices" has our groups of 3; now, reduce it.
   let newArray = vertices.reduce((acc, current, index) => {
     if ((index + 1) % 3 === 0) {
       acc.push(current);

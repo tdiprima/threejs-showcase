@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Draw a Million Spheres</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/build/three.min.js"></script>
+</head>
+<body>
+<div id="info">WARNING - Drawing a million spheres may be demanding on some hardware. ⚠️</div>
+<script>
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Create a geometry and material for the spheres
+  const geometry = new THREE.SphereGeometry(0.1, 16, 16);
+  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+
+  // Create an InstancedMesh with 1,000,000 instances
+  const instanceCount = 1000000;
+  const instancedMesh = new THREE.InstancedMesh(geometry, material, instanceCount);
+
+  // Position each instance
+  const dummy = new THREE.Object3D();
+  for (let i = 0; i < instanceCount; ++i) {
+    dummy.position.set(
+      Math.random() * 100 - 50,
+      Math.random() * 100 - 50,
+      Math.random() * 100 - 50
+    );
+    dummy.updateMatrix();
+    instancedMesh.setMatrixAt(i, dummy.matrix);
+  }
+
+  scene.add(instancedMesh);
+
+  // Set camera position
+  camera.position.z = 50;
+
+  // Animation loop
+  function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  }
+
+  animate();
+</script>
+</body>
+</html>

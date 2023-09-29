@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>draw line measure</title>
+  <title>Draw line with real-time measurement</title>
 </head>
 <body>
 
@@ -45,10 +45,7 @@
     scene.add(plane);
 
     let lineGeometry = new THREE.BufferGeometry();
-    let lineMaterial = new THREE.LineBasicMaterial({
-      color: 0x00ff00,
-      // depthWrite: false
-    });
+    let lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
 
     renderer.domElement.addEventListener('mousedown', onMouseDown, false);
     renderer.domElement.addEventListener('mousemove', onMouseMove, false);
@@ -127,12 +124,18 @@
       },
     };
 
+    window.addEventListener("resize", function () {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    });
+
     (function render() {
       requestAnimationFrame(render);
       renderer.render(scene, camera);
     })();
   });
 </script>
-
 </body>
 </html>

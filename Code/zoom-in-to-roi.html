@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Zoom in on a ROI</title>
+  <link href="/css/main.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="info">Left-click: rotate, Mouse-wheel/middle-click: zoom, Right-click: pan</div>
+<script type="importmap">{
+    "imports": {
+      "three": "/build/three.module.js",
+      "three/examples/": "/jsm/"
+    }
+  }
+</script>
+<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
+<script type="module">
+  import * as THREE from "three";
+  import { OrbitControls } from "three/examples/controls/OrbitControls.js";
+
+  console.log(`%cREVISION ${THREE.REVISION}`, "color: #ff00cc;");
+
+  const imgSrc = "/images/play.jpg";
+
+  const scene = new THREE.Scene();
+
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.z = 1.5;
+
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+
+  const texture = new THREE.TextureLoader().load(imgSrc);
+
+  const geometry = new THREE.PlaneGeometry(1, 1);
+  const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+  const mesh = new THREE.Mesh(geometry, material);
+  // mesh.scale.set(1.0, 0.56, 1.0);
+  mesh.scale.set(1.75, 0.98, 1.75);
+  scene.add(mesh);
+
+  // Set the initial target of the controls to the center of the scene
+  controls.target.set(0, 0, 0);
+
+  (function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  })();
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  window.addEventListener("resize", onWindowResize);
+</script>
+</body>
+</html>
