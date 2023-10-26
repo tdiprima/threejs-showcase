@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Green Channel Histogram</title>
+  <title>Red Channel Histogram</title>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
     body {
@@ -14,8 +14,6 @@
 <body>
 <input id="inputImage" onchange="handleImage()" type="file">
 <div id="plotlyDiv"></div>
-<div id="mean"></div>
-<div id="stdDev"></div>
 <img id="img">
 <script>
   const average = array => array.reduce((a, b) => a + b) / array.length;
@@ -39,23 +37,13 @@
       ctx.drawImage(image, 0, 0);
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-      let greenValues = [];
+      let redValues = [];
 
       for (let i = 0; i < imageData.length; i += 4) {
-        greenValues.push(imageData[i + 1]); // BGR
+        redValues.push(imageData[i + 2]); // BGR
       }
 
-      let avg = average(greenValues);
-      let std = standardDeviation(greenValues);
-      console.log("Mean:", avg);
-      console.log("Std Dev:", std);
-      console.log({ width: image.width, height: image.height });
-      console.log("Num pixels:", image.width * image.height); // (greenValues.length)
-
-      document.getElementById("mean").innerHTML = `Mean: ${avg.toFixed(2)}`;
-      document.getElementById("stdDev").innerHTML = `Standard Dev.: ${std.toFixed(2)}`;
-
-      drawHistogram(greenValues);
+      drawHistogram(redValues);
     };
   }
 
@@ -64,12 +52,12 @@
       x: data,
       type: "histogram",
       marker: {
-        color: "green"
+        color: "red"
       }
     };
 
     const layout = {
-      title: "Green Channel (Probability) Histogram",
+      title: "Red Channel (Class) Histogram",
       xaxis: {
         title: "Pixel Value"
       },
