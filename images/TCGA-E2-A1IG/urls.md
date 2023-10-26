@@ -9,8 +9,6 @@
 
 [Incept 4 PNG](https://beak.bmi.stonybrook.edu:8890/halcyon/?iiif=file:///data/erich/FeatureStorage/incept4/brca/TCGA-E2-A1IG-01Z-00-DX1.C894EEA1-708A-4043-8C60-3BCA98AA751E.zip/0,0,512,433/512,/0/default.png)
 
-[Testing](https://beak.bmi.stonybrook.edu:8890/halcyon/?renderType=byClass&iiif=file:///data/erich/FeatureStorage/incept4/brca/TCGA-E2-A1IG-01Z-00-DX1.C894EEA1-708A-4043-8C60-3BCA98AA751E.zip/0,0,512,433/512,/0/default.png)
-
 [Incept 4 JSON](https://beak.bmi.stonybrook.edu:8890/halcyon/?iiif=file:///data/erich/FeatureStorage/incept4/brca/TCGA-E2-A1IG-01Z-00-DX1.C894EEA1-708A-4043-8C60-3BCA98AA751E.zip/info.json)
 
 
