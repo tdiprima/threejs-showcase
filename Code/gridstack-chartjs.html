@@ -6,9 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gridstack with Chart.js</title>
   <link href="/css/gridstack.min.css" rel="stylesheet"/>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="/js/jquery.min.js"></script>
   <script src="/js/gridstack-all.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/js/chart.js"></script>
   <style>
     @font-face {
       font-family: 'TradeWinds';
@@ -25,7 +25,8 @@
       padding: 10px;
       border: 1px solid #ccc;
     }
-    #histogram {
+
+    #histogram, #mySecondChart {
       display: block;
       width: 800px;
       height: 600px;
@@ -33,7 +34,7 @@
   </style>
 </head>
 <body>
-<h1>Black Hawk Down</h1>
+<h1>Channel Distributions</h1>
 
 <div class="grid-stack" data-gs-animate="yes">
   <div class="grid-stack-item" data-gs-x="0" data-gs-y="0" data-gs-width="800" data-gs-height="600">
@@ -41,9 +42,9 @@
       <canvas width="800" height="600" id="histogram"></canvas>
     </div>
   </div>
-  <div class="grid-stack-item" data-gs-x="4" data-gs-y="0" data-gs-width="4" data-gs-height="4">
+  <div class="grid-stack-item" data-gs-x="0" data-gs-y="0" data-gs-width="800" data-gs-height="600">
     <div class="grid-stack-item-content">
-      <canvas id="mySecondChart"></canvas>
+      <canvas width="800" height="600" id="mySecondChart"></canvas>
     </div>
   </div>
 </div>
@@ -61,9 +62,9 @@
     return channelValuesDistribution;
   }
 
-  function createHistogram(cvd, divID, bg, border) {
+  function createHistogram(dist, data) {
     // Use the distribution data (of green values) to create a histogram.
-    let histogramCanvas = document.getElementById(divID);
+    let histogramCanvas = document.getElementById(data.divId);
     histogramCanvas.width = 800;
     histogramCanvas.height = 600;
     let histogramCtx = histogramCanvas.getContext('2d');
@@ -72,10 +73,10 @@
       data: {
         labels: Array.from({length: 256}, (_, i) => i),  // X-axis labels 0-255
         datasets: [{
-          label: 'Green Channel Distribution',
-          data: cvd,
-          backgroundColor: bg,
-          borderColor: border,
+          label: `${data.name} Channel Distribution`,
+          data: dist,
+          backgroundColor: data.bg,
+          borderColor: data.fg,
           borderWidth: 1
         }]
       },
@@ -95,9 +96,9 @@
     return histogramChart;
   }
 
-  function createChart(src, id, ch, bg, bord) {
+  function createChart(data) {
     const image = new Image();
-    image.src = src;
+    image.src = data.src;
     image.onload = function() {
       // Create a canvas to draw the image
       const canvas = document.createElement("canvas");
@@ -106,18 +107,31 @@
       const ctx = canvas.getContext("2d");
       ctx.drawImage(image, 0, 0);
 
-      let dist = createDistribution(canvas, ctx, ch);
-      let chart = createHistogram(dist, id, bg, bord);
+      let dist = createDistribution(canvas, ctx, data.channel);
+      let chart = createHistogram(dist, data);
     };
   }
 
-  window.addEventListener('DOMContentLoaded', (event) => {
-    // Initialize the grid
-    let grid = GridStack.init();
+  window.addEventListener('DOMContentLoaded', () => {
+    GridStack.init(); // Initialize the grid
 
-    createChart("/images/incept4.png", "histogram", 1, 'rgba(0, 255, 0, 0.2)', 'rgba(0, 255, 0, 1)'); // TCGA-E2-A1IG
+    createChart({
+      src: "/images/incept4.png",
+      divId: "histogram",
+      channel: 1,
+      bg: 'rgba(0, 255, 0, 0.2)',
+      fg: 'rgba(0, 255, 0, 1)',
+      name: "Green"
+    }); // TCGA-E2-A1IG
 
-    createChart("/images/class.png", "mySecondChart", 0, 'rgba(255, 0, 0, 0.2)', 'rgba(255, 0, 0, 1)') // Name N/A
+    createChart({
+      src: "/images/class.png",
+      divId: "mySecondChart",
+      channel: 0,
+      bg: 'rgba(255, 0, 0, 0.2)',
+      fg: 'rgba(255, 0, 0, 1)',
+      name: "Red"
+    }); // Slide Name N/A
 
   });
 </script>
