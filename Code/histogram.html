@@ -42,7 +42,7 @@
       let greenValues = [];
 
       for (let i = 0; i < imageData.length; i += 4) {
-        greenValues.push(imageData[i + 1]); // BGR
+        greenValues.push(imageData[i + 1]);
       }
 
       let avg = average(greenValues);
