@@ -40,7 +40,7 @@
       let redValues = [];
 
       for (let i = 0; i < imageData.length; i += 4) {
-        redValues.push(imageData[i + 2]); // BGR
+        redValues.push(imageData[i]);
       }
 
       drawHistogram(redValues);
