@@ -50,12 +50,12 @@
 
 <script>
   function createDistribution(canvas, ctx, channel) {
-    // Create a distribution array that represents how frequently each green value appears.
+    // Create a distribution array that represents how frequently each value appears.
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
     let channelValuesDistribution = new Array(256).fill(0);  // For 8-bit channel, so we have 0-255
 
     for (let i = 0; i < imageData.length; i += 4) {
-      channelValuesDistribution[imageData[i + channel]]++;  // Increase count for this green value
+      channelValuesDistribution[imageData[i + channel]]++;  // Increase count for this value
     }
 
     return channelValuesDistribution;
@@ -117,7 +117,7 @@
 
     createChart("/images/incept4.png", "histogram", 1, 'rgba(0, 255, 0, 0.2)', 'rgba(0, 255, 0, 1)'); // TCGA-E2-A1IG
 
-    createChart("/images/class.png", "mySecondChart", 0, 'rgba(255, 0, 0, 0.2)', 'rgba(255, 0, 0, 1)')
+    createChart("/images/class.png", "mySecondChart", 0, 'rgba(255, 0, 0, 0.2)', 'rgba(255, 0, 0, 1)') // Name N/A
 
   });
 </script>
