@@ -37,14 +37,14 @@
 <h1>Channel Distributions</h1>
 
 <div class="grid-stack" data-gs-animate="yes">
-  <div class="grid-stack-item" data-gs-x="0" data-gs-y="0" data-gs-width="800" data-gs-height="600">
+  <div class="grid-stack-item" data-gs-x="0" data-gs-y="0" data-gs-width="12" data-gs-height="1">
     <div class="grid-stack-item-content">
-      <canvas width="800" height="600" id="histogram"></canvas>
+      <canvas id="histogram"></canvas>
     </div>
   </div>
-  <div class="grid-stack-item" data-gs-x="0" data-gs-y="0" data-gs-width="800" data-gs-height="600">
+  <div class="grid-stack-item" data-gs-x="0" data-gs-y="0" data-gs-width="12" data-gs-height="1">
     <div class="grid-stack-item-content">
-      <canvas width="800" height="600" id="mySecondChart"></canvas>
+      <canvas id="mySecondChart"></canvas>
     </div>
   </div>
 </div>
@@ -81,6 +81,8 @@
         }]
       },
       options: {
+        responsive: true,
+        maintainAspectRatio: false,
         scales: {
           y: {
             beginAtZero: true
