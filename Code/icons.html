@@ -1,70 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>3D Interface with Buttons</title>
-    <style>
-        /* Basic styling for the button */
-        #myButton {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1;
-        }
-        /* Style for your 3D canvas */
-        #canvasContainer {
-            width: 100%;
-            height: 100vh;
-        }
-    </style>
+  <title>3D Interface with Buttons</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css.map">
+  <style>
+    body {
+      background-color: black;
+    }
+
+    /* Basic styling for the button */
+    #myButton {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 1;
+    }
+
+    /* Style for your 3D canvas */
+    #canvasContainer {
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
 </head>
 <body>
-    <div id="canvasContainer"></div>
-    <button id="myButton">Click Me</button>
-    <!-- Three.js and your JavaScript file -->
-    <script src="https://threejs.org/build/three.js"></script>
-    <script>
-      // Get the container element
-const container = document.getElementById('canvasContainer');
+<div id="canvasContainer"></div>
+<!-- <button id="myButton">Click Me</button> -->
+<button id="myButton"><i class="fa fa-superpowers" aria-hidden="true"></i></button>
+<!-- Three.js -->
+<script src="https://threejs.org/build/three.js"></script>
+<script>
+  // Get the container element
+  const container = document.getElementById('canvasContainer');
 
-// Create a scene, camera, and renderer
-const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize(window.innerWidth, window.innerHeight);
-container.appendChild(renderer.domElement);
+  // Create a scene, camera, and renderer
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  container.appendChild(renderer.domElement);
 
-// Add some objects to the scene (e.g., a cube)
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new THREE.Mesh(geometry, material);
-scene.add(cube);
+  // Add some objects to the scene (e.g., a cube)
+  const geometry = new THREE.BoxGeometry();
+  const material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+  const cube = new THREE.Mesh(geometry, material);
+  scene.add(cube);
 
-camera.position.z = 5;
+  camera.position.z = 5;
 
-      // Button interaction
-      const button = document.getElementById('myButton');
-button.addEventListener('click', () => {
+  // Button interaction
+  const button = document.getElementById('myButton');
+  button.addEventListener('click', () => {
     // Example interaction: change the cube's color
     cube.material.color.set(Math.random() * 0xffffff);
-});
+  });
 
-      // Handle window resizing
-      window.addEventListener('resize', () => {
+  // Handle window resizing
+  window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-});
+  });
 
 
-// Animation loop
-function animate() {
+  // Animation loop
+  function animate() {
     requestAnimationFrame(animate);
     // Rotate the cube
     cube.rotation.x += 0.01;
     cube.rotation.y += 0.01;
     renderer.render(scene, camera);
-}
-animate();
-    </script>
+  }
+
+  animate();
+</script>
 </body>
 </html>
