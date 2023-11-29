@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>move camera with gui</title>
+  <style>
+    body {
+      background-color: black;
+    }
+
+    canvas {
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvasId"></canvas>
+
+<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
+<script type="importmap">
+  {
+    "imports": {
+      "three": "/build/three.module.js"
+    }
+  }
+</script>
+
+<script type="module">
+  import * as THREE from "three";
+  import {GUI} from "/jsm/libs/dat.gui.module.js";
+  import {OrbitControls} from "/jsm/controls/OrbitControls.js";
+
+  window.onload = function () {
+    let canvas;
+    let scene;
+    let camera;
+    let renderer;
+    let testPerspectiveCamera;
+    let testPerspectiveCameraHelper;
+
+    const RED = "#ff0000";
+    const GREEN = "#00ff00";
+    const BLUE = "#0000ff";
+    const LIMIT = 100;
+
+    canvas = document.getElementById("canvasId");
+    scene = new THREE.Scene();
+    scene.name = "scene";
+
+    function resize() {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener("resize", resize);
+
+    function initAxes() {
+      function makeAxis(start, finish, material, name) {
+        let points = [start, finish];
+        let axisGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        let newAxis = new THREE.Line(axisGeometry, material);
+        newAxis.name = name;
+        scene.add(newAxis);
+      }
+
+      let xAxisMaterial = new THREE.LineBasicMaterial({color: RED});
+      let yAxisMaterial = new THREE.LineBasicMaterial({color: GREEN});
+      let zAxisMaterial = new THREE.LineBasicMaterial({color: BLUE});
+
+      makeAxis(new THREE.Vector3(-LIMIT, 0, 0), new THREE.Vector3(LIMIT, 0, 0), xAxisMaterial, "xAxis");
+      makeAxis(new THREE.Vector3(0, -LIMIT, 0), new THREE.Vector3(0, LIMIT, 0), yAxisMaterial, "yAxis");
+      makeAxis(new THREE.Vector3(0, 0, -LIMIT), new THREE.Vector3(0, 0, LIMIT), zAxisMaterial, "zAxis");
+    }
+
+    function initGui() {
+      let controls = {
+        get near() {
+          return testPerspectiveCamera.near;
+        },
+        set near(value) {
+          testPerspectiveCamera.near = value;
+          testPerspectiveCamera.updateProjectionMatrix();
+          testPerspectiveCameraHelper.update();
+        },
+        get far() {
+          return testPerspectiveCamera.far;
+        },
+        set far(value) {
+          testPerspectiveCamera.far = value;
+          testPerspectiveCamera.updateProjectionMatrix();
+          testPerspectiveCameraHelper.update();
+        },
+        get aspect() {
+          return testPerspectiveCamera.aspect;
+        },
+        set aspect(value) {
+          testPerspectiveCamera.aspect = value;
+          testPerspectiveCamera.updateProjectionMatrix();
+          testPerspectiveCameraHelper.update();
+        },
+        get fov() {
+          return testPerspectiveCamera.fov;
+        },
+        set fov(value) {
+          testPerspectiveCamera.fov = value;
+          testPerspectiveCamera.updateProjectionMatrix();
+          testPerspectiveCameraHelper.update();
+        },
+        get positionX() {
+          return testPerspectiveCamera.position.x;
+        },
+        set positionX(value) {
+          testPerspectiveCamera.position.x = value;
+        },
+        get positionY() {
+          return testPerspectiveCamera.position.y;
+        },
+        set positionY(value) {
+          testPerspectiveCamera.position.y = value;
+        },
+        get positionZ() {
+          return testPerspectiveCamera.position.z;
+        },
+        set positionZ(value) {
+          testPerspectiveCamera.position.z = value;
+        }
+      };
+
+      // dat.gui
+      let gui = new GUI();
+
+      // folder
+      let perspectiveCameraFolder = gui.addFolder("testPerspectiveCamera");
+
+      // controls
+      perspectiveCameraFolder.add(controls, "near", 0, 50);
+      perspectiveCameraFolder.add(controls, "far", 0, 200);
+      perspectiveCameraFolder.add(controls, "aspect", 0, 4);
+      perspectiveCameraFolder.add(controls, "fov", 0, 100);
+      perspectiveCameraFolder.add(controls, "positionX", -LIMIT, LIMIT);
+      perspectiveCameraFolder.add(controls, "positionY", -LIMIT, LIMIT);
+      perspectiveCameraFolder.add(controls, "positionZ", -LIMIT, LIMIT);
+
+      perspectiveCameraFolder.open();
+    }
+
+    function render() {
+      renderer.render(scene, camera);
+      testPerspectiveCamera.updateMatrixWorld();
+      requestAnimationFrame(render);
+    }
+
+    function initCamera() {
+      camera = new THREE.PerspectiveCamera(
+        75,
+        canvas.clientWidth / canvas.clientHeight,
+        1,
+        10000
+      );
+      camera.name = "camera";
+      camera.position.set(60, 40, 150);
+      scene.add(camera);
+    }
+
+    function initRenderer() {
+      renderer = new THREE.WebGLRenderer({
+        canvas: canvas
+      });
+      renderer.setSize(canvas.width, canvas.height, false);
+    }
+
+    function initLight() {
+      let ambientLight = new THREE.AmbientLight(0xffffff, 1);
+      ambientLight.name = "ambientLight";
+      scene.add(ambientLight);
+    }
+
+    function initTestPerspectiveCamera() {
+      // Our test camera
+      testPerspectiveCamera = new THREE.PerspectiveCamera(
+        45, // fov
+        2, // aspect
+        20, // near
+        100 // far
+      );
+      testPerspectiveCamera.name = "testPerspectiveCamera";
+      testPerspectiveCamera.position.set(40, 0, 0);
+      testPerspectiveCamera.lookAt(0, 100, 0);
+
+      // Camera helper
+      testPerspectiveCameraHelper = new THREE.CameraHelper(testPerspectiveCamera);
+      testPerspectiveCameraHelper.name = "testPerspectiveCameraHelper";
+      testPerspectiveCamera.updateMatrixWorld();
+      scene.add(testPerspectiveCameraHelper);
+    }
+
+    function listSceneObjects() {
+      let parentId = scene?.parent?.id;
+      console.log("Scene", {
+        id: scene.id,
+        name: scene.name,
+        parentId: parentId
+      })
+
+      console.log("Children:");
+
+      let objects = scene.children;
+      for (let i = 0; i < objects.length; i++) {
+        console.log({
+          id: objects[i].id,
+          name: objects[i].name,
+          parentId: objects[i].parent.id
+        });
+      }
+    }
+
+    initCamera();
+    initRenderer();
+    initLight();
+    initAxes();
+    initTestPerspectiveCamera();
+    initGui();
+
+    new OrbitControls(camera, canvas);
+
+    listSceneObjects();
+
+    console.log("%ctestPerspectiveCamera:", "color: deeppink;", testPerspectiveCamera);
+    console.log("%ccamera helper matrixAutoUpdate:", "color: #ccff00;", testPerspectiveCameraHelper.matrixAutoUpdate);
+
+    resize();
+    render();
+  };
+</script>
+</body>
+</html>
