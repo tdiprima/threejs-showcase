@@ -24,66 +24,61 @@
 </script>
 
 <script type="module">
-  import * as THREE from 'three'
-  import {OrbitControls} from '/jsm/controls/OrbitControls.js'
-  import Stats from '/jsm/libs/stats.module.js'
-  import {GUI} from "/jsm/libs/dat.gui.module.js";
+  import * as THREE from 'three';
+  import { OrbitControls } from '/jsm/controls/OrbitControls.js';
+  import Stats from '/jsm/libs/stats.module.js';
+  import { GUI } from '/jsm/libs/dat.gui.module.js';
 
-  const scene = new THREE.Scene()
-  var axesHelper = new THREE.AxesHelper(5)
-  scene.add(axesHelper)
+  let scene = new THREE.Scene();
+  let axesHelper = new THREE.AxesHelper(5);
+  scene.add(axesHelper);
 
-  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
 
-  const renderer = new THREE.WebGLRenderer()
-  renderer.setSize(window.innerWidth, window.innerHeight)
-  document.body.appendChild(renderer.domElement)
+  let renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-  const controls = new OrbitControls(camera, renderer.domElement)
+  let controls = new OrbitControls(camera, renderer.domElement);
 
-  const geometry = new THREE.BoxGeometry()
-  const material = new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true})
-  const cube = new THREE.Mesh(geometry, material)
-  scene.add(cube)
+  let geometry = new THREE.BoxGeometry();
+  let material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
+  let cube = new THREE.Mesh(geometry, material);
+  // cube.position.set(0, 0, 0); // This is the default position
+  scene.add(cube);
 
-  camera.position.z = 1.5
-
-  window.addEventListener('resize', onWindowResize, false)
+  window.addEventListener('resize', onWindowResize, false);
 
   function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight
-    camera.updateProjectionMatrix()
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
-  const stats = new Stats()
-  document.body.appendChild(stats.dom)
+  let stats = new Stats();
+  document.body.appendChild(stats.dom);
 
-  const gui = new GUI()
+  let gui = new GUI();
 
-  const cubeFolder = gui.addFolder('Cube')
-  cubeFolder.add(cube.rotation, 'x', 0, Math.PI * 2, 0.01)
-  cubeFolder.add(cube.rotation, 'y', 0, Math.PI * 2, 0.01)
-  cubeFolder.add(cube.rotation, 'z', 0, Math.PI * 2, 0.01)
-  cubeFolder.open()
+  let cubeFolder = gui.addFolder('Cube');
+  cubeFolder.add(cube.rotation, 'x', 0, Math.PI * 2, 0.01);
+  cubeFolder.add(cube.rotation, 'y', 0, Math.PI * 2, 0.01);
+  cubeFolder.add(cube.rotation, 'z', 0, Math.PI * 2, 0.01);
+  cubeFolder.open();
 
-  const cameraFolder = gui.addFolder('Camera')
-  cameraFolder.add(camera.position, 'z', 0, 10, 0.01)
-  cameraFolder.open()
+  let cameraFolder = gui.addFolder('Camera');
+  cameraFolder.add(camera.position, 'z', 0, 10, 0.01);
+  cameraFolder.open();
 
-  var animate = function () {
-    requestAnimationFrame(animate)
-    //cube.rotation.x += 0.01;
-    //cube.rotation.y += 0.01;
-    render()
-    stats.update()
-  }
+  let animate = function() {
+    requestAnimationFrame(animate);
+    // camera.lookAt(cube.position); // make the camera look at the cube
+    renderer.render(scene, camera);
+    stats.update();
+  };
 
-  function render() {
-    renderer.render(scene, camera)
-  }
-
-  animate()
+  animate();
 </script>
 </body>
 </html>
