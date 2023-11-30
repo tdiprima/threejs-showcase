@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Red Channel Histogram</title>
+  <script src="/js/mathematics.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
     body {
@@ -14,16 +15,15 @@
 <body>
 <input id="inputImage" onchange="handleImage()" type="file">
 <div id="plotlyDiv"></div>
+
+<div id="mean"></div>
+<div id="median"></div>
+<div id="mode"></div>
+<div id="stdDev"></div>
+<br>
 <img id="img">
+
 <script>
-  const average = array => array.reduce((a, b) => a + b) / array.length;
-
-  function standardDeviation(array) {
-    const mean = array.reduce((acc, val) => acc + val, 0) / array.length;
-    const variance = array.reduce((acc, val) => acc + ((val - mean) ** 2), 0) / array.length;
-    return Math.sqrt(variance);
-  }
-
   function handleImage() {
     const fileInput = document.getElementById("inputImage");
     const image = new Image();
@@ -43,21 +43,28 @@
         redValues.push(imageData[i]);
       }
 
+      document.getElementById("mean").innerHTML = `Mean: ${average(redValues).toFixed(2)}`;
+      document.getElementById("median").innerHTML = `Median: ${median(redValues).toFixed(2)}`;
+      document.getElementById("mode").innerHTML = `Mode: ${mode(redValues)}`;
+      document.getElementById("stdDev").innerHTML = `Standard Dev.: ${standardDeviation(redValues).toFixed(2)}`;
+
       drawHistogram(redValues);
     };
   }
 
+  const chartType = "histogram";
+  // const chartType = "bar"; // is better, but is slow
   function drawHistogram(data) {
     const trace = {
       x: data,
-      type: "histogram",
+      type: chartType,
       marker: {
         color: "red"
       }
     };
 
     const layout = {
-      title: "Red Channel (Class) Histogram",
+      title: `Red Channel (Class) ${chartType.charAt(0).toUpperCase()}${chartType.slice(1)}`,
       xaxis: {
         title: "Pixel Value"
       },

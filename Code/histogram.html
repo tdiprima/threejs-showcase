@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Green Channel Histogram</title>
+  <script src="/js/mathematics.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
   <style>
     body {
@@ -14,18 +15,15 @@
 <body>
 <input id="inputImage" onchange="handleImage()" type="file">
 <div id="plotlyDiv"></div>
+
 <div id="mean"></div>
+<div id="median"></div>
+<div id="mode"></div>
 <div id="stdDev"></div>
+<br>
 <img id="img">
+
 <script>
-  const average = array => array.reduce((a, b) => a + b) / array.length;
-
-  function standardDeviation(array) {
-    const mean = array.reduce((acc, val) => acc + val, 0) / array.length;
-    const variance = array.reduce((acc, val) => acc + ((val - mean) ** 2), 0) / array.length;
-    return Math.sqrt(variance);
-  }
-
   function handleImage() {
     const fileInput = document.getElementById("inputImage");
     const image = new Image();
@@ -45,14 +43,15 @@
         greenValues.push(imageData[i + 1]);
       }
 
-      let avg = average(greenValues);
-      let std = standardDeviation(greenValues);
-      console.log("Mean:", avg);
-      console.log("Std Dev:", std);
       console.log({ width: image.width, height: image.height });
       console.log("Num pixels:", image.width * image.height); // (greenValues.length)
 
+      let avg = average(greenValues);
+      let std = standardDeviation(greenValues);
+
       document.getElementById("mean").innerHTML = `Mean: ${avg.toFixed(2)}`;
+      document.getElementById("median").innerHTML = `Median: ${median(greenValues).toFixed(2)}`;
+      document.getElementById("mode").innerHTML = `Mode: ${mode(greenValues)}`;
       document.getElementById("stdDev").innerHTML = `Standard Dev.: ${std.toFixed(2)}`;
 
       drawHistogram(greenValues);
