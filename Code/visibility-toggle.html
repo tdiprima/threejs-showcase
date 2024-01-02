@@ -8,9 +8,8 @@
 </head>
 <body>
 <button id="toggleButton">Toggle Mesh Visibility</button>
-<!-- <script src="https://threejs.org/build/three.js"></script> -->
-<script src="/build/three.js"></script>
-<script>
+<script type="module">
+  import * as THREE from "/build/three.module.js";
   let scene, camera, renderer, mesh;
 
   init();

@@ -5,11 +5,11 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Draw a Million Spheres</title>
   <link rel="stylesheet" href="/css/main.css">
-  <script src="/build/three.min.js"></script>
 </head>
 <body>
 <div id="info">WARNING - Drawing a million spheres may be demanding on some hardware. ⚠️</div>
-<script>
+<script type="module">
+  import * as THREE from "/build/three.module.js";
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 

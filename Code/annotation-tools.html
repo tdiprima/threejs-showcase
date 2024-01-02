@@ -7,11 +7,13 @@
   <link href="/css/main.css" rel="stylesheet">
 </head>
 <body>
+
 <button id="rectangle">rectangle</button>
 <button id="ellipse">ellipse</button>
 <button id="polygon">polygon</button>
-<script src="/build/three.min.js"></script>
-<script>
+
+<script type="module">
+  import * as THREE from "/build/three.module.js";
   let scene, camera, renderer, updateMesh;
   let vertices;
   let segments;
