@@ -1,49 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta content="IE=edge" http-equiv="X-UA-Compatible">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Image Annotation</title>
-  <!-- TODO: NOTE: -->
-  <!-- Due to limitations of the OpenGL Core Profile with the WebGL renderer on
-  most platforms, 'linewidth' will always be 1 regardless of the set value.
-  See: https://threejs.org/docs/#api/en/materials/LineBasicMaterial.linewidth -->
-  <link href="/css/main.css" rel="stylesheet">
-</head>
-<body>
-<button id="toggleButton">drawing toggle</button>
+// drawingModule.js
+import * as THREE from 'three';
 
-<script type="importmap">{
-  "imports": {
-    "three": "/build/three.module.js"
-  }
-}
-</script>
-
-<script async src="/es-module-shims-1.3.6/dist/es-module-shims.js"></script>
-
-<script type="module">
-  import * as THREE from "three";
-  import { OrbitControls } from "/jsm/controls/OrbitControls.js";
-
+export function enableDrawing(scene, camera, renderer, controls) {
+  // Add drawing functionality
+  // This might include event listeners for mouse interactions
+  // and functions to update the scene based on user input
   let btnDraw = document.getElementById("toggleButton");
   let imageSource = "/images/image1.jpg";
   let isDrawing = false;
   let mouseIsPressed = false;
-  let controls;
   let color = "#0000ff";
-
-  let scene = new THREE.Scene();
-  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.z = 5;
-  camera.lookAt(new THREE.Vector3(0, 0, 0));
-
-  let renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  controls = new OrbitControls(camera, renderer.domElement);
 
   btnDraw.addEventListener("click", function () {
     if (isDrawing) {
@@ -166,18 +132,5 @@
     }
   }
 
-  window.addEventListener("resize", function () {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.render(scene, camera);
-  });
-
-  (function animate() {
-    requestAnimationFrame(animate);
-    controls.update();
-    renderer.render(scene, camera);
-  })();
-</script>
-</body>
-</html>
+  // Return any necessary objects or functions for further use
+}
