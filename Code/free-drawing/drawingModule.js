@@ -101,12 +101,22 @@ export function enableDrawing(scene, camera, renderer, controls) {
           }
         }
 
-        try {
+        if (line.geometry.attributes.position) {
           line.geometry.attributes.position.needsUpdate = true;
-        } catch (e) {
-          // No big deal.
         }
       }
+    }
+  }
+
+  function decimate(line) {
+    if (line.geometry.attributes.position) {
+      let originalArray = line.geometry.attributes.position.array;
+      let decimatedArray = [];
+
+      for (let i = 0; i < originalArray.length; i += 9) {
+        decimatedArray.push(originalArray[i], originalArray[i + 1], originalArray[i + 2]);
+      }
+      console.log("Position array lengths:\nOriginal:", polygonPositions, "\nDecimated:", decimatedArray);
     }
   }
 
@@ -121,14 +131,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
       polygonPositions.push(currentPolygonPositions); // Store the current polygon's positions in the polygonPositions array
       currentPolygonPositions = []; // Clear the current polygon's array
 
-      // DECIMATE
-      let originalArray = line.geometry.attributes.position.array;
-      let decimatedArray = [];
-
-      for (let i = 0; i < originalArray.length; i += 9) {
-        decimatedArray.push(originalArray[i], originalArray[i + 1], originalArray[i + 2]);
-      }
-      console.log("Position array lengths:\nOriginal:", polygonPositions, "\nDecimated:", decimatedArray);
+      // decimate(line);
     }
   }
 
