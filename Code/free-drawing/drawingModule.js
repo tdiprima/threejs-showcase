@@ -6,7 +6,6 @@ export function enableDrawing(scene, camera, renderer, controls) {
   // This might include event listeners for mouse interactions
   // and functions to update the scene based on user input
   let btnDraw = document.getElementById("toggleButton");
-  let imageSource = "/images/image1.jpg";
   let isDrawing = false;
   let mouseIsPressed = false;
   let color = "#0000ff";
@@ -30,15 +29,14 @@ export function enableDrawing(scene, camera, renderer, controls) {
     }
   });
 
-  // Set up geometry to raycast against
-  let loader = new THREE.TextureLoader();
-  let planeGeom = new THREE.PlaneGeometry(10, 10);
+  // TODO: Set up geometry to raycast against
+  let aspectRatio = 1024 / 768;
+  let planeWidth = 10; // You can adjust this value as needed
+  let planeHeight = planeWidth / aspectRatio;
 
-  // Get texture
-  let texture = loader.load(imageSource);
-
-  // Set material texture
-  let planeMat = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide});
+  let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
+  let texture = new THREE.TextureLoader().load("/images/image1.jpg");
+  let planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
   let plane = new THREE.Mesh(planeGeom, planeMat);
   scene.add(plane);
 
@@ -48,7 +46,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
 
   let lineMaterial = new THREE.LineBasicMaterial({color});
 
-  // Dashed Line Issue Solution
+  // TODO: Dashed Line Issue Solution
   lineMaterial.polygonOffset = true;
   lineMaterial.polygonOffsetFactor = -1;
   lineMaterial.depthTest = false;
