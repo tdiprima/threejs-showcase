@@ -1,5 +1,4 @@
 // app.js
-import * as THREE from 'three';
 import { createScene } from './sceneModule.js';
 import { enableDrawing } from './drawingModule.js';
 
