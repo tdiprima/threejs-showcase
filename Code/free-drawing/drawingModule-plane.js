@@ -2,19 +2,11 @@
 import * as THREE from 'three';
 
 export function enableDrawing(scene, camera, renderer, controls) {
-  // Add drawing functionality
-  // This might include event listeners for mouse interactions
-  // and functions to update the scene based on user input
-  // let btnDraw = document.getElementById("toggleButton");
-  let btnDraw = document.createElement("button");
-  btnDraw.id = "toggleButton";
-  btnDraw.innerHTML = "drawing toggle";
-  let canvas = document.querySelector('canvas');
-  document.body.insertBefore(btnDraw, canvas);
-
+  let btnDraw = document.getElementById("toggleButton");
   let isDrawing = false;
   let mouseIsPressed = false;
   let color = "#0000ff";
+  let plane;
 
   btnDraw.addEventListener("click", function () {
     if (isDrawing) {
@@ -35,16 +27,61 @@ export function enableDrawing(scene, camera, renderer, controls) {
     }
   });
 
-  // TODO: Set up geometry to raycast against
-  let aspectRatio = 1024 / 768;
-  let planeWidth = 10;
-  let planeHeight = planeWidth / aspectRatio;
+  function plane1() {
+    // Set up geometry to raycast against
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    let planeWidth = 16;
+    let planeHeight = planeWidth / aspectRatio;
+    console.log(planeWidth, planeHeight);
 
-  let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
-  let texture = new THREE.TextureLoader().load("/images/image1.jpg");
-  let planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-  let plane = new THREE.Mesh(planeGeom, planeMat);
-  scene.add(plane);
+    let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
+    let planeMat = new THREE.MeshBasicMaterial({transparent: true, opacity: 0.5, side: THREE.DoubleSide});
+    let planeMesh = new THREE.Mesh(planeGeom, planeMat);
+    scene.add(planeMesh);
+
+    return planeMesh;
+  }
+
+  // plane = plane1();
+
+  function plane2() {
+    // Create the plane geometry
+    let planeGeometry = new THREE.PlaneGeometry(1000, 1000); // Large enough size
+
+    // Create a transparent material
+    let planeMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.5,
+      depthTest: false
+    });
+
+    let planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+
+    // Add plane to the camera
+    camera.add(planeMesh);
+
+    // Position the plane in front of the camera
+    planeMesh.position.set(0, 0, -1);
+
+    // Set a high render order
+    planeMesh.renderOrder = 999;
+
+    // Add the camera to the scene (because it has not already been added, afaik)
+    scene.add(camera);
+
+    // Be a static object in the scene:
+    scene.add(planeMesh);
+
+    // Render the scene
+    renderer.render(scene, camera);
+
+    return planeMesh;
+  }
+
+  plane = plane2();
+
+  let objects = [plane];
 
   // Set up the raycaster and mouse vector
   let raycaster = new THREE.Raycaster();
@@ -52,7 +89,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
 
   let lineMaterial = new THREE.LineBasicMaterial({color});
 
-  // TODO: Dashed Line Issue Solution
+  // Dashed Line Issue Solution
   lineMaterial.polygonOffset = true; // Prevent z-fighting (which causes flicker)
   lineMaterial.polygonOffsetFactor = -1; // Push the polygon further away from the camera
   lineMaterial.depthTest = false;  // Render on top
@@ -69,6 +106,9 @@ export function enableDrawing(scene, camera, renderer, controls) {
     if (isDrawing) {
       mouseIsPressed = true;
 
+      console.log("objects:", objects);
+      console.log("scene.children:", scene.children);
+
       // Create a new BufferAttribute for each line
       line = new THREE.Line(new THREE.BufferGeometry(), lineMaterial);
       scene.add(line);
@@ -83,9 +123,11 @@ export function enableDrawing(scene, camera, renderer, controls) {
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      let intersects = raycaster.intersectObjects(scene.children, true);
+      // let intersects = raycaster.intersectObjects(scene.children, true);
+      let intersects = raycaster.intersectObjects(objects, true);
 
       if (intersects.length > 0) {
+        console.log('Intersected!');
         let point = intersects[0].point;
 
         // Check if it's the first vertex of the current polygon
@@ -112,18 +154,6 @@ export function enableDrawing(scene, camera, renderer, controls) {
     }
   }
 
-  function decimate(line) {
-    if (line.geometry.attributes.position) {
-      let originalArray = line.geometry.attributes.position.array;
-      let decimatedArray = [];
-
-      for (let i = 0; i < originalArray.length; i += 9) {
-        decimatedArray.push(originalArray[i], originalArray[i + 1], originalArray[i + 2]);
-      }
-      console.log("Position array lengths:\nOriginal:", polygonPositions, "\nDecimated:", decimatedArray);
-    }
-  }
-
   function onMouseUp() {
     if (isDrawing) {
       mouseIsPressed = false;
@@ -134,10 +164,6 @@ export function enableDrawing(scene, camera, renderer, controls) {
 
       polygonPositions.push(currentPolygonPositions); // Store the current polygon's positions in the polygonPositions array
       currentPolygonPositions = []; // Clear the current polygon's array
-
-      // decimate(line);
     }
   }
-
-  // Return any necessary objects or functions for further use
 }

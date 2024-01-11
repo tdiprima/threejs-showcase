@@ -1,6 +1,7 @@
 // app.js
 import { createScene } from './sceneModule.js';
 import { enableDrawing } from './drawingModule.js';
+// import { enableDrawing } from './drawingModule-plane.js';
 
 // Create the scene
 const { scene, camera, renderer, controls } = createScene();
