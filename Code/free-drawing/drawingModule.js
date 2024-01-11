@@ -35,7 +35,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
     }
   });
 
-  // TODO: Set up geometry to raycast against
+  // Set up geometry to raycast against
   let aspectRatio = 1024 / 768;
   let planeWidth = 10;
   let planeHeight = planeWidth / aspectRatio;
@@ -52,7 +52,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
 
   let lineMaterial = new THREE.LineBasicMaterial({color});
 
-  // TODO: Dashed Line Issue Solution
+  // Dashed Line Issue Solution
   lineMaterial.polygonOffset = true; // Prevent z-fighting (which causes flicker)
   lineMaterial.polygonOffsetFactor = -1; // Push the polygon further away from the camera
   lineMaterial.depthTest = false;  // Render on top
@@ -64,10 +64,14 @@ export function enableDrawing(scene, camera, renderer, controls) {
   let currentPolygonPositions = []; // Store positions for current polygon
   let polygonPositions = []; // Store positions for each polygon
   const distanceThreshold = 0.1;
+  let objects = [];
 
   renderer.domElement.addEventListener('pointerdown', event => {
     if (isDrawing) {
       mouseIsPressed = true;
+
+      // Build the objects array
+      objects.push(plane);
 
       // Create a new BufferAttribute for each line
       line = new THREE.Line(new THREE.BufferGeometry(), lineMaterial);
@@ -83,9 +87,13 @@ export function enableDrawing(scene, camera, renderer, controls) {
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
-      let intersects = raycaster.intersectObjects(scene.children, true);
+
+      // TESTING DIFFERENT INTERSECT OBJECTS
+      // let intersects = raycaster.intersectObjects(scene.children, true);
+      let intersects = raycaster.intersectObjects(objects, true);
 
       if (intersects.length > 0) {
+        console.log('Intersected!');
         let point = intersects[0].point;
 
         // Check if it's the first vertex of the current polygon
@@ -108,6 +116,8 @@ export function enableDrawing(scene, camera, renderer, controls) {
         if (line.geometry.attributes.position) {
           line.geometry.attributes.position.needsUpdate = true;
         }
+      } else {
+        console.log("Raycasting didn't work.");
       }
     }
   }
