@@ -1,11 +1,8 @@
 // drawingModule.js
 import * as THREE from 'three';
-import { squareProperties } from './dumpObject.js';
+import { objectProperties } from './dumpObject.js';
 
 export function enableDrawing(scene, camera, renderer, controls) {
-  // Add drawing functionality
-  // This might include event listeners for mouse interactions
-  // and functions to update the scene based on user input
   // let btnDraw = document.getElementById("toggleButton");
   let btnDraw = document.createElement("button");
   btnDraw.id = "toggleButton";
@@ -37,16 +34,16 @@ export function enableDrawing(scene, camera, renderer, controls) {
   });
 
   // Set up geometry to raycast against
-  let aspectRatio = 1024 / 768;
-  let planeWidth = 10;
-  let planeHeight = planeWidth / aspectRatio;
-
-  let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
-  let texture = new THREE.TextureLoader().load("/images/image1.jpg");
-  let planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-  let plane = new THREE.Mesh(planeGeom, planeMat);
-  plane.name = "plane";
-  scene.add(plane);
+  // let aspectRatio = 1024 / 768;
+  // let planeWidth = 10;
+  // let planeHeight = planeWidth / aspectRatio;
+  // console.log(planeWidth, planeHeight);
+  // let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
+  // let texture = new THREE.TextureLoader().load("/images/image1.jpg");
+  // let planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+  // let plane = new THREE.Mesh(planeGeom, planeMat);
+  // plane.name = "plane";
+  // scene.add(plane);
 
   // Set up the raycaster and mouse vector
   let raycaster = new THREE.Raycaster();
@@ -73,7 +70,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
       mouseIsPressed = true;
 
       // Build the objects array
-      // objects.push(plane);
+      objects = [];
       scene.traverse(function (object) {
         if (object instanceof THREE.Mesh && object.visible) {
           objects.push(object);
@@ -81,7 +78,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
       });
 
       console.log("Objects:", objects);
-      squareProperties(objects);
+      objectProperties(objects);
 
       // Create a new BufferAttribute for each line
       line = new THREE.Line(new THREE.BufferGeometry(), lineMaterial);
@@ -159,5 +156,4 @@ export function enableDrawing(scene, camera, renderer, controls) {
     }
   }
 
-  // Return any necessary objects or functions for further use
 }
