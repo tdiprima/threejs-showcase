@@ -1,5 +1,6 @@
 // drawingModule.js
 import * as THREE from 'three';
+import { squareProperties } from './dumpObject.js';
 
 export function enableDrawing(scene, camera, renderer, controls) {
   // Add drawing functionality
@@ -44,6 +45,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
   let texture = new THREE.TextureLoader().load("/images/image1.jpg");
   let planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
   let plane = new THREE.Mesh(planeGeom, planeMat);
+  plane.name = "plane";
   scene.add(plane);
 
   // Set up the raycaster and mouse vector
@@ -71,7 +73,15 @@ export function enableDrawing(scene, camera, renderer, controls) {
       mouseIsPressed = true;
 
       // Build the objects array
-      objects.push(plane);
+      // objects.push(plane);
+      scene.traverse(function (object) {
+        if (object instanceof THREE.Mesh && object.visible) {
+          objects.push(object);
+        }
+      });
+
+      console.log("Objects:", objects);
+      squareProperties(objects);
 
       // Create a new BufferAttribute for each line
       line = new THREE.Line(new THREE.BufferGeometry(), lineMaterial);

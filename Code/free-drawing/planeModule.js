@@ -42,12 +42,13 @@ export function enableDrawing(scene, camera, renderer, controls) {
     let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
     let planeMat = new THREE.MeshBasicMaterial({transparent: true, opacity: 0.5, side: THREE.DoubleSide});
     let planeMesh = new THREE.Mesh(planeGeom, planeMat);
+    planeMesh.name = "plane";
     scene.add(planeMesh);
 
     return planeMesh;
   }
 
-  // plane = plane1();
+  plane = plane1();
 
   function plane2() {
     // Create the plane geometry
@@ -62,6 +63,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
     });
 
     let planeMesh = new THREE.Mesh(planeGeometry, planeMaterial);
+    planeMesh.name = "plane";
 
     // Add plane to the camera
     camera.add(planeMesh);
@@ -84,7 +86,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
     return planeMesh;
   }
 
-  plane = plane2();
+  // plane = plane2();
 
   let objects = [plane];
 
