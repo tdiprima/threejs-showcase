@@ -1,6 +1,6 @@
 // app.js
 import { createScene } from './sceneModule.js';
-import { CreateImageViewer } from './squareModule.js';
+// import { CreateImageViewer } from './squareModule.js';
 // import { addPlane } from './planeModule.js';
 import { enableDrawing } from './drawingModule.js';
 
@@ -8,7 +8,7 @@ import { enableDrawing } from './drawingModule.js';
 const { scene, camera, renderer, controls } = createScene();
 
 // Create square with image
-CreateImageViewer(scene, 0, 0, 10, 7.5, "/images/image2.jpg");
+// CreateImageViewer(scene, 0, 0, 10, 7.5, "/images/image2.jpg");
 
 // Add plane
 // addPlane(scene, camera, renderer);

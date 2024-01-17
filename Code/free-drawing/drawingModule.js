@@ -3,7 +3,6 @@ import * as THREE from 'three';
 import { objectProperties } from './dumpObject.js';
 
 export function enableDrawing(scene, camera, renderer, controls) {
-  // let btnDraw = document.getElementById("toggleButton");
   let btnDraw = document.createElement("button");
   btnDraw.id = "toggleButton";
   btnDraw.innerHTML = "drawing toggle";
@@ -33,17 +32,19 @@ export function enableDrawing(scene, camera, renderer, controls) {
     }
   });
 
+  // TODO: COMMENT OUT IF USING OTHER MODULES
   // Set up geometry to raycast against
-  // let aspectRatio = 1024 / 768;
-  // let planeWidth = 10;
-  // let planeHeight = planeWidth / aspectRatio;
-  // console.log(planeWidth, planeHeight);
-  // let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
-  // let texture = new THREE.TextureLoader().load("/images/image1.jpg");
-  // let planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-  // let plane = new THREE.Mesh(planeGeom, planeMat);
-  // plane.name = "plane";
-  // scene.add(plane);
+  let imageSize = { width: 1024, height: 794 };
+  let aspectRatio = imageSize.width / imageSize.height;
+  let planeWidth = 10; // You can adjust this value as needed
+  let planeHeight = planeWidth / aspectRatio;
+
+  let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
+  let texture = new THREE.TextureLoader().load("/images/image1.jpg");
+  let planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+  let plane = new THREE.Mesh(planeGeom, planeMat);
+  plane.name = "plane";
+  scene.add(plane);
 
   // Set up the raycaster and mouse vector
   let raycaster = new THREE.Raycaster();
@@ -90,8 +91,12 @@ export function enableDrawing(scene, camera, renderer, controls) {
 
   function onMouseMove(event) {
     if (isDrawing && mouseIsPressed) {
-      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+      // Get the bounding rectangle of the renderer's DOM element
+      const rect = renderer.domElement.getBoundingClientRect();
+
+      // Adjust the mouse coordinates
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
       raycaster.setFromCamera(mouse, camera);
 
@@ -123,8 +128,6 @@ export function enableDrawing(scene, camera, renderer, controls) {
         if (line.geometry.attributes.position) {
           line.geometry.attributes.position.needsUpdate = true;
         }
-      } else {
-        console.log("Raycasting didn't work.");
       }
     }
   }
@@ -141,6 +144,29 @@ export function enableDrawing(scene, camera, renderer, controls) {
     }
   }
 
+  // TEST CONVERSION
+  function convertToImageCoordinates(worldCoordinates, planeWidth, planeHeight, imageWidth, imageHeight) {
+    // Normalize the 3D coordinates to the plane's scale
+    const normalizedX = (worldCoordinates.x / planeWidth) + 0.5; // Assuming plane is centered
+    const normalizedY = (worldCoordinates.y / planeHeight) + 0.5; // Assuming plane is centered
+
+    // Convert to image coordinates
+    const imageX = Math.round(normalizedX * imageWidth);
+    const imageY = Math.round((1 - normalizedY) * imageHeight); // Flip Y-axis
+
+    return { x: imageX, y: imageY };
+  }
+
+  function logImageCoords(polygonPositions, imageWidth, imageHeight) {
+    // Convert and log image coordinates
+    const imageCoordinates = polygonPositions.map(pos => {
+      const worldPoint = new THREE.Vector3(pos[0], pos[1], pos[2]);
+      return convertToImageCoordinates(worldPoint, planeGeom.parameters.width, planeGeom.parameters.height, imageWidth, imageHeight);
+    });
+
+    console.log("Image Coordinates: ", imageCoordinates);
+  }
+
   function onMouseUp() {
     if (isDrawing) {
       mouseIsPressed = false;
@@ -152,7 +178,10 @@ export function enableDrawing(scene, camera, renderer, controls) {
       polygonPositions.push(currentPolygonPositions); // Store the current polygon's positions in the polygonPositions array
       currentPolygonPositions = []; // Clear the current polygon's array
 
+      console.log("polygonPositions:", polygonPositions);
+
       // decimate(line);
+      logImageCoords(polygonPositions, imageSize.width, imageSize.height);
     }
   }
 
