@@ -73,10 +73,11 @@
         startPoint.x,
         startPoint.y,
         endPoint.x,
-        endPoint.y
+        endPoint.y,
+        calculateScaleFactor(camera, renderer)
       ).toFixed(2);
 
-      message = `Length: ${length}`;
+      message = `Length ${length} px`;
       // console.log(`%c${message}`, "color: #ccff00;");
 
       let textGeometry = new TextGeometry(message, {
@@ -118,10 +119,25 @@
   });
 
   const Calculate = {
-    lineLength(x1, y1, x2, y2) {
-      return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+    lineLength(x1, y1, x2, y2, scaleFactor) {
+      const threeJsUnitsLength = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+      return threeJsUnitsLength * scaleFactor; // Convert to pixels
     }
   };
+
+  // Determine scaleFactor based on scene setup
+  function calculateScaleFactor(camera, renderer) {
+    // Calculate the visible height at the depth of the plane
+    const distance = camera.position.z;
+    const vFov = (camera.fov * Math.PI) / 180; // Convert vertical fov to radians
+    const planeHeightAtDistance = 2 * Math.tan(vFov / 2) * distance;
+
+    // Calculate the scale factor
+    const screenHeight = renderer.domElement.clientHeight;
+    const scaleFactor = screenHeight / planeHeightAtDistance;
+
+    return scaleFactor;
+  }
 
   window.addEventListener("resize", function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
