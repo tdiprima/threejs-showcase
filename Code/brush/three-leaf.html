@@ -43,7 +43,7 @@
       this.camera.position.z = 500;
 
       // Add Three.js object
-      let geometry = new THREE.BoxGeometry(200, 200, 200);
+      let geometry = new THREE.BoxGeometry(100, 100, 100);
       let material = new THREE.MeshBasicMaterial({color: 0x00ff00});
       this.cube = new THREE.Mesh(geometry, material);
       this.scene.add(this.cube);
@@ -53,8 +53,8 @@
 
     animate: function () {
       // Update Three.js scene
-      // this.cube.rotation.x += 0.01;
-      // this.cube.rotation.y += 0.01;
+      this.cube.rotation.x += 0.01;
+      this.cube.rotation.y += 0.01;
       this.renderer.render(this.scene, this.camera);
 
       // Next frame
