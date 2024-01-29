@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Leaflet and Three.js Integration</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.css" rel="stylesheet">
+  <style>
+    #map { height: 100vh; width: 100%; }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r132/three.min.js"></script>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/leaflet-paintpolygon@1.2.1-alpha.1/dist/Leaflet.PaintPolygon.min.js"></script> -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/leaflet-paintpolygon/dist/Leaflet.PaintPolygon.min.js"></script> -->
+  <script src="/js/Leaflet.PaintPolygon.min.js"></script>
+</head>
+<body>
+<div id="map"></div>
+<script>
+  // Create Leaflet map on map element
+  let map = L.map('map').setView([51.505, -0.09], 13);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+  }).addTo(map);
+
+  // Create Three.js Layer
+  let ThreeLayer = L.Layer.extend({
+    onAdd: function (map) {
+      this.map = map;
+      let size = this.map.getSize();
+
+      // Create a new WebGL renderer and append it to the Leaflet's overlay pane
+      this.renderer = new THREE.WebGLRenderer({alpha: true});
+      this.renderer.setSize(size.x, size.y);
+      this.renderer.domElement.style.position = 'absolute';
+      this.renderer.domElement.style.top = 0;
+      this.renderer.domElement.style.left = 0;
+      let panes = this.map.getPanes();
+      panes.overlayPane.appendChild(this.renderer.domElement);
+
+      // Create the Three.js Scene and Camera
+      this.scene = new THREE.Scene();
+      this.camera = new THREE.PerspectiveCamera(60, size.x / size.y, 1, 100000);
+      this.camera.position.z = 500;
+
+      // Add Three.js object
+      let geometry = new THREE.BoxGeometry(200, 200, 200);
+      let material = new THREE.MeshBasicMaterial({color: 0x00ff00});
+      this.cube = new THREE.Mesh(geometry, material);
+      this.scene.add(this.cube);
+
+      this.animate();
+    },
+
+    animate: function () {
+      // Update Three.js scene
+      // this.cube.rotation.x += 0.01;
+      // this.cube.rotation.y += 0.01;
+      this.renderer.render(this.scene, this.camera);
+
+      // Next frame
+      requestAnimationFrame(this.animate.bind(this));
+    }
+  });
+
+  // Add ThreeLayer to the map
+  let threeLayer = new ThreeLayer();
+  threeLayer.addTo(map);
+
+  // Paint Polygon
+  let paintpolygonControl = L.control.paintPolygon().addTo(map);
+</script>
+</body>
+</html>
