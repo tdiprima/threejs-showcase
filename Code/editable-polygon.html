@@ -43,6 +43,7 @@
 
   // The setAttribute("position") method sets up the initial vertex positions
   geometry.setAttribute("position", new THREE.Float32BufferAttribute(initialVertices, 3));
+  // geometry.attributes.position.array
 
   // Create material
   const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -61,6 +62,7 @@
     const handleMesh = new THREE.Mesh(handleGeometry, handleMaterial);
     handleMesh.position.fromArray(initialVertices.slice(i, i + 3));
     handles.push(handleMesh);
+    // console.log(i, i + 3, initialVertices.slice(i, i + 3));
   }
 
   // Add handles to the scene
