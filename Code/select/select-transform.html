@@ -35,6 +35,7 @@
   let geometry = new THREE.BoxGeometry(1, 1, 1);
   let material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
   let cube = new THREE.Mesh(geometry, material);
+  cube.name = "cube";
   scene.add(cube);
 
   // foo(scene, camera, renderer);

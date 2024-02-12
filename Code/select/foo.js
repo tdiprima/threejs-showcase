@@ -51,5 +51,5 @@ export function foo(scene, camera, renderer) {
     }
   }
 
-  window.addEventListener('click', onMouseClick, false);
+  renderer.domElement.addEventListener('click', onMouseClick, false);
 }

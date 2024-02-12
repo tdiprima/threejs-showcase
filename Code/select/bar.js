@@ -5,6 +5,7 @@ export function bar(scene, camera, renderer) {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
   const controls = new TransformControls(camera, renderer.domElement);
+  console.log("controls", controls);
   scene.add(controls);
 
   // Enhanced function to handle mesh deletion
@@ -43,16 +44,34 @@ export function bar(scene, camera, renderer) {
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children, true);
 
-    if (intersects.length > 0) {
-      const selectedMesh = intersects[0].object;
+    // if (intersects.length > 0) {
+    //   const selectedMesh = intersects[0].object;
+    //   console.log("selectedMesh", selectedMesh);
+    //
+    //   // Setup deletion button
+    //   setupDeletionButton(selectedMesh);
+    //
+    //   // Attach transform controls to the selected object
+    //   controls.attach(selectedMesh);
+    // }
 
-      // Setup deletion button
-      setupDeletionButton(selectedMesh);
+    for (let i = 0; i < intersects.length; i++) {
+      const intersect = intersects[i];
+      // Filter out objects that are part of TransformControls or not your target
+      if (intersect.object.name !== 'Z' && intersect.object !== controls.object) {
+        // Found a valid mesh that's not part of the controls
+        const selectedMesh = intersect.object;
+        console.log("selectedMesh", selectedMesh);
 
-      // Attach transform controls to the selected object
-      controls.attach(selectedMesh);
+        // Setup deletion button
+        setupDeletionButton(selectedMesh);
+
+        // Attach transform controls to the selected object
+        controls.attach(selectedMesh);
+        break; // Stop the loop once the first valid mesh is found and processed
+      }
     }
   }
 
-  window.addEventListener('click', onMouseClick, false);
+  renderer.domElement.addEventListener('click', onMouseClick, false);
 }
