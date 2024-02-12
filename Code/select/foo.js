@@ -26,6 +26,7 @@ export function foo(scene, camera, renderer) {
     button.style.top = `${vector.y}px`;
 
     button.onclick = function() {
+      controls.detach(); // Detach controls if attached
       scene.remove(mesh);
       document.body.removeChild(button); // Remove the button after deletion
     };
@@ -33,12 +34,23 @@ export function foo(scene, camera, renderer) {
     document.body.appendChild(button);
   }
 
+  const intersectableObjects = [];
+
+  scene.traverse((object) => {
+    // Check if the object's name contains "annotation"
+    if (object.name.includes("annotation")) {
+      intersectableObjects.push(object);
+    }
+  });
+
+  // Now, intersectableObjects contains all objects you're interested in
+
   function onMouseClick(event) {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(scene.children, true);
+    const intersects = raycaster.intersectObjects(intersectableObjects, true);
 
     if (intersects.length > 0) {
       const selectedMesh = intersects[0].object;

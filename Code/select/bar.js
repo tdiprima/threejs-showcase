@@ -35,6 +35,15 @@ export function bar(scene, camera, renderer) {
     });
   }
 
+  const intersectableObjects = [];
+
+  scene.traverse((object) => {
+    // Check if the object's name contains "annotation"
+    if (object.name.includes("annotation")) {
+      intersectableObjects.push(object);
+    }
+  });
+
   function onMouseClick(event) {
     event.preventDefault();
 
@@ -42,35 +51,35 @@ export function bar(scene, camera, renderer) {
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(scene.children, true);
+    const intersects = raycaster.intersectObjects(intersectableObjects, true);
 
-    // if (intersects.length > 0) {
-    //   const selectedMesh = intersects[0].object;
-    //   console.log("selectedMesh", selectedMesh);
-    //
-    //   // Setup deletion button
-    //   setupDeletionButton(selectedMesh);
-    //
-    //   // Attach transform controls to the selected object
-    //   controls.attach(selectedMesh);
-    // }
+    if (intersects.length > 0) {
+      const selectedMesh = intersects[0].object;
+      console.log("selectedMesh", selectedMesh);
 
-    for (let i = 0; i < intersects.length; i++) {
-      const intersect = intersects[i];
-      // Filter out objects that are part of TransformControls or not your target
-      if (intersect.object.name !== 'Z' && intersect.object !== controls.object) {
-        // Found a valid mesh that's not part of the controls
-        const selectedMesh = intersect.object;
-        console.log("selectedMesh", selectedMesh);
+      // Setup deletion button
+      setupDeletionButton(selectedMesh);
 
-        // Setup deletion button
-        setupDeletionButton(selectedMesh);
-
-        // Attach transform controls to the selected object
-        controls.attach(selectedMesh);
-        break; // Stop the loop once the first valid mesh is found and processed
-      }
+      // Attach transform controls to the selected object
+      controls.attach(selectedMesh);
     }
+
+    // for (let i = 0; i < intersects.length; i++) {
+    //   const intersect = intersects[i];
+    //   // Filter out objects that are part of TransformControls or not your target
+    //   if (intersect.object.name !== 'Z' && intersect.object !== controls.object) {
+    //     // Found a valid mesh that's not part of the controls
+    //     const selectedMesh = intersect.object;
+    //     console.log("selectedMesh", selectedMesh);
+    //
+    //     // Setup deletion button
+    //     setupDeletionButton(selectedMesh);
+    //
+    //     // Attach transform controls to the selected object
+    //     controls.attach(selectedMesh);
+    //     break; // Stop the loop once the first valid mesh is found and processed
+    //   }
+    // }
   }
 
   renderer.domElement.addEventListener('click', onMouseClick, false);
