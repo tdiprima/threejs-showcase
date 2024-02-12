@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>three.js app</title>
+  <link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+<script src="/build/three.min.js"></script>
+<script>
+  let scene = new THREE.Scene();
+  let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 5;
+
+  let renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
+
+  // Create a LineLoop
+  const material = new THREE.LineBasicMaterial({color: 0x0000ff});
+  const points = [];
+  points.push(new THREE.Vector3(-10, 0, 0));
+  points.push(new THREE.Vector3(0, 10, 0));
+  points.push(new THREE.Vector3(10, 0, 0));
+  points.push(new THREE.Vector3(-10, 0, 0)); // Close the loop
+
+  const geometry = new THREE.BufferGeometry().setFromPoints(points);
+  const lineLoop = new THREE.LineLoop(geometry, material);
+  scene.add(lineLoop);
+
+  // Adjust raycaster parameters for line objects
+  const raycaster = new THREE.Raycaster();
+  raycaster.params.Line.threshold = 0.1; // Adjust based on your needs
+
+  const mouse = new THREE.Vector2();
+
+  function onMouseClick(event) {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObject(lineLoop, true);
+    if (intersects.length > 0) {
+      // Handle intersection
+      console.log("LineLoop intersected");
+    }
+  }
+
+  renderer.domElement.addEventListener('click', onMouseClick, false);
+
+  window.addEventListener("resize", function () {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+  });
+
+  (function animate() {
+    requestAnimationFrame(animate);
+    renderer.render(scene, camera);
+  })();
+</script>
+</body>
+</html>
