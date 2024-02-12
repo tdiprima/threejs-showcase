@@ -8,6 +8,7 @@
   <!-- Display a button near a mesh for deletion and add edit handles to the mesh upon clicking it. -->
   <!-- TransformControls allows for moving, rotating, and scaling objects in the scene. -->
   <!-- https://sbcode.net/threejs/transform-controls/ -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="/css/main.css" rel="stylesheet">
 </head>
 <body>
@@ -23,6 +24,7 @@
   import * as THREE from "three";
   import { foo } from "./foo.js";
   import { bar } from "./bar.js";
+  import { baz } from "./baz.js";
 
   let scene = new THREE.Scene();
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -39,7 +41,8 @@
   scene.add(cube);
 
   // foo(scene, camera, renderer);
-  bar(scene, camera, renderer);
+  // bar(scene, camera, renderer);
+  baz(scene, camera, renderer);
 
   window.addEventListener("resize", function () {
     renderer.setSize(window.innerWidth, window.innerHeight);
