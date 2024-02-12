@@ -26,6 +26,7 @@
 <script type="module">
   import * as THREE from "three";
   import { CSS2DRenderer, CSS2DObject } from '/jsm/renderers/CSS2DRenderer.js';
+  import { DragControls } from "/jsm/controls/DragControls.js";
 
   let scene = new THREE.Scene();
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -82,8 +83,14 @@
   function onMouseUp(event) {
     event.preventDefault();
     isDrawing = false;
+
+    renderer.domElement.removeEventListener("mousedown", onMouseDown, false);
+    renderer.domElement.removeEventListener("mousemove", onMouseMove, false);
+    renderer.domElement.removeEventListener("mouseup", onMouseUp, false);
+
     endPoint = getMousePosition(event.clientX, event.clientY);
     updateRectangle();
+    addEditHandles();
 
     // Make sure the user actually drew something
     if (startPoint.x !== endPoint.x && startPoint.y !== endPoint.y) {
@@ -142,6 +149,56 @@
     // Icon clicked, remove rect and icon
     scene.remove(rect);
     scene.remove(iconObject);
+    // And edit handles
+    if (handles && handles.length > 0) {
+      handles.forEach(function (element) {
+        scene.remove(element);
+        element.geometry.dispose();
+        element.material.dispose();
+      });
+    }
+  }
+
+  let handles = [];
+  function addEditHandles() {
+    let vertices = rect.geometry.attributes.position.array;
+
+    // Create handles for each vertex
+    for (let i = 0; i < vertices.length; i += 3) {
+      const handleGeometry = new THREE.SphereGeometry(0.1);
+      const handleMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+      const handleMesh = new THREE.Mesh(handleGeometry, handleMaterial);
+      handleMesh.position.fromArray(vertices.slice(i, i + 3));
+      handles.push(handleMesh);
+      // console.log(i, i + 3, vertices.slice(i, i + 3));
+    }
+
+    // Add handles to the scene
+    handles.forEach(element => scene.add(element));
+
+    // Create DragControls
+    const dragControls = new DragControls(handles, camera, renderer.domElement);
+
+    dragControls.addEventListener("dragstart", function (event) {
+      // Set color of handle when dragging starts
+      event.object.material.color.set(0xffff00);
+    });
+
+    dragControls.addEventListener("dragend", function (event) {
+      // Set color of handle when dragging ends
+      event.object.material.color.set(0xff0000);
+    });
+
+    dragControls.addEventListener("drag", function (event) {
+      const position = event.object.position;
+      const index = handles.indexOf(event.object);
+
+      // When a handle is dragged, update the position of the corresponding vertex in the buffer attribute
+      geometry.attributes.position.setXYZ(index, position.x, position.y, position.z);
+
+      // Notify Three.js to update the geometry
+      geometry.attributes.position.needsUpdate = true;
+    });
   }
 
   function animate() {
