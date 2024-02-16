@@ -4,11 +4,8 @@
   <meta charset="UTF-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>heads-up display</title>
+  <link rel="stylesheet" href="/css/main.css">
   <style>
-    body {
-      background-color: black;
-    }
-
     #hud {
       position: absolute;
       top: 10px;
@@ -21,11 +18,13 @@
   </style>
 </head>
 <body>
-
-<div id="hud">
+<div id="info">You can also move the HUD element around the screen.</div>
+<!-- <div id="hud">
   Coordinates: <span id="coords">0, 0, 0</span>
+</div> -->
+<div id="hud">
+  Rotation: <span id="coords">0, 0</span>
 </div>
-
 <script type="importmap">{
     "imports": {
       "three": "/build/three.module.js",
@@ -41,12 +40,13 @@
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 5;
 
-  let renderer = new THREE.WebGLRenderer({antialias: true});
+  let renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setClearColor("#708090");
   document.body.appendChild(renderer.domElement);
 
   let geometry = new THREE.BoxGeometry(1, 1, 1);
-  let material = new THREE.MeshBasicMaterial({color: 0x0000ff});
+  let material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
   let cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
 
@@ -55,7 +55,7 @@
   let hudElement = document.getElementById("hud");
   let coordsElement = document.getElementById("coords");
   let isDragging = false;
-  let previousMousePosition = {x: 0, y: 0};
+  let previousMousePosition = { x: 0, y: 0 };
 
   // Function to update the position of the HUD
   function moveHUD(event) {
@@ -68,14 +68,14 @@
       hudElement.style.left = rect.left + deltaX + 'px';
       hudElement.style.top = rect.top + deltaY + 'px';
 
-      previousMousePosition = {x: event.clientX, y: event.clientY};
+      previousMousePosition = { x: event.clientX, y: event.clientY };
     }
   }
 
   // Event listeners for draggable HUD
   hudElement.addEventListener('mousedown', function (event) {
     isDragging = true;
-    previousMousePosition = {x: event.clientX, y: event.clientY};
+    previousMousePosition = { x: event.clientX, y: event.clientY };
   });
 
   document.addEventListener('mouseup', function () {
