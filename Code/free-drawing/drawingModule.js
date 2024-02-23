@@ -168,15 +168,25 @@ export function enableDrawing(scene, camera, renderer, controls) {
   }
 
   function onMouseUp() {
-    if (isDrawing) {
+    if (isDrawing && mouseIsPressed) {
       mouseIsPressed = false;
 
-      // Draw the final line
-      line.geometry.setDrawRange(0, currentPolygonPositions.length / 3);
-      line.geometry.computeBoundingSphere();
+      // Ensure there are at least 3 points to form a closed polygon
+      if (currentPolygonPositions.length >= 9) { // 3 points * 3 coordinates (x, y, z)
+        // Close the polygon by adding the first point to the end
+        const firstPoint = currentPolygonPositions.slice(0, 3);
+        currentPolygonPositions.push(...firstPoint);
 
-      polygonPositions.push(currentPolygonPositions); // Store the current polygon's positions in the polygonPositions array
-      currentPolygonPositions = []; // Clear the current polygon's array
+        // Create a new geometry with the closed polygon positions
+        const closedPolygonGeometry = new THREE.BufferGeometry();
+        closedPolygonGeometry.setAttribute('position', new THREE.Float32BufferAttribute(currentPolygonPositions, 3));
+        line.geometry = closedPolygonGeometry;
+        line.geometry.setDrawRange(0, currentPolygonPositions.length / 3);
+        line.geometry.computeBoundingSphere();
+      }
+
+      polygonPositions.push(currentPolygonPositions); // Store the current polygon's positions
+      currentPolygonPositions = []; // Clear the current polygon's array for the next drawing
 
       console.log("polygonPositions:", polygonPositions);
 
