@@ -12,8 +12,6 @@
 <body>
 <button id="download">Download</button>
 <script>
-  let imgSrc = "/images/grumpy-cat.jpg";
-
   let scene = new THREE.Scene();
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 2;
@@ -23,17 +21,15 @@
   document.body.appendChild(renderer.domElement);
 
   let planeGeom = new THREE.PlaneGeometry(4, 4);
-  let tex = new THREE.TextureLoader().load(imgSrc, (tex) => {
+  let tex = new THREE.TextureLoader().load("/images/grumpy-cat.jpg", (tex) => {
+    tex.encoding = THREE.sRGBEncoding;
     tex.needsUpdate = true;
 
     const width = tex.image.width;
     const height = tex.image.height;
     const aspect = height / width;
 
-    let planeMaterial = new THREE.MeshBasicMaterial({
-      color: 0xffffff,
-      map: tex
-    });
+    let planeMaterial = new THREE.MeshBasicMaterial({ map: tex });
 
     let plane = new THREE.Mesh(planeGeom, planeMaterial);
     plane.scale.set(1.0, aspect, 1.0);
