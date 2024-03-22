@@ -4,10 +4,12 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>three.js app</title>
+  <title>with raycaster threshold</title>
+  <!-- webgl_interactive_lines.html -->
   <link href="/css/main.css" rel="stylesheet">
 </head>
 <body>
+<div id="info">Click triangle, see console -></div>
 <script src="/build/three.min.js"></script>
 <script>
   let scene = new THREE.Scene();
@@ -32,7 +34,7 @@
 
   // Adjust raycaster parameters for line objects
   const raycaster = new THREE.Raycaster();
-  raycaster.params.Line.threshold = 0.1; // Adjust based on your needs
+  raycaster.params.Line.threshold = 3; // 0.1
 
   const mouse = new THREE.Vector2();
 
