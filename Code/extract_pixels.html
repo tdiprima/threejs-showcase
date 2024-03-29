@@ -49,6 +49,7 @@
   let planeGeom = new THREE.PlaneGeometry(4, 4);
   let tex = new THREE.TextureLoader().load(imgSrc, (tex) => {
     tex.needsUpdate = true;
+    tex.colorSpace = THREE.SRGBColorSpace;
 
     const width = tex.image.width;
     const height = tex.image.height;

@@ -37,6 +37,7 @@
   const controls = new OrbitControls(camera, renderer.domElement);
 
   const texture = new THREE.TextureLoader().load(imgSrc);
+  texture.colorSpace = THREE.SRGBColorSpace;
 
   const geometry = new THREE.PlaneGeometry(1, 1);
   const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });

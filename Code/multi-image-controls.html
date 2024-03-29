@@ -22,7 +22,7 @@
 <body>
 <table>
   <tr>
-    <td colspan="2"><button id="toggleButton">toggleButton</button></td>
+    <td colspan="2"><button id="toggleButton">toggle controls</button></td>
   </tr>
   <tr>
     <td><div id="image1"></div></td>
@@ -65,6 +65,7 @@
   document.getElementById('image1').appendChild(renderer1.domElement);
 
   let texture1 = new THREE.TextureLoader().load('/images/image1.jpg');
+  texture1.colorSpace = THREE.SRGBColorSpace;
   let material1 = new THREE.MeshBasicMaterial({map: texture1, side: THREE.DoubleSide});
   let geometry1 = new THREE.PlaneGeometry(3, 2);
   let mesh1 = new THREE.Mesh(geometry1, material1);
@@ -89,6 +90,7 @@
   controls2.addEventListener('change', onControlsChange2);
 
   let texture2 = new THREE.TextureLoader().load('/images/image2.jpg');
+  texture2.colorSpace = THREE.SRGBColorSpace;
   let material2 = new THREE.MeshBasicMaterial({map: texture2, side: THREE.DoubleSide});
   let geometry2 = new THREE.PlaneGeometry(3, 2);
   let mesh2 = new THREE.Mesh(geometry2, material2);

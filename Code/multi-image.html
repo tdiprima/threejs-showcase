@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Two Images with Three.js</title>
+  <title>multi-image</title>
   <style>
     body {
       margin: 0;
@@ -75,6 +75,7 @@
 
     // Load the second image texture
     let texture = new THREE.TextureLoader().load(`/images/${image}`);
+    texture.colorSpace = THREE.SRGBColorSpace;
     let material = new THREE.MeshBasicMaterial({map: texture, side: THREE.DoubleSide});
     let geometry = new THREE.PlaneGeometry(4, 3);
     let mesh = new THREE.Mesh(geometry, material);

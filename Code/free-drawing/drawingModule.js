@@ -41,6 +41,7 @@ export function enableDrawing(scene, camera, renderer, controls) {
 
   let planeGeom = new THREE.PlaneGeometry(planeWidth, planeHeight);
   let texture = new THREE.TextureLoader().load("/images/image1.jpg");
+  texture.colorSpace = THREE.SRGBColorSpace;
   let planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
   let plane = new THREE.Mesh(planeGeom, planeMat);
   plane.name = "plane";
