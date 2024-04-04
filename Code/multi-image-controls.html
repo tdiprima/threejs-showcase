@@ -121,11 +121,12 @@
   // Toggle button click event listener
   document.getElementById("toggleButton").addEventListener("click", toggleControlsDetachment);
 
-  function updatePointer(event) {
+  function updatePointer(event, canvas) {
     const mouse = new THREE.Vector2();
+    const domRect = canvas.getBoundingClientRect();
 
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    mouse.x = ((event.clientX - domRect.left) / domRect.width) * 2 - 1;
+    mouse.y = -((event.clientY - domRect.top) / domRect.height) * 2 + 1;
 
     return mouse;
   }
@@ -133,7 +134,7 @@
   // MOUSEDOWN / RAYCASTING
   function onMouseDown1(event) {
     // console.log("onMouseDown1");
-    const mouse = updatePointer(event);
+    const mouse = updatePointer(event, renderer1.domElement);
 
     const raycaster1 = new THREE.Raycaster();
     raycaster1.setFromCamera(mouse, camera1);
@@ -148,7 +149,7 @@
 
   function onMouseDown2(event) {
     // console.log("onMouseDown2");
-    const mouse = updatePointer(event);
+    const mouse = updatePointer(event, renderer2.domElement);
 
     const raycaster2 = new THREE.Raycaster();
     raycaster2.setFromCamera(mouse, camera2);
