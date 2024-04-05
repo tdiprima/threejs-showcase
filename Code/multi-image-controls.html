@@ -63,99 +63,57 @@
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
     const geometry = new THREE.PlaneGeometry(3, 2);
     const mesh = new THREE.Mesh(geometry, material);
+    mesh.name = imagePath.replace("/images/", ""); // clean path
     scene.add(mesh);
 
     const controls = new OrbitControls(camera, renderer.domElement);
+    controls.addEventListener('change', () => onControlsChange(camera, controls === controls1 ? camera2 : camera1));
 
-    return { scene, camera, renderer, controls, mesh };
+    renderer.domElement.addEventListener('mousedown', (event) => onMouseDown(event, renderer, camera, mesh));
+
+    return { scene, camera, renderer, controls };
   }
 
-  // Setup scenes
-  const { scene: scene1, camera: camera1, renderer: renderer1, controls: controls1, mesh: mesh1 } = setupScene("#2b2b2b", "/images/image1.jpg", "image1");
-  const { scene: scene2, camera: camera2, renderer: renderer2, controls: controls2, mesh: mesh2 } = setupScene("#484848", "/images/image2.jpg", "image2");
-
-  controls1.addEventListener("click", onControlsChange1);
-  controls2.addEventListener("click", onControlsChange2);
-
-  function onControlsChange1() {
-    if (detachControls) return;
-    camera2.copy(camera1);
-    camera2.updateProjectionMatrix();
+  // Handlers
+  function onControlsChange(sourceCamera, targetCamera) {
+    if (!detachControls) {
+      targetCamera.copy(sourceCamera);
+      targetCamera.updateProjectionMatrix();
+    }
+    // If detachControls is true, do nothing, allowing independent movement
   }
 
-  function onControlsChange2() {
-    if (detachControls) return;
-    camera1.copy(camera2);
-    camera1.updateProjectionMatrix();
-  }
-
-  // Function to detach or reattach controls based on the 'detachControls' flag
-  function toggleControlsDetachment() {
-    detachControls = !detachControls;
-    controls1.enabled = true;
-    controls2.enabled = true;
-  }
-
-  // Toggle button click event listener
-  document.getElementById("toggleButton").addEventListener("click", toggleControlsDetachment);
-
-  function updatePointer(event, canvas) {
+  function onMouseDown(event, renderer, camera, mesh) {
     const mouse = new THREE.Vector2();
-    const domRect = canvas.getBoundingClientRect();
-
+    let domRect = renderer.domElement.getBoundingClientRect();
     mouse.x = ((event.clientX - domRect.left) / domRect.width) * 2 - 1;
     mouse.y = -((event.clientY - domRect.top) / domRect.height) * 2 + 1;
 
-    return mouse;
-  }
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObject(mesh);
 
-  // MOUSEDOWN / RAYCASTING
-  function onMouseDown1(event) {
-    const mouse = updatePointer(event, renderer1.domElement);
-
-    const raycaster1 = new THREE.Raycaster();
-    raycaster1.setFromCamera(mouse, camera1);
-    const intersects1 = raycaster1.intersectObject(mesh1);
-
-    if (intersects1.length > 0) {
-      console.log('Image 1 clicked!', intersects1[0].object);
+    if (intersects.length > 0) {
+      console.log(`Clicked on ${intersects[0].object.name}!`);
       event.stopPropagation();
-      return;
     }
   }
 
-  function onMouseDown2(event) {
-    const mouse = updatePointer(event, renderer2.domElement);
+  // Setup scenes
+  const { scene: scene1, camera: camera1, renderer: renderer1, controls: controls1 } = setupScene("#2b2b2b", "/images/image1.jpg", "image1");
+  const { scene: scene2, camera: camera2, renderer: renderer2, controls: controls2 } = setupScene("#484848", "/images/image2.jpg", "image2");
 
-    const raycaster2 = new THREE.Raycaster();
-    raycaster2.setFromCamera(mouse, camera2);
-    const intersects2 = raycaster2.intersectObject(mesh2);
-
-    if (intersects2.length > 0) {
-      console.log('Image 2 clicked!', intersects2[0].object);
-      event.stopPropagation();
-      return;
-    }
-  }
-
-  renderer1.domElement.addEventListener('mousedown', onMouseDown1);
-  renderer2.domElement.addEventListener('mousedown', onMouseDown2);
-
-  window.addEventListener('resize', function () {
-    const width = window.innerWidth
-    const height = window.innerHeight
-    const aspect = width / height
-
-    camera1.aspect = aspect;
-    camera1.updateProjectionMatrix();
-
-    camera2.aspect = aspect;
-    camera2.updateProjectionMatrix();
-
-    renderer1.setSize(RENDER_WIDTH, RENDER_HEIGHT);
-    renderer2.setSize(RENDER_WIDTH, RENDER_HEIGHT);
+  // Resize event listener
+  window.addEventListener('resize', () => {
+    const width = window.innerWidth, height = window.innerHeight;
+    [camera1, camera2].forEach(camera => {
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    });
+    [renderer1, renderer2].forEach(renderer => renderer.setSize(width / 2, height / 2));
   });
 
+  // Animation loop
   function update() {
     if (!detachControls) {
       controls1.update();
@@ -164,11 +122,17 @@
 
     renderer1.render(scene1, camera1);
     renderer2.render(scene2, camera2);
-
     requestAnimationFrame(update);
   }
 
   update();
+
+  // Toggle button event listener
+  function toggleControlsDetachment() {
+    detachControls = !detachControls; // Simply toggle the flag
+  }
+
+  document.getElementById("toggleButton").addEventListener("click", toggleControlsDetachment);
 </script>
 </body>
 </html>
