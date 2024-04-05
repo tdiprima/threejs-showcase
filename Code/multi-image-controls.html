@@ -61,7 +61,7 @@
     const texture = new THREE.TextureLoader().load(imagePath);
     texture.colorSpace = THREE.SRGBColorSpace;
     const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-    const geometry = new THREE.PlaneGeometry(3, 2);
+    const geometry = new THREE.PlaneGeometry(4, 3);
     const mesh = new THREE.Mesh(geometry, material);
     mesh.name = imagePath.replace("/images/", ""); // clean path
     scene.add(mesh);
