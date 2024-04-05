@@ -105,13 +105,19 @@
 
   // Resize event listener
   window.addEventListener('resize', () => {
-    const width = window.innerWidth, height = window.innerHeight;
+    const width = window.innerWidth / 2; // Half the width for each renderer
+    const height = window.innerHeight / 2;
+
+    // Update each camera
     [camera1, camera2].forEach(camera => {
-      camera.aspect = width / height;
+      camera.aspect = width / height; // Adjust aspect ratio to match rendering area
       camera.updateProjectionMatrix();
     });
-    [renderer1, renderer2].forEach(renderer => renderer.setSize(width / 2, height / 2));
+
+    // Update each renderer to fill half the window each
+    [renderer1, renderer2].forEach(renderer => renderer.setSize(width, height));
   });
+
 
   // Animation loop
   function update() {
