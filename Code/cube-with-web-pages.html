@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>three.js css3d - youtube</title>
+  <title>Cube with HTML</title>
   <meta charset="utf-8">
   <meta content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" name="viewport">
   <link href="/css/main.css" rel="stylesheet" type="text/css">
@@ -34,28 +34,15 @@
   let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 500;
 
-  let renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0xffffff, 1);
-  document.getElementById('container').appendChild(renderer.domElement);
-
   let cssRenderer = new CSS3DRenderer();
   cssRenderer.setSize(window.innerWidth, window.innerHeight);
   cssRenderer.domElement.style.position = 'absolute';
   cssRenderer.domElement.style.top = 0;
   document.getElementById('container').appendChild(cssRenderer.domElement);
 
-  // Create the cube
-  let geometry = new THREE.BoxGeometry(200, 200, 200);
-  // let material = new THREE.MeshBasicMaterial({ color: 0x000000, wireframe: true });
-  let material = new THREE.MeshBasicMaterial({color: 0xdddddd});
-  let cube = new THREE.Mesh(geometry, material);
-  scene.add(cube);
-
   // Create HTML elements for each side of the cube
   let sides = [];
   // let urls = ['https://www.google.com', 'https://www.bing.com', 'https://www.yahoo.com', 'https://www.duckduckgo.com', 'https://www.bbc.com', 'https://www.cnn.com'];
-  // let urls = ['page1.html', 'page1.html', 'page1.html', 'page1.html', 'page1.html', 'page1.html'];
   let urls = ['page1.html', 'page2.html', 'page3.html', 'page4.html', 'page5.html', 'page6.html'];
 
   for (let i = 0; i < urls.length; i++) {
@@ -91,7 +78,6 @@
   // Render loop
   function animate() {
     requestAnimationFrame(animate);
-    renderer.render(scene, camera);
     cssRenderer.render(scene, camera);
     controls.update();
   }
@@ -102,7 +88,6 @@
   window.addEventListener('resize', function () {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
     cssRenderer.setSize(window.innerWidth, window.innerHeight);
   });
 </script>

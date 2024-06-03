@@ -2,17 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>page 1</title>
+  <style>
+    body {
+      background-color: #ffffff;
+    }
+  </style>
 </head>
 <body>
-  Hello World 1
-  <button id="page2">Go to Page 2</button>
+Hello World 1
+<button id="page2">Go to Page 2</button>
 
-  <script>
-    document.getElementById('page2').addEventListener('click', () => {
-      window.location.href = 'page2.html';
-    });
-  </script>
+<script>
+  document.getElementById('page2').addEventListener('click', () => {
+    window.location.href = 'page2.html';
+  });
+</script>
 </body>
 </html>
