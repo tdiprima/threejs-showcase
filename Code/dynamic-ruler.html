@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Three.js Measurement Tool</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+    let scene, camera, renderer, line, circle;
+    let isDrawing = false;
+    let startPoint = new THREE.Vector3();
+    let endPoint = new THREE.Vector3();
+
+    init();
+    animate();
+
+    function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.z = 5;
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Line material
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+
+        // Line geometry
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints([startPoint, startPoint]);
+        line = new THREE.Line(lineGeometry, lineMaterial);
+        scene.add(line);
+
+        // Circle material
+        const circleMaterial = new THREE.LineDashedMaterial({ color: 0xff0000, dashSize: 0.1, gapSize: 0.1 });
+
+        // Circle geometry
+        const circleGeometry = new THREE.BufferGeometry();
+        const points = [];
+        for (let i = 0; i <= 64; i++) {
+            const angle = (i / 64) * Math.PI * 2;
+            points.push(new THREE.Vector3(Math.cos(angle), Math.sin(angle), 0));
+        }
+        circleGeometry.setFromPoints(points);
+        circle = new THREE.LineLoop(circleGeometry, circleMaterial);
+        circle.computeLineDistances(); // Needed for dashed lines
+        scene.add(circle);
+
+        // Event listeners
+        renderer.domElement.addEventListener('mousedown', onMouseDown, false);
+        renderer.domElement.addEventListener('mousemove', onMouseMove, false);
+        renderer.domElement.addEventListener('mouseup', onMouseUp, false);
+    }
+
+    function onMouseDown(event) {
+        isDrawing = true;
+        startPoint = getMousePosition(event);
+        updateLineAndCircle();
+    }
+
+    function onMouseMove(event) {
+        if (!isDrawing) return;
+        endPoint = getMousePosition(event);
+        updateLineAndCircle();
+    }
+
+    function onMouseUp() {
+        isDrawing = false;
+        circle.visible = false; // Hide the circle when drawing stops
+    }
+
+    function getMousePosition(event) {
+        const rect = renderer.domElement.getBoundingClientRect();
+        const mouse = new THREE.Vector2(
+            ((event.clientX - rect.left) / rect.width) * 2 - 1,
+            -((event.clientY - rect.top) / rect.height) * 2 + 1
+        );
+
+        const vector = new THREE.Vector3(mouse.x, mouse.y, 0.5).unproject(camera);
+        vector.sub(camera.position).normalize();
+        const distance = -camera.position.z / vector.z;
+        return camera.position.clone().add(vector.multiplyScalar(distance));
+    }
+
+    function updateLineAndCircle() {
+        line.geometry.setFromPoints([startPoint, endPoint]);
+
+        const distance = startPoint.distanceTo(endPoint);
+        circle.scale.set(distance, distance, distance);
+        circle.position.copy(startPoint.clone().add(endPoint).multiplyScalar(0.5));
+        circle.visible = true;
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+</script>
+</body>
+</html>
