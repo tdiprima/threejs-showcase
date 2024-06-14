@@ -29,7 +29,7 @@
         document.body.appendChild(renderer.domElement);
 
         // Line material
-        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x00ff00 });
 
         // Line geometry
         const lineGeometry = new THREE.BufferGeometry().setFromPoints([startPoint, startPoint]);
@@ -37,7 +37,7 @@
         scene.add(line);
 
         // Circle material
-        const circleMaterial = new THREE.LineDashedMaterial({ color: 0xff0000, dashSize: 0.1, gapSize: 0.1 });
+        const circleMaterial = new THREE.LineDashedMaterial({ color: 0x00ff00, dashSize: 0.1, gapSize: 0.1 });
 
         // Circle geometry
         const circleGeometry = new THREE.BufferGeometry();
@@ -49,6 +49,7 @@
         circleGeometry.setFromPoints(points);
         circle = new THREE.LineLoop(circleGeometry, circleMaterial);
         circle.computeLineDistances(); // Needed for dashed lines
+        circle.visible = false;
         scene.add(circle);
 
         // Event listeners
@@ -59,6 +60,7 @@
 
     function onMouseDown(event) {
         isDrawing = true;
+        circle.visible = true;
         startPoint = getMousePosition(event);
         updateLineAndCircle();
     }
@@ -91,7 +93,7 @@
         line.geometry.setFromPoints([startPoint, endPoint]);
 
         const distance = startPoint.distanceTo(endPoint);
-        circle.scale.set(distance, distance, distance);
+        circle.scale.set(distance / 2, distance / 2, distance / 2);
         circle.position.copy(startPoint.clone().add(endPoint).multiplyScalar(0.5));
         circle.visible = true;
     }
