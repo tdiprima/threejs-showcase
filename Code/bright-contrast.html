@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Image Brightness and Contrast</title>
+    <style>
+        body { margin: 0; overflow: hidden; }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <label for="brightness">Brightness</label>
+        <input type="range" id="brightness" min="-1" max="1" step="0.01" value="0">
+        <br>
+        <label for="contrast">Contrast</label>
+        <input type="range" id="contrast" min="0" max="2" step="0.01" value="1">
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        let scene, camera, renderer, material;
+
+        init();
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 2;
+
+            renderer = new THREE.WebGLRenderer();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            const geometry = new THREE.PlaneGeometry(4, 4);
+            const texture = new THREE.TextureLoader().load('/images/image1.jpg', (texture) => {
+                material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        texture1: { value: texture },
+                        brightness: { value: 0.0 },
+                        contrast: { value: 1.0 }
+                    },
+                    vertexShader: `
+                        varying vec2 vUv;
+                        void main() {
+                            vUv = uv;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform sampler2D texture1;
+                        uniform float brightness;
+                        uniform float contrast;
+                        varying vec2 vUv;
+                        void main() {
+                            vec4 color = texture2D(texture1, vUv);
+                            color.rgb += brightness;
+                            if (contrast > 0.0) {
+                                color.rgb = (color.rgb - 0.5) / contrast + 0.5;
+                            } else {
+                                color.rgb = vec3(0.5);
+                            }
+                            gl_FragColor = color;
+                        }
+                    `
+                });
+
+                const mesh = new THREE.Mesh(geometry, material);
+                scene.add(mesh);
+
+                animate();
+            });
+
+            const brightnessSlider = document.getElementById('brightness');
+            const contrastSlider = document.getElementById('contrast');
+
+            brightnessSlider.addEventListener('input', (event) => {
+                material.uniforms.brightness.value = parseFloat(event.target.value);
+            });
+
+            contrastSlider.addEventListener('input', (event) => {
+                material.uniforms.contrast.value = parseFloat(event.target.value);
+            });
+
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+    </script>
+</body>
+</html>
