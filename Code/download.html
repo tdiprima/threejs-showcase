@@ -5,6 +5,7 @@
   <meta content="IE=edge" http-equiv="X-UA-Compatible">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>download image portion</title>
+  <!-- https://www.donmccurdy.com/2020/06/17/color-management-in-threejs/ -->
   <link href="/css/main.css" rel="stylesheet" type="text/css">
   <script src="/build/three.min.js"></script>
 </head>
@@ -17,13 +18,19 @@
 
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  // Output encoding controls how the final rendered image is adjusted before being displayed on your screen.
+  // You're telling three.js to apply gamma correction to the final image.
+  // This correction makes the colors look natural and consistent with how images are typically displayed on screens.
+  // Gamma is a way to adjust the brightness of an image so it looks natural and realistic to our eyes.
   renderer.outputEncoding = THREE.sRGBEncoding;
   document.body.appendChild(renderer.domElement);
 
   let planeGeom = new THREE.PlaneGeometry(4, 4);
   let tex = new THREE.TextureLoader().load("/images/grumpy-cat.jpg", (tex) => {
+    // You're telling three.js that the texture image is in the sRGB color space.
+    // This helps three.js correctly interpret the colors in the texture, making them appear as intended.
     // tex.encoding = THREE.sRGBEncoding;
-    tex.colorSpace = THREE.SRGBColorSpace
+    tex.colorSpace = THREE.SRGBColorSpace;
     tex.needsUpdate = true;
 
     const width = tex.image.width;
