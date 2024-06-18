@@ -17,11 +17,13 @@
 
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, preserveDrawingBuffer: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.outputEncoding = THREE.sRGBEncoding;
   document.body.appendChild(renderer.domElement);
 
   let planeGeom = new THREE.PlaneGeometry(4, 4);
   let tex = new THREE.TextureLoader().load("/images/grumpy-cat.jpg", (tex) => {
-    tex.encoding = THREE.sRGBEncoding;
+    // tex.encoding = THREE.sRGBEncoding;
+    tex.colorSpace = THREE.SRGBColorSpace
     tex.needsUpdate = true;
 
     const width = tex.image.width;
