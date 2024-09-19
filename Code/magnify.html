@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three.js Image Magnifier</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene, Camera, and Renderer Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Load Image Texture
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load('/images/play.jpg', function(texture) {
+            const geometry = new THREE.PlaneGeometry(10, 7);
+            const material = new THREE.MeshBasicMaterial({ map: texture });
+            const plane = new THREE.Mesh(geometry, material);
+            scene.add(plane);
+
+            // Main camera setup
+            camera.position.z = 7;
+
+            // Magnifier Camera Setup
+            const magnifierCamera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000); // Zoom camera
+            const magnifierScene = new THREE.Scene();
+            const magnifierPlane = new THREE.Mesh(geometry, material); // Same image
+            magnifierScene.add(magnifierPlane);
+
+            // Magnifier Viewport size and position
+            const magnifierWidth = 150;
+            const magnifierHeight = 150;
+            let magnifierPosition = { x: 0, y: 0 };
+
+            // Animation Loop
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Render the main scene
+                renderer.render(scene, camera);
+
+                // Render the magnifier box at mouse location
+                renderer.setViewport(magnifierPosition.x, magnifierPosition.y, magnifierWidth, magnifierHeight);
+                renderer.setScissor(magnifierPosition.x, magnifierPosition.y, magnifierWidth, magnifierHeight);
+                renderer.setScissorTest(true);
+                renderer.render(magnifierScene, magnifierCamera);
+
+                // Reset the full viewport after rendering magnifier
+                renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+                renderer.setScissorTest(false);
+            }
+            animate();
+
+            // Update the magnifier's camera position based on mouse movement
+            document.addEventListener('mousemove', (event) => {
+                // Convert mouse position to normalized device coordinates (-1 to 1)
+                const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+
+                // Convert to coordinates on the plane
+                const planePositionX = mouseX * 2.5;
+                const planePositionY = mouseY * 2.5;
+
+                // Move magnifier camera to follow the mouse
+                magnifierCamera.position.set(planePositionX, planePositionY, 1); // Magnifier zoom level
+
+                // Move magnifier box (UI overlay) to follow the mouse
+                magnifierPosition.x = event.clientX - magnifierWidth / 2;
+                magnifierPosition.y = window.innerHeight - event.clientY - magnifierHeight / 2;
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+            });
+        });
+    </script>
+</body>
+</html>
