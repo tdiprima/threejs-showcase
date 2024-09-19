@@ -10,7 +10,7 @@
     </style>
 </head>
 <body>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="/build/three.min.js"></script>
     <script>
         // Scene, Camera, and Renderer Setup
         const scene = new THREE.Scene();
@@ -21,11 +21,13 @@
 
         // Load Image Texture
         const textureLoader = new THREE.TextureLoader();
-        textureLoader.load('/images/play.jpg', function(texture) {
-            const geometry = new THREE.PlaneGeometry(10, 7);
+        textureLoader.load('/images/image1.jpg', function(texture) {
+            const geometry = new THREE.PlaneGeometry(10, 8);
             const material = new THREE.MeshBasicMaterial({ map: texture });
             const plane = new THREE.Mesh(geometry, material);
             scene.add(plane);
+
+            texture.colorSpace = THREE.SRGBColorSpace;
 
             // Main camera setup
             camera.position.z = 7;
@@ -37,8 +39,8 @@
             magnifierScene.add(magnifierPlane);
 
             // Magnifier Viewport size and position
-            const magnifierWidth = 150;
-            const magnifierHeight = 150;
+            const magnifierWidth = 256;
+            const magnifierHeight = 256;
             let magnifierPosition = { x: 0, y: 0 };
 
             // Animation Loop
