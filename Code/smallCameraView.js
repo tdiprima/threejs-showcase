@@ -4,6 +4,29 @@ export function addSmallCameraView(scene, mainCamera, renderer, controls) {
   // Create a smaller camera that mirrors the main camera
   const smallCamera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
+  // Variables to manage the small camera view state
+  let isMinimized = false;
+  const defaultSize = { width: window.innerWidth / 3, height: window.innerHeight / 3 }; // Normal size
+  const minimizedSize = { width: 50, height: 50 }; // Minimized size
+
+  // Function to get current size based on minimized state
+  function getCurrentSize() {
+    return isMinimized ? minimizedSize : defaultSize;
+  }
+
+  // Function to handle minify/maximize toggle on click
+  renderer.domElement.addEventListener('click', (event) => {
+    const mouseX = event.clientX;
+    const mouseY = window.innerHeight - event.clientY; // Flip Y since canvas Y starts at top
+
+    const { width, height } = getCurrentSize();
+
+    // Check if the click is within the small camera viewport
+    if (mouseX < width && mouseY < height) {
+      isMinimized = !isMinimized; // Toggle minimized state
+    }
+  });
+
   // Animation loop for rendering both views
   function animate() {
     requestAnimationFrame(animate);
@@ -19,11 +42,12 @@ export function addSmallCameraView(scene, mainCamera, renderer, controls) {
     smallCamera.rotation.copy(mainCamera.rotation);
     smallCamera.updateProjectionMatrix();
 
+    // Get current size of the small camera view
+    const { width, height } = getCurrentSize();
+
     // Render small camera view in the lower-left corner
-    const insetWidth = window.innerWidth / 3; // 1/3rd of the screen width
-    const insetHeight = window.innerHeight / 3; // 1/3rd of the screen height
-    renderer.setViewport(10, 10, insetWidth, insetHeight); // Bottom-left corner
-    renderer.setScissor(10, 10, insetWidth, insetHeight); // Define scissor area for the small view
+    renderer.setViewport(10, 10, width, height); // Adjusted based on current size
+    renderer.setScissor(10, 10, width, height); // Define scissor area for the small view
     renderer.setScissorTest(true); // Enable scissor test to limit rendering to the smaller viewport
     renderer.render(scene, smallCamera); // Render small camera
   }
